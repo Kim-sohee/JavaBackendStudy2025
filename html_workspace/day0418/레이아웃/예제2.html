@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrapper{
+            width: 1000px;
+            margin: auto;
+        }
+        #header, #footer{
+            height: 50px;
+            background-color: antiquewhite;
+        }
+        #content *{
+            height: 400px;
+            display:inline;
+        }
+        #aside{
+            width: 100px;
+            background-color: blue;
+        }
+        #section{
+            width: 900px;
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="header">헤더</div>
+        <div id="content">
+            <div id="aside">컨텐츠1</div>
+            <div id="section">컨텐츠2</div>
+        </div>
+        <div id="footer">푸터</div>
+    </div>
+</body>
+</html>

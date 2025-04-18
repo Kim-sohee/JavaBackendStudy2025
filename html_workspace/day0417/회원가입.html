@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 폼</title>
+
+    <!-- CSS 적용 -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- <style>
+        td{
+            font-size: 9px;
+            color: red;
+        }
+        input{
+            background-color: yellow;
+        }
+    </style> -->
+</head>
+<body>
+    <table width="500px" border="1px" align="center">
+        <tr>
+            <td colspan="2" align="center">회원가입</td>
+        </tr>
+        <tr>
+            <td>ID</td>
+            <td><input type="text" placeholder="아이디 입력"></td>
+        </tr>
+        <tr>
+            <td>PASSWORD</td>
+            <td><input type="password" placeholder="비밀번호 입력" maxlength="8"></td>
+        </tr>
+        <tr>
+            <td>이름</td>
+            <td><input type="text" placeholder="이름 입력"></td>
+        </tr>
+        <tr>
+            <td>이메일</td>
+            <td>
+                <input type="text" placeholder="메일 아이디입력">
+                <label>@</label>
+                <select>
+                    <option value="">naver</option>
+                    <option value="">google</option>
+                    <option value="">daum</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>이메일 수신 여부</td>
+            <td>
+                예 <input type="radio" name="receive">
+                아니오 <input type="radio" name="receive">
+            </td>
+        </tr>
+        <tr>
+            <td>보유기술</td>
+            <td>
+                Java<input type="checkbox">
+                MySQL<input type="checkbox">
+                Spring<input type="checkbox">
+                Linux<input type="checkbox">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center"><button>회원가입</button></td>
+        </tr>
+    </table>
+</body>
+</html>
