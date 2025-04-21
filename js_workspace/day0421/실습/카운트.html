@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        let count = 0;
+
+        function plus(){
+            count++;
+            console.log("누른 횟수: ", count);
+        }
+        function minus(){
+            count--;
+            console.log("누른 횟수: ", count);
+        }
+    </script>
+</head>
+<body>
+    <button id="prev" onclick="minus()">감소</button>
+    <button id="next" onclick="plus()">증가</button>
+</body>
+</html>
