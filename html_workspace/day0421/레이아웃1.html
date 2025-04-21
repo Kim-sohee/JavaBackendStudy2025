@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #container{
+            width: 600px;
+            height: 500px;
+            margin: auto;
+        }
+        #header{
+            background-color: antiquewhite;
+        }
+        #aside{
+            background-color: aquamarine;
+            float: left;
+            width: 100px;
+            height: 400px;
+        }
+        #content{
+            background-color: brown;
+            /*block요소를 float 시키면 서로 배척하는 성질이 사라짐.
+            주의- 인라인으로 변하는 것은 아님 -> width, height, marin, padding 전부 적용 가능*/
+            float: left; 
+            width: 500px;
+            height: 400px;
+        }
+        #footer{
+            background-color: yellowgreen;
+            height: 50px;
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="header">header</div>
+        <div id="aside">aside</div>
+        <div id="content">content</div>
+        <div id="footer">footer</div>
+    </div>
+</body>
+</html>
