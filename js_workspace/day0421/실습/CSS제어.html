@@ -29,7 +29,7 @@
             width: 300px;
             height: 350px;
             opacity: 1;   /* 투명 0~1 불투명 */
-            transform: rotate(-22deg);
+            transform: rotate(0deg);
         }
         img{
             width: 50px;
@@ -37,16 +37,47 @@
     </style>
     <script>
         //width의 크기를 높이기
-        let wariorWidth = 100;
-        function setWidth(){
+        let wariorWidth = 300;
+        function setWidthPlus(){
             document.querySelector("#pic").style.width = wariorWidth+"px";
-            wariorWidth += 100;
+            wariorWidth += 10;
+        }
+        function setWidthMinus(){
+            document.querySelector("#pic").style.width = wariorWidth+"px";
+            wariorWidth -= 10;
         }
 
+        //height의 크기를 높이기
+        let wariorHeight = 350;
+        function setHieightPlus(){
+            document.querySelector("#pic").style.height = wariorHeight+"px";
+            wariorHeight += 10;
+        }
+        function setHieightMinus(){
+            document.querySelector("#pic").style.height = wariorHeight+"px";
+            wariorHeight -= 10;
+        }
+
+        //투명도 조절하기
         let wariorOpercity=1;
-        function setOpacity(){
+        function setOpacityPlus(){
             document.querySelector("#pic").style.opacity = wariorOpercity;
             wariorOpercity += 0.1;
+        }
+        function setOpacityMinus(){
+            document.querySelector("#pic").style.opacity = wariorOpercity;
+            wariorOpercity -= 0.1;
+        }
+
+        //회전값 조절하기
+        let wariorDeg = 0;
+        function setRotatePlus(){
+            document.querySelector("#pic").style.transform = "rotate("+wariorDeg+"deg)";
+            wariorDeg += 10;
+        }
+        function setRotateMinus(){
+            document.querySelector("#pic").style.transform = "rotate("+wariorDeg+"deg)";
+            wariorDeg -= 10;
         }
     </script>
 </head>
@@ -55,23 +86,23 @@
         <div id="aside">
             <div>
                 너비 조절
-                <img src="../../../images/warior/plus_btn.png" alt="" onclick="setWidth()">
-                <img src="../../../images/warior/minus_btn.png" alt="">
+                <img src="../../../images/warior/plus_btn.png" alt="" onclick="setWidthPlus()">
+                <img src="../../../images/warior/minus_btn.png" alt="" onclick="setWidthMinus()">
             </div>
             <div>
                 높이 조절
-                <img src="../../../images/warior/plus_btn.png" alt="">
-                <img src="../../../images/warior/minus_btn.png" alt="">
+                <img src="../../../images/warior/plus_btn.png" alt="" onclick="setHieightPlus()">
+                <img src="../../../images/warior/minus_btn.png" alt="" onclick="setHieightMinus()">
             </div>
             <div>
                 투명도 조절
-                <img src="../../../images/warior/plus_btn.png" alt="" onclick="setOpacity()">
-                <img src="../../../images/warior/minus_btn.png" alt="">
+                <img src="../../../images/warior/plus_btn.png" alt="" onclick="setOpacityPlus()">
+                <img src="../../../images/warior/minus_btn.png" alt="" onclick="setOpacityMinus()">
             </div>
             <div>
                 각도 조절
-                <img src="../../../images/warior/plus_btn.png" alt="">
-                <img src="../../../images/warior/minus_btn.png" alt="">
+                <img src="../../../images/warior/plus_btn.png" alt="" onclick="setRotatePlus()">
+                <img src="../../../images/warior/minus_btn.png" alt="" onclick="setRotateMinus()">
             </div>
         </div>
         <div id="section">
