@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrapper{
+            width: 600px;
+            height: 600px;
+            background-color: yellow;
+            margin: auto;
+        }
+        #header{
+            height: 50px;
+            background-color: yellowgreen;
+            /* 컨텐츠에 대한 수평 중앙 정렬 */
+            text-align: center;
+            line-height: 50px;
+        }
+
+        #header button:nth-child(1){
+            background-color: rgb(211, 108, 108);
+            width: 80px;
+            height: 45px;
+            border-radius: 5px;
+        }
+        #header button:nth-child(2){
+            background-color: rgb(106, 106, 216);
+            width: 80px;
+            height: 45px;
+            border-radius: 5px;
+        }
+
+        #section{
+            height: 550px;
+            background-color: green;
+        }
+        img{
+            width: 100%;
+            height: 100%;
+        }
+        
+    </style>
+
+    <script>
+        let num = 1;
+        function next(){
+            num<9 ? num++: num=9;
+            document.querySelector("#pic").src = "../../../images/geographic/animal"+num+".jpg";
+        }
+        function prev(){
+            num>1 ? num--: num=1;
+            document.querySelector("#pic").src = "../../../images/geographic/animal"+num+".jpg";
+        }
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="header">
+            <button onclick="prev()">이전</button>
+            <button onclick="next()">다음</button>
+        </div>
+        <div id="section">
+            <img id="pic" src="../../../images/geographic/animal1.jpg" alt="">
+        </div>
+    </div>
+</body>
+</html>
