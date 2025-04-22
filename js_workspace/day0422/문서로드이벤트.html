@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function init(){
+            let box = document.getElementById("box");
+            box.innerText = "김소희";
+        }
+    </script>
+</head>
+<body onload="init()">
+    <div id="box"></div>
+    <button ondblclick="alert('더블 클릭이었다.')"
+        onmouseover="alert('마우스 올렸어?')"
+        onmouseout="alert('마우스 내려놨어?')">저를 클릭하세요.</button>
+
+    <select onchange="alert('다른것으로 바꿨어?')">
+        <!-- option 사이의 텍스트는 innerText이고 서버에 전송할 실제 데이터는 value 속성에 넣어야 한다. -->
+        <option value="google.com">google</option>
+        <option value="naver.com">naver</option>
+        <option value="daum.net">daum</option>
+    </select>
+    
+    <!-- 주의: onchange 이벤트 핸들러는 기존 값이 바뀌는 상황을 잡아내는 이벤트 핸들러이므로 select 박스에만 사용할 수 있는 것이 아님 -->
+    <input type="text" onchange="alert('다른 값을 넣었네?')">
+</body>
+</html>
