@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrapper{
+            width: 900px;
+            height: 600px;
+            margin: auto;
+        }
+        #aside{
+            width: 100px;
+            height: 100%;
+            float: left;
+            background-color: aquamarine;
+        }
+        #section{
+            width: 800px;
+            height: 100%;
+            float: left;
+            background-color: rgb(23, 134, 97);
+            /*자식 중에서 하나라도 absolute, relative가 적용되어 있으면
+            부모가 기준을 마련해야 하므로 absolute, relative로 지정해야 함.*/
+            position: relative;
+        }
+        #section img{
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+        }
+        #dark{
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            opacity: 0.8;
+        }
+        #aside img{
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+    <script>
+        let flag = false;
+        function onoff(){
+            let light = document.querySelector("#switch");  //switch
+            let room = document.querySelector("#dark");     //room
+
+            flag = !flag;   // switch toggle
+            
+            let imgPath = flag ? "../../images/light/switch_on.png" : "../../images/light/switch_off.png";
+            let dark = flag ? 0: 0.8;
+            
+            light.src = imgPath;
+            room.style.opacity = dark;
+        }
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="aside">
+            <img id="switch" src="../../images/light/switch_off.png" alt="" onclick="onoff()">
+        </div>
+        <div id="section">
+            <img src="../../images/light/room.jpg" alt="">
+            <div id="dark"></div>
+        </div>
+    </div>
+</body>
+</html>

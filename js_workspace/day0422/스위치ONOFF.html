@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script>
+        let state = false;
+        function onoff(){
+            let img = document.querySelector("img");
+            state = !state;
+            let ligth = state ? "on" : "off";
+            img.src = "../../images/light/switch_"+ligth+".png";
+        }
+    </script>
+</head>
+<body>
+    <img onclick="onoff()" src="../../images/light/switch_off.png" alt="">
+</body>
+</html>
