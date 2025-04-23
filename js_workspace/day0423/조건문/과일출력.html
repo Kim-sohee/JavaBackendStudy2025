@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function showInput(){
+            let n = prompt("과일 번호를 입력하세요.\n1.사과\n2.바나나\n3.딸기\n4.오렌지\n5.배");
+            let name = "";
+            let img = document.querySelector("img");
+            if(n == 1){
+                name = "apple";
+            }else if(n == 2){
+                name = "banana";
+            }else if(n == 3){
+                name = "berry"
+            }else if(n == 4){
+                name = "orange"
+            }else if(n == 5){
+                name = "pear"
+            }else{
+                alert("1~5번까지의 범위의 숫자를 입력하세요.");
+                name = "error";
+            }
+            img.src = "../../images/fruit/" + name + ".png";
+        }
+    </script>
+</head>
+<body>
+    <button onclick="showInput()">프롬프트 띄우기</button><br>
+    <img>
+</body>
+</html>

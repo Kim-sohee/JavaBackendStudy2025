@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #stage{
+            width: 1000px;
+            height: 576px;
+            background-image: url(../../images/plane/bg.jpg);
+            background-position: 0px 0px;   /*x축방향, y축방향*/
+            margin: auto;
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
+    <script>
+        // 배경, 비행기
+        let stage;
+        let img;
+        
+        // 배경 x축 값
+        let bgX = 0;
+
+        // 이미지 x, y축 값
+        let imgX = 300;
+        let imgY = 200;
+
+        //배경 제어
+        function bgEffect(){
+            //background-position의 x축 방향 값을 감소(left)시킴
+            //stage를 load와 동시에 전역변수에 저장해놓았음.
+            bgX -= 5;
+            stage.style.backgroundPosition = bgX +"px 0px";
+
+        }
+
+        function init(){
+            // js에서 동적으로 이미지 생성
+            img = document.createElement("img");
+            img.src = "../../images/plane/plane.png";
+            img.style.width = "50px";
+            img.style.position = "absolute";
+            img.style.left = imgX + "px";
+            img.style.top = imgY + "px";
+
+            // 생성된 이미지를 어느 부모 밑에 부착할지 결정
+            stage = document.getElementById("stage");
+            stage.appendChild(img);
+
+
+            //함수 호출하여 자동 배경 효과 구현
+            setInterval("bgEffect()", 100);
+        }
+
+        // 키보드로 비행기 이미지 위치 제어
+        function move(){
+            let key = event.keyCode;
+            let moveValue = 10; //이동 값
+
+            // if(key == 37){  //좌측키
+            //     imgX -= moveValue;
+            // }else if(key == 39){    //우측키
+            //     imgX += moveValue;
+            // }else if(key == 38){    //위축 키
+            //     imgY -= moveValue;
+            // }else if(key == 40){    //아래축 키
+            //     imgY += moveValue;
+            // }
+
+            switch(key){
+                case 37: imgX -= moveValue; break;
+                case 39: imgX += moveValue; break;
+                case 38: imgY -= moveValue; break;
+                case 40: imgY += moveValue; break;
+            }
+
+            img.style.left = imgX + "px";
+            img.style.top = imgY + "px";
+        }
+
+    </script>
+</head>
+<body onload="init()" onkeydown="move()">
+    <div id="stage"></div>
+</body>
+</html>
