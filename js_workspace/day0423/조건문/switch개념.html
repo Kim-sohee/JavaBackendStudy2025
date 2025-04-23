@@ -1,0 +1,22 @@
+<script>
+    let bd = prompt("혈액형 입력하기");
+    // break는 else~if의 else 역할이다.
+    // switch문이 else~if문을 완전히 대체할 수 없다. 
+    // -> case에 올 수 있는 코드는 문자,숫자,논리값 같은 상수만 올 수 있다.
+    switch(bd){
+        case "A":
+            document.write("세심한");
+            break;
+        case "B":
+            document.write("고집스러운");
+            break;
+        case "O":
+            document.write("엉뚱한");
+            break;
+        case "AB":
+            document.write("사교적인");
+            break;
+        default:
+            document.write("혈액형 타입이 아님");
+    }
+</script>

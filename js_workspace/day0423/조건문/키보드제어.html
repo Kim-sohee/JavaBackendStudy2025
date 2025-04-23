@@ -59,14 +59,21 @@
             let key = event.keyCode;
             let moveValue = 10; //이동 값
 
-            if(key == 37){  //좌측키
-                imgX -= moveValue;
-            }else if(key == 39){    //우측키
-                imgX += moveValue;
-            }else if(key == 38){    //위축 키
-                imgY -= moveValue;
-            }else if(key == 40){    //아래축 키
-                imgY += moveValue;
+            // if(key == 37){  //좌측키
+            //     imgX -= moveValue;
+            // }else if(key == 39){    //우측키
+            //     imgX += moveValue;
+            // }else if(key == 38){    //위축 키
+            //     imgY -= moveValue;
+            // }else if(key == 40){    //아래축 키
+            //     imgY += moveValue;
+            // }
+
+            switch(key){
+                case 37: imgX -= moveValue; break;
+                case 39: imgX += moveValue; break;
+                case 38: imgY -= moveValue; break;
+                case 40: imgY += moveValue; break;
             }
 
             img.style.left = imgX + "px";

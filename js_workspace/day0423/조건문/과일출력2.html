@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function showInput(){
+            //prompt는 사용자의 문자열 입력을 염두에 둔 메시지창
+            //입력을 숫자로 넣어도 내부적으로 문자로 이해
+            let n = prompt("과일 번호를 입력하세요.\n1.사과\n2.바나나\n3.딸기\n4.오렌지\n5.배");
+            let name;
+            let img = document.querySelector("img");
+
+            switch(parseInt(n)){
+                case 1: name="apple"; break;
+                case 2: name="banana"; break;
+                case 3: name="berry"; break;
+                case 4: name="orange"; break;
+                case 5: name="pear"; break;
+                default: alert("번호에 있는 것만 선택하세요.");
+                
+            }
+            img.src = "../../images/fruit/" + name + ".png";
+        }
+    </script>
+</head>
+<body>
+    <button onclick="showInput()">프롬프트 띄우기</button><br>
+    <img>
+</body>
+</html>

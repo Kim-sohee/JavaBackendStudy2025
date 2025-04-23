@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script>
+    function setImg(object){
+        let select = object.value;
+        img = document.getElementById("img");
+        img.style.width = "100px";  
+
+        let imgpath = "";
+        if(select == "apple"){
+            imgpath = "../../images/fruit/apple.png";
+        }else if(select == "banana"){
+            imgpath = "../../images/fruit/banana.png";
+        }
+        else if(select == "berry"){
+            imgpath = "../../images/fruit/berry.png";
+        }
+        else if(select == "orange"){
+            imgpath = "../../images/fruit/orange.png";
+        }
+        else if(select == "pear"){
+            imgpath = "../../images/fruit/pear.png";
+        }
+        
+        img.src = imgpath;
+    }
+</script>
+<body>
+    <div id="stage">
+        <select id="fruit" onchange="setImg(this)">
+            <option value="apple">사과</option>
+            <option value="banana">바나나</option>
+            <option value="berry">딸기</option>
+            <option value="orange">오렌지</option>
+            <option value="pear">배</option>
+        </select><br>
+        <img id="img" src="" alt="">
+    </div>
+</body>
+</html>
