@@ -1,0 +1,16 @@
+<script>
+    let bd = prompt("본인의 혈액형을 입력하세요.");
+    let msg = "";
+    if(bd == "A"){
+        msg = "세심하다"; // A형
+    }else if(bd == "B"){
+        msg = "고집이 세다"; // B형
+    }else if(bd == "O"){
+        msg = "오지랖쟁이"; // O형
+    }else if(bd == "AB"){
+        msg = "결정장애"; // AB형
+    }else{
+        msg = "존재하지 않는 혈액형입니다.";
+    }
+    document.write(msg);
+</script>
