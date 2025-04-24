@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrapper{
+            width: 700px;
+            height: 600px;
+            margin: auto;
+            background-color: silver;
+        }
+        #header{
+            width: 100%;
+            height: 80px;
+            background-color: gray;
+        }
+        #header div{
+            width: 100px;
+            height: 100%;
+            float: left;
+        }
+        #content{
+            width: 100%;
+            height: 520px;
+            background-color: rgb(190, 190, 190);
+        }
+        #header div:nth-child(1){background-color: red;}
+        #header div:nth-child(2){background-color: orange;}
+        #header div:nth-child(3){background-color: yellow;}
+        #header div:nth-child(4){background-color: green;}
+        #header div:nth-child(5){background-color: blue;}
+        #header div:nth-child(6){background-color: navy;}
+        #header div:nth-child(7){background-color: purple;}
+    </style>
+    <script>
+        function setColor(c){
+            let content = document.getElementById("content");
+            content.style.background = c;
+        }
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="header">
+            <div onclick="setColor('red')">빨</div>
+            <div onclick="setColor('orange')">주</div>
+            <div onclick="setColor('yellow')">노</div>
+            <div onclick="setColor('green')">초</div>
+            <div onclick="setColor('blue')">파</div>
+            <div onclick="setColor('navy')">남</div>
+            <div onclick="setColor('purple')">보</div>
+        </div>
+        <div id="content"></div>
+    </div>
+</body>
+</html>
