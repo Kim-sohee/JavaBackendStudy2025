@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #stage{
+            width: 1000px;
+            height: 800px;
+            margin: auto;
+            background-image: url(../../images/gallerxy/bg.png);
+            position: relative;
+        }
+    </style>
+    <script>
+        //stage의 background-position의 y값 증가
+        let bgY = 0;
+        function bgEffect(){
+            let stage = document.getElementById("stage");
+            bgY += 2;
+            stage.style.backgroundPosition = `0px ${bgY}px`;
+        }
+        
+        function createEnemy(){
+            let img;
+            for(let j=1; j<=5; j++){
+                for(let i=1; i<=20; i++){
+                
+                    //이미지 생성
+                    img = document.createElement("img");
+                    img.src = "../../images/gallerxy/enemy2.png";
+                    img.style.position = "absolute";
+                    
+                    img.style.left = 150 + (i*30) + "px";
+                    img.style.top = 150 + (j*30)+"px"; 
+
+                    //이미지 부착
+                    let stage = document.getElementById("stage");
+                    stage.appendChild(img);
+                }
+            }
+        }
+
+        function init(){
+            //적군 생성
+            createEnemy();
+
+            //타이머 함수 호출
+            setInterval("bgEffect()", 50);
+        }
+    </script>
+</head>
+<body onload="init()">
+    <div id="stage"></div>
+</body>
+</html>
