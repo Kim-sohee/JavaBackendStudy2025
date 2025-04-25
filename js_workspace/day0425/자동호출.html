@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        //setInterval("함수", 호출시간간격) -> 지정한 함수를 지정된 간격으로 무한호출
+        //setTimeout("함수", 호출시간간격) -> 지정한 함수를 지정된 시간이 흐른 후 호출
+
+        function test(){
+            console.log("나 불렀어?");
+            setTimeout("test()", 200);
+        }
+
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

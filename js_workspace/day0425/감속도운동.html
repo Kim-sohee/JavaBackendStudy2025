@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <!-- 감속운동 구현하는 법
+    내 위치 = 현재 나의 위치 + a*(목표지점 - 나의 위치)
+    x = x + a*(taget - x) -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        let div;
+        let a=0.1; //비율계수(기울기), 숫자가 높을수록 투박함
+        let targetX = 800;  //목표지점
+
+
+        //물체 움직임
+        function move(){
+            //나의 위치 = 기존나의위치 + a * (목표지점-나의위치)
+            //남은 거리의 정해진 비율로 증가
+            div.style.left = parseInt(div.style.left) + a*(targetX - parseInt(div.style.left))+"px";
+            setTimeout("move()", 30);
+        }
+
+        //물체 생성
+        function createRect(){
+            div = document.createElement("div");
+            div.style.background = "red";
+            div.style.width = "50px";
+            div.style.height = "50px";
+
+            div.style.position = "absolute";
+            div.style.left = "0px";
+            div.style.top = "100px";
+
+            document.body.appendChild(div);
+        }
+
+        //프로그램 가동과 동시에 물체 생성
+        addEventListener("load", function(){
+            createRect();
+        });
+        
+    </script>
+</head>
+<body>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #box{
+            width: 50px;
+            height: 50px;
+            background-color: red;
+            border-radius: 50%;
+            position: absolute;
+            left: 0px;
+            top: 150px;
+        }
+    </style>
+    <script>
+        let loc=0;
+        let flag=true;
+        let btnFlag=false;
+
+        //도형의 position 값 변경
+        function move(){
+            let box = document.getElementById("box");
+            if(loc<0 || loc>700){
+                flag = !flag;
+            }
+            flag ? loc+=10: loc-=10;
+            box.style.left = loc+"px";
+        }
+
+        //로드될 때
+        addEventListener("load", function(){
+            let manual = document.querySelector("input:nth-child(1)");
+            manual.addEventListener("click", function(){
+                move();
+            });
+
+            let interval;
+            let auto = document.querySelector("input:nth-child(2)");
+            auto.addEventListener("click", function(){
+                btnFlag = !btnFlag;
+                if(btnFlag){
+                    this.value="멈춤"
+                    interval = setInterval("move()", 10);
+                }else{
+                    this.value="자동"
+                    clearInterval(interval);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <input type="button" value="수동">
+    <input type="button" value="자동">
+    <div id="box"></div>
+</body>
+</html>
