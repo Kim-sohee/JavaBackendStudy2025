@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        //선언문에 의한 함수는 재사용을 염두에 둔 코드 방식
+        // function test(){}
+
+        //재사용 함수는 사용자의 이벤트 없이는 의미가 없는 함수이므로
+        //이벤트를 처리하는 함수는 보통 익명함수로 처리한다.
+        addEventListener("mousemove", function(){
+            //모든 이벤트는 event 객체가 알고 있다.
+            let x = event.clientX;  //마우스의 X 좌표
+            let y = event.clientY;  //마우스의 Y 좌표
+
+            console.log(`x좌표=${x}, y좌표=${y}`);
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>
