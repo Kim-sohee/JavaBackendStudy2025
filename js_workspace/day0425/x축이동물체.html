@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #box{
+            width: 50px;
+            height: 50px;
+            background-color: rebeccapurple;
+            border-radius: 50%;
+            position: absolute;
+            left: 0px;
+            top: 150px;
+        }
+    </style>
+    <script>
+        //도형의 position left 값을 증가시킨다.
+        let num=0;
+        function move(){
+            let box = document.getElementById("box");
+            num+=10;
+            box.style.left = num+"px";
+        }
+
+        addEventListener("load", function(){
+            // document.querySelector("input:nth-child(1)");
+            let m = document.querySelector("#manual");
+            m.addEventListener("click", function(){
+                move();
+            });
+
+            let a = document.querySelector("#auto");
+            a.addEventListener("click", function(){
+                setInterval("move()", 100);
+            });
+        });
+    </script>
+</head>
+<body>
+    <input type="button" value="수동" id="manual">
+    <input type="button" value="자동" id="auto">
+    <div id="box"></div>
+</body>
+</html>
