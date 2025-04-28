@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            margin:0px;
+        }
+        #wrapper{
+            width: 100%;
+            height: 600px;
+            background-color: rgb(255, 255, 162);
+            position: relative;
+        }
+    </style>
+    <script>
+        let cat;
+        let a = 0.1;    //비율계수
+        let targetX;
+        let targetY;
+
+        function createPic(){
+            cat = document.createElement("img");
+            cat.src = "../../images/cat.png";
+            cat.style.width = 60+"px";
+
+            cat.style.position = "absolute";
+            cat.style.left = 200 +"px";
+            cat.style.top = 150 +"px";
+
+            document.getElementById("wrapper").appendChild(cat);
+        }
+
+        //목표 지점에 부드럽게 다가가는 감속도 운동 구현
+        function move(){
+            //나의 위치 = 현재 위치 + 비율계수 * (남은 거리)
+            //                                남은 거리 = 목표지점 - 현재 위치
+            cat.style.left = parseFloat(cat.style.left) + a*(targetX - parseFloat(cat.style.left))+"px";
+            cat.style.top = parseFloat(cat.style.top) + a*(targetY - parseFloat(cat.style.top))+"px";;
+        }
+
+        function gameLoop(){
+            move();
+        }
+
+        addEventListener("load", function(){
+            createPic();
+
+            //마우스 이벤트 연결하기
+            document.getElementById("wrapper")
+                    .addEventListener("mousedown", function(){
+                
+                targetX = event.clientX;
+                targetY = event.clientY;
+            
+            });
+
+            setInterval("gameLoop()", 10);
+        });
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        
+    </div>
+</body>
+</html>

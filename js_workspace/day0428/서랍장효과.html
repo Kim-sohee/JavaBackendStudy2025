@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            margin: 0px;
+        }
+        #rect{
+            height: 150px;
+            background-color: navy;
+            position: relative;
+            left: -5px;
+            border-radius: 5px;
+        }
+    </style>
+    <script>
+        let rect;
+        let targetW = 35;  //목표 너비
+        let a = 0.1;    //비율 계수
+
+        //초기화 함수
+        function init(){
+            rect = document.getElementById("rect");
+            rect.style.width = targetW + "px";
+        }
+
+        function gameLoop(){
+            //길이를 조절하는 함수를 끝없이 호출
+            setLength();
+        }
+
+        //움직이기 함수
+        function setLength(){
+            //감속도 공식은 물리적 크기, 위치 등 모두 적용 가능
+            //나의너비 = 현재 너비 + 비율계수*(목표너비 - 현재의 너비)
+            rect.style.width = parseFloat(rect.style.width) + a * (targetW - parseFloat(rect.style.width)) + "px";
+        }
+
+        //로드 될 때
+        addEventListener("load", function(){
+            init();
+
+            //마우스 올리기
+            rect.addEventListener("mouseover", function(){
+                targetW = 350;
+            });
+            //마우스 내리기
+            rect.addEventListener("mouseout", function(){
+                targetW = 35;
+            });
+
+            setInterval("gameLoop()", 10);
+        });
+    </script>
+</head>
+<body>
+    <div id="rect"></div>
+</body>
+</html>
