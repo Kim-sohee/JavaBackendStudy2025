@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            margin:0px;
+        }
+        #wrapper{
+            width: 100%;
+            height: 600px;
+            background-color: antiquewhite;
+            position: relative;
+        }
+    </style>
+    <script src="../lib/common.js"></script>
+    <script>
+        let cat;
+        let wp;
+        let a=0.1;
+        let targetX = 100, targetY = 200;
+        let count = 0;
+
+        let bar;
+        let barX= 50;
+
+        function init(){
+            cat = document.createElement("img");
+            cat.src = "../../images/cat.png";
+            cat.style.width = 60 + "px";
+
+            cat.style.position = "absolute";
+            cat.style.left = targetX + "px";
+            cat.style.top = targetY + "px";
+
+            bar = document.createElement("div");
+            bar.style.backgroundColor="navy";
+            bar.style.width = barX + "px";
+            bar.style.height = 100 + "px";
+            bar.style.borderRadius = "5px"
+            bar.style.textAlign = "right";
+            bar.innerText = "♣"
+            bar.style.color = "white"
+            
+            bar.style.position = "absolute";
+            bar.style.left = -10 + "px";
+
+            wp = document.getElementById("wrapper");
+            wp.appendChild(cat);
+            wp.appendChild(bar);
+        }
+
+        function move(){
+            cat.style.left = parseFloat(cat.style.left) + a*(targetX - parseFloat(cat.style.left))+"px";
+            cat.style.top = parseFloat(cat.style.top) + a*(targetY - parseFloat(cat.style.top))+"px";
+        }
+
+        function autoPos(){
+            count++
+            if(count%100==0){
+                targetX = getRandom(1000);
+                targetY = getRandom(600);
+            }
+        }
+
+        function barMove(){
+            bar.style.width = parseFloat(bar.style.width) + a*(barX - parseFloat(bar.style.width))+"px";
+        }
+
+        function gameLoop(){
+            move();
+            autoPos();
+            barMove();
+        }
+
+
+        window.addEventListener("load", ()=>{
+            init();
+
+            wp.addEventListener("mousedown", ()=>{
+                targetX = event.clientX;
+                targetY = event.clientY;
+            });
+
+            bar.addEventListener("mouseover", ()=>{
+                barX = 500;
+            });
+            bar.addEventListener("mouseout", ()=>{
+                barX = 50;
+            });
+
+            setInterval("gameLoop()", 10);
+
+        });
+
+    </script>
+</head>
+<body>
+    <div id="wrapper"></div>
+</body>
+</html>
