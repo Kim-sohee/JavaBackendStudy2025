@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #stage{
+            width: 700px;
+            height: 400px;
+            background-color: yellow;
+            position: relative;
+        }
+    </style>
+    <script>
+        let circle;
+        let x = 0;
+        let flag=true;
+        let autoFlag=false;
+
+        //물체 생성 함수
+        function createCircle(){
+            circle = document.createElement("div");
+            circle.style.width="50px";
+            circle.style.height="50px";
+            circle.style.background = "red";
+            circle.style.borderRadius = "50%";
+
+            circle.style.position = "absolute";
+            circle.style.left = "0px";
+            circle.style.top = "100px";
+
+            let stage = document.getElementById("stage");
+            stage.appendChild(circle);
+        }
+
+        //생성한 물체의 움직임 처리
+        function move(){
+            flag ? x+=5 : x-=5;
+            circle.style.left = x+"px";
+            if(x<0 || x>650) flag = !flag;    //방향 전환
+        }
+
+        //자동 처리 함수
+        function auto(){
+            if(autoFlag) move();
+        }
+
+        //자바스크립트 언어는 2가지 플랫폼으로 개발 가능
+        //1) 브라우저 기반 - 최상위 객체는 window(=브라우저)
+        //2) Node.js 기반 - 최상위 객체는 global
+        window.addEventListener("load", function(){
+            //물체 만들기
+            createCircle();
+
+            //각 버튼들의 이벤트 연결하기
+            document.querySelector("button:nth-child(1)")
+                    .addEventListener("click", function(){
+                //수동 버튼 클릭 시 아래 내용 실행
+                move();
+            });
+            document.querySelector("button:nth-child(2)")
+                    .addEventListener("click", function(){
+                //자동 버튼 클릭 시 아래 내용 실행
+                autoFlag = true;
+            });
+            document.querySelector("button:nth-child(3)")
+                    .addEventListener("click", function(){
+                //멈춤 버튼 클릭 시 아래 내용 실행
+                autoFlag = false;
+            });
+
+            //멈추지 않는 루프를 실행,
+            // setTimeout()은 지정된 시간이 흐르고 나서 함수를 호출한 다음에 자동 소멸
+            // setInterval()은 지정된 시간 간격으로 끝없이 지정된 함수를 호출하는 루프
+            setInterval("auto()", 10);
+        });
+    </script>
+</head>
+<body>
+    <button>Manual</button>
+    <button>Auto</button>
+    <button>Pause</button>
+    <div id="stage"></div>
+</body>
+</html>

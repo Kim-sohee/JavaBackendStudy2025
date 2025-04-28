@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            margin: 0px;
+        }
+        #wrapper{
+            width: 100%;
+            height: 900px;
+            background-image: url(../../images/badi/night.jpg);
+            background-size: 100% 100%;
+            position: relative;
+        }
+    </style>
+    <script src="../lib/common.js"></script>
+    <script>
+        let bug;
+        let a = 0.1;
+        let targetX = 100, targetY = 100;
+        let count = 0;   //반딧불의 위치를 언제 바꿀지를 결정짓는 변수
+
+        function init(){
+            bug = document.createElement("img");
+            bug.src = "../../images/badi/bug.png";
+            bug.style.width = 40 + "px";
+
+            bug.style.position = "absolute";
+            bug.style.left = targetX + "px";
+            bug.style.top = targetY + "px";
+
+            document.getElementById("wrapper").append(bug);
+        }
+
+        function move(){
+            bug.style.left = parseFloat(bug.style.left) + a * (targetX - parseFloat(bug.style.left))+"px";
+            bug.style.top = parseFloat(bug.style.top) + a * (targetY - parseFloat(bug.style.top))+"px";
+        }
+
+        function setPos(){
+            targetX = getRandom(11)*100;
+            targetY = getRandom(10)*100;
+        }
+
+        //loop
+        function gameLoop(){
+            count++;
+            if(count % 70 == 0) setPos();
+            move();
+        }
+
+        window.addEventListener("load", function(){
+            init();
+
+            let wrapper = document.getElementById("wrapper");
+            wrapper.addEventListener("mousedown", function(){
+                targetX = event.clientX;
+                targetY = event.clientY;
+            });
+            setInterval("gameLoop()", 50);
+        });
+    </script>
+</head>
+<body>
+    <div id="wrapper"></div>
+</body>
+</html>
