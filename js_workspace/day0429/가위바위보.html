@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../lib/common.js"></script>
+    <script>
+        let imgArray = new Array(3);    //메모리에 붙어 있는 빈 상자 3개 생성
+        imgArray[0] = "가위.png";
+        imgArray[1] = "바위.png";
+        imgArray[2] = "보.png";
+
+
+        function gawi(){
+            let img = document.querySelector("img");
+            img.src = "../../images/가위바위보/"+imgArray[getRandom(imgArray.length-1)];    //랜덤 값 적용
+        }
+
+        // 문서가 로드될 때
+        window.addEventListener("load", function(){
+            document.querySelector("button").addEventListener("click",()=>{
+                gawi();
+            });
+        });
+    </script>
+</head>
+<body>
+    <button>가위바위보 실행</button>
+    <p>
+    <img>
+</body>
+</html>

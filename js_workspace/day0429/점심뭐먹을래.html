@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../lib/common.js"></script>
+    <script>
+        let food = ["부대찌개", "짜장면", "쌀국수", "샐러드", "국밥", "김치찌개", 
+                    "생선조림", "냉면", "치킨", "족발", "토스트"];
+
+        function lunch(){
+            let div = document.querySelector("div");
+            div.style.fontSize = 80 + "px";
+            div.style.font = "bold";
+
+            div.innerText = food[getRandom(food.length-1)];
+        }
+
+        addEventListener("load", function(){
+            document.querySelector("button").addEventListener("click", function(){
+                lunch();
+            });
+        });
+    </script>
+</head>
+<body>
+    <button>메뉴 추천</button>
+    <p>
+    <div></div>
+</body>
+</html>
