@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>단어게임</title>
+    <style>
+        #wrapper{
+            width: 400px;
+            height: 550px;
+            background-color: antiquewhite;
+            margin: auto;
+        }
+        #content{
+            width: 100%;
+            height: 250px;
+            background-color: rgb(135, 239, 243);
+            text-align: center;
+            font-size: 100px;
+            font-weight: bold;
+            line-height: 250px;
+        }
+        #input_area{
+            width: 100%;
+            height: 80px;
+            background-color: rgb(106, 202, 206);
+            text-align: center;
+        }
+        #input_area input{
+            width: 97%;
+            height: 97%;
+            border-radius: 10px;
+            border: 0px;
+            font-size: 70px;
+        }
+        #feedback{
+            width: 100%;
+            height: 150px;
+            background-color: rgb(56, 109, 110);
+            font-size: 90px;
+            text-align: center;
+            font-weight: bold;
+            color: red;
+        }
+        #score{
+            width: 100%;
+            height: 70px;
+            background-color: rgb(28, 63, 65);
+            text-align: center;
+            color: white;
+            font-size: 35px;
+            line-height: 70px;
+        }
+    </style>
+    <script>
+        let wordArr = ["바다", "갤러리", "사과", "미끄럼틀", "병원",
+                       "우주선", "저녁", "네팔", "핫도그", "대한민국"];
+
+        let content;
+        let input;
+        let feedback;
+        let score;
+        let n = 0;
+        let total = 0;
+
+        // 게임에 사용할 단어를 출력하는 함수
+        function printWord(){
+            if(n<wordArr.length){
+                content.innerText = wordArr[n];
+            }else{
+                content.innerText = "게임 종료";
+            }
+        }
+
+        function next(){
+            n++;
+            printWord();
+        }
+
+        // 초기화 함수
+        function init(){
+            content = document.getElementById("content");
+            input = document.querySelector("#input_area input");
+            feedback = document.getElementById("feedback");
+            score = document.getElementById("score");
+
+            //텍스트 박스에 키 이벤트 연결
+            input.addEventListener("keyup", function(e){
+                //Enter키 눌렀을 때 (Enter키의 아스키코드는 13번)
+                if(e.keyCode == 13){
+
+                    //일치할 때만 코드가 수행
+                    if(content.innerText == input.value){
+                        feedback.innerText = "O";
+                        total += 10;
+                    }else{
+                        feedback.innerText = "X";
+                    }
+                    next();
+                    input.value="";
+                    
+                }
+            });
+
+            printWord();
+        }
+        
+        function gameLoop(){
+            score.innerText = "Total: " + total;
+        }
+
+        //문서 로드 시 호출
+        addEventListener("load", function(){
+            init();
+            setInterval("gameLoop()", 10);
+        });
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="content"></div>
+        <div id="input_area">
+            <input type="text">
+        </div>
+        <div id="feedback"></div>
+        <div id="score"></div>
+    </div>
+</body>
+</html>
