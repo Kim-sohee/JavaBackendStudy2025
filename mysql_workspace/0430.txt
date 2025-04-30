@@ -1,0 +1,56 @@
+SQL> --현재 유저가 보유한 테이블을 보고 싶은 경우
+SQL> --mysql은 show tables 명령이지만, oracle은 복잡하다
+SQL> --오라클은 시스템의 정보를 얻기 위해서는 사전이라 불리는 dictionary를 조회할 줄 알아야 한다.
+SQL> --수백여개의 딕셔너리를 개발자가 암기해야 하나? -> NO!
+SQL> --딕셔너리의 명명 규칙이 있다.
+SQL> --현재 접속한 사용자 계정이 일반 계정인 경우 접두어가 user_로 시작한다.
+SQL> --현재 접속한 계정이 관리자인 경우 sys, system등 인경우 dba_로 시작(또는 v$_접두어로 시작)
+SQL> select table_name from user_tables;
+
+TABLE_NAME                                                                      
+------------------------------------------------------------                    
+MEMBERSHIP                                                                      
+MEMBER                                                                          
+
+SQL> --ddl 중 제거하는 명령어는 drop이다.
+SQL> DROP TABLE MEMBERSHIP;
+
+Table dropped.
+
+SQL> DROP TABLE MEMBER;
+
+Table dropped.
+
+SQL> --앞으로 테이블 만들경우 까다롭게 컬럼에 제한을 가하자.
+SQL> --제약조건을 부여하자
+SQL> --레코드는 유일한 것만 받아들이겠다 UNIQUE
+SQL> --NULL을 허용하지 않겠다. NOT NULL
+SQL> --지정된 값만 허용 CHECK
+SQL> --아무런 값을 넣지 않으면 기본으로 값을 자동 지정하겠다. DEFAULT
+SQL> --위의 모든 제약 조건을 부여하여 테이블 생성
+SQL> CREATE TABLE MEMBER(
+  2  ID VARCHAR2(20) UNIQUE
+  3  , NAME VARCHAR2(30) NOT NULL
+  4  , GENDER VARCHAR2(6)
+  5  , REGDATE DATE DEFAULT SYSDATE
+  6  , CONSTRAINT CHK_MEMBER CHECK (GENDER='남' OR GENDER='여')
+  7  );
+
+Table created.
+
+SQL> --제약조건이 동작하는지 테스트하자
+SQL> INSERT INTO MEMBER(ID, GENDER) VALUES('ADAMS', '남');
+INSERT INTO MEMBER(ID, GENDER) VALUES('ADAMS', '남')
+*
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("JS"."MEMBER"."NAME") 
+
+
+SQL> INSERT INTO MEMBER(ID,NAME,GENDER) VALUES('ADAMS','A', '너');
+INSERT INTO MEMBER(ID,NAME,GENDER) VALUES('ADAMS','A', '너')
+*
+ERROR at line 1:
+ORA-02290: check constraint (JS.CHK_MEMBER) violated 
+
+
+SQL> SPOOL OFF
