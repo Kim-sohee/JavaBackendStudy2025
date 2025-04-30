@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            margin: "auto";
+        }
+        #wrapper{
+            width: 100%;
+            height: 800px;
+        }
+        #content{
+            width: 90%;
+            height: 100%;
+            background-image: url(../../images/rollercoster/bg2.png);
+            background-size: 100% 800px;
+            float: left;
+            position: relative;
+        }
+        #aside{
+            width: 10%;
+            height: 100%;
+            background-color: antiquewhite;
+            float: left;
+            overflow: scroll;
+        }
+        #wrapper button{
+            width: 100%;
+        }
+    </style>
+    <script>
+        let content;
+        let aside;
+
+        let img;
+        let index=0;
+        let posArray = [];  //위치 정보를 저장할 배열
+        let flag = false;
+
+        //주인공 생성하여 content에 부착
+        function createHero(){
+            img = document.createElement("img");
+            img.src = "../../images/rollercoster/user.png";
+            img.style.width = 50 + "px";
+            img.style.position = "absolute";
+            img.style.left = 30 + "px";
+            img.style.top = 200 + "px";
+
+            //방향 전환
+            img.style.transform = "scaleX(-1)"; //x축 방향 flip
+
+            content.appendChild(img);
+        }
+
+        //span 태그를 생성하여 점으로 표현하고 content에 부착
+        function createDot(x, y){
+            let span = document.createElement("span");
+            span.style.background = "red";
+            span.style.borderRadius = "50%";
+            span.style.display = "inline-block";    //공존 능력 + block질량 가능
+            span.style.width = 3 + "px";
+            span.style.height = 3 + "px";
+
+            span.style.position = "absolute";
+            span.style.left = x + "px";
+            span.style.top = y + "px";
+            content.appendChild(span);
+
+            aside.innerText += `x: ${x}, y:${y}\n`;
+        }
+
+        //이차원 배열은 곧 메모리상의 데이터베이스와 같다.
+        //개념적으로는 테이블로 생각해도 무관
+        function insertDot(x, y){
+            let pos = [x, y];
+            posArray.push(pos);
+        }
+
+        function move(){
+            //db에 쌓여있는 순서대로
+            if(flag){
+                if(index >= posArray.length) { index = 0; }
+                img.style.left = posArray[index][0] + "px";
+                img.style.top = posArray[index][1] + "px";
+                index++;
+            }
+        }
+
+        function init(){
+            content = document.getElementById("content");
+            aside = document.getElementById("aside");
+
+            createHero();   //주인공 등장
+            //content에 이벤트 연결
+            content.addEventListener("mousedown", function(){
+                let x = event.clientX;
+                let y = event.clientY;
+                createDot(x, y);    //점 만들기
+                
+                //데이터베이스 정보를 쌓기
+                insertDot(x, y);
+            });
+
+            document.querySelector("button").addEventListener("click", ()=>{
+                flag = true;
+            });
+        }
+
+
+        addEventListener("load", function(){
+            init();
+            setInterval("move()", 100);
+        });
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <button>start</button>
+        <div id="content"></div>
+        <div id="aside">좌표 누적</div>
+    </div>
+</body>
+</html>
