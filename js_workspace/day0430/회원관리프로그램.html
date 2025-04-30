@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrapper{
+            width: 1000px;
+            height: 600px;
+            margin: auto;
+            background-color: antiquewhite;
+        }
+        #aside1{
+            width: 200px;
+            height: 100%;
+            background-color: aqua;
+            float: left;
+            text-align: center;
+        }
+        #section{
+            width: 600px;
+            height: 100%;
+            background-color: blue;
+            float: left;
+        }
+        #aside2{
+            width: 200px;
+            height: 100%;
+            background-color:cadetblue;
+            float: left;
+            text-align: center;
+        }
+
+        #header{
+            width: 100%;
+            height: 50px;
+            background-color: darkblue;
+        }
+        #content{
+            width: 100%;
+            height: 550px;
+            background-color:cornflowerblue;
+            overflow: hidden;
+        }
+        form input{
+            height: 35px;
+            margin: 2px;
+            border: 1px solid #cccccc;
+            border-radius: 3px;
+        }
+        table{
+            border-collapse: collapse;  /*두겹으로 겹치는 테이블의 기본 경계를 허문다*/
+        }
+    </style>
+    <script>
+        let content;    //회원 목록 table이 출력될 영역
+        let memberArray=[];
+        let currentIndex;
+        
+        //사원에 대한 자세한 정보를 가져와서 우측 영역에 출력하기
+        function getDetail(i){
+            currentIndex = i;
+            form2.empno.value = memberArray[i][0];
+            form2.ename.value = memberArray[i][1];
+            form2.sal.value = memberArray[i][2];
+            form2.comm.value = memberArray[i][3];
+        }
+        
+        //사원 수정
+        function edit(){
+            //현재 이차원 배열인 memberArray의 수정하고 싶은 사원을 접근
+            memberArray[currentIndex][0] = form2.empno.value;   //사원번호 반영
+            memberArray[currentIndex][1] = form2.ename.value;
+            memberArray[currentIndex][2] = form2.sal.value;
+            memberArray[currentIndex][3] = form2.comm.value;
+
+            printTable();
+        }
+        
+        //사원 삭제
+        function del(){
+            memberArray.splice(currentIndex, 1);
+            printTable();   //테이블 갱신
+        }
+
+        function printTable(){  //동적으로 테이블 출력
+            let tag = "<table border='1px' width='100%'>"
+            tag += "<tr align='center'>";
+            tag += "<td>No</td>";    
+            tag += "<td>EMPNO</td>";    
+            tag += "<td>ENAME</td>";    
+            tag += "<td>SAL</td>";    
+            tag += "<td>COMM</td>";    
+            tag += "</tr>";
+
+            //실제 데이터가 출력될 tr 영역
+            for(let i=0; i<memberArray.length; i++){
+                tag += "<tr align='center' onClick=\"getDetail("+i+")\"  onMouseOver='this.style.background=\"yellow\"' onMouseOut=\"this.style.background='\'\">";
+                tag += `<td>${i+1}</td>`;
+                for(let j=0; j<memberArray[i].length; j++){
+                    tag += `<td>${memberArray[i][j]}</td>`;     
+                }
+                tag += "</tr>";
+            }
+            //통계 출력
+            tag = tag+"<tr>";
+            tag = tag+"<td colspan='5' align='right'>사원 수 "+memberArray.length+"명</td>";
+            tag = tag+"</tr>";
+
+            tag += "</table>";
+            content.innerHTML = tag;
+        }
+
+        //메모리 상의 데이터베이스(배열)에 사원 등록하기
+        function regist(){
+            //사원 한명은 하나의 일차원 배열에 담을 수 있으므로, 1차원 배열 생성
+            let member = [];
+            member.push(form1.empno.value); //사원번호의 값을 0번째에 등록
+            member.push(form1.ename.value); //사원명의 값을 1번째에 등록
+            member.push(form1.sal.value); //급여의 값을 2번째에 등록
+            member.push(form1.comm.value); //커미션의 값을 3번째에 등록
+
+            //방금 생성된 사원 1명의 정보를 담는 member 배열을 memberArray라는 배열에 추가하자
+            memberArray.push(member);
+            // alert("가입을 축하합니다.");
+
+            //등록 초기화(기존 입력했던 데이터를 지움)
+            form1.reset();
+        }
+
+        function init(){
+            content = document.getElementById("content");
+        }
+
+        addEventListener("load", function(){
+            init();
+            printTable();
+            
+            //문서 로드 시 커서를 좌측 입력 최상단에 올려놓기
+            form1.empno.focus();    //커서 올려놓기
+
+            //등록 버튼에 클릭 이벤트 연결
+            let bt_regist = document.querySelector("#aside1 input[type='button']");
+            bt_regist.addEventListener("click", function(){
+                regist();   //회원 등록
+                printTable();
+            });
+
+            form2.bt_edit.addEventListener("click", function(){
+                if(confirm("정보를 수정하실래요?")){
+                    edit();
+                }
+            });
+
+            //삭제 버튼에 클릭 이벤트 연결
+            form2.bt_del.addEventListener("click", function(){
+                if(confirm("삭제하시겠어요?")){
+                    if(currentIndex == undefined){
+                        alert("먼저 삭제하실 사원을 선택하세요.");
+                    }else{
+                        del();
+                    } 
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="aside1">
+            <!-- 입력 양식 구성 -->
+            <!-- 폼 태그는 제출양식을 작성하기 위한 태그이며 눈에 보이지 않음,
+                주 용도는 전송 범위를 설정 -->
+             <form name="form1">
+                <input type="text" name="empno" placeholder="사원번호 입력">
+                <input type="text" name="ename" placeholder="사원명 입력">
+                <input type="text" name="sal" placeholder="급여 입력">
+                <input type="text" name="comm" placeholder="커미션 입력">
+                <input type="button" value="사원 등록">
+             </form>
+        </div>
+        <div id="section">
+            <div id="header"></div>
+            <div id="content"></div>
+        </div>
+        <div id="aside2">
+            <form name="form2">
+                <input type="text" name="empno" placeholder="사원번호 입력">
+                <input type="text" name="ename" placeholder="사원명 입력">
+                <input type="text" name="sal" placeholder="급여 입력">
+                <input type="text" name="comm" placeholder="커미션 입력">
+                <input type="button" name="bt_edit" value="사원 수정">
+                <input type="button" name="bt_del" value="사원 삭제">
+             </form>
+        </div>
+    </div>
+    
+</body>
+</html>
