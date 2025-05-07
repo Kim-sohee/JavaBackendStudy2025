@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrapper{
+            width: 600px;
+            height: 600px;
+            background-color: antiquewhite;
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
+    <script src="./Ball.js"></script>
+    <script src="../../lib/common.js"></script>
+    <script>
+        let ballArray = [];
+        let colorArray = ["red", "orange", "yellow", "green", "blue", "navy", "purple"];
+        let wrapper;
+
+        let fire = ()=>{
+            let ball = new Ball(wrapper, colorArray[getRandom(colorArray.length-1)], getRandom(600), getRandom(600), 40, getRandom(20), getRandom(20));
+            ballArray.push(ball);
+        }
+
+        let gameLoop = ()=>{
+            for(let i=0; i<ballArray.length; i++){
+                let ball = ballArray[i];
+                ball.move();
+            }
+        }
+
+
+        window.addEventListener("load", ()=>{
+            wrapper = document.getElementById("wrapper");
+            window.addEventListener("keydown", (e)=>{
+                if(e.keyCode === 32){
+                    fire();
+                }
+            });
+            setInterval(gameLoop, 100);
+        });
+    </script>
+</head>
+<body>
+    <div id="wrapper"></div>
+</body>
+</html>
