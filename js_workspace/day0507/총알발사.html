@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./js/Bullet.js"></script>
+    <script src="../lib/common.js"></script>
+    <script>
+        let bulletArray = [];   //다수의 총알을 보관할 전역변수
+        let colorArray = ["red", "blue", "yellow", "black", "green", "pink", "purple", "orange", "navy"];
+        
+        function fire(){
+            let bullet = new Bullet(colorArray[getRandom(colorArray.length-1)], getRandom(800));
+            bulletArray.push(bullet);
+        }
+        
+        function gameLoop(){
+            //화면에 등장한 모든 총알을 대상으로 움직임 메서드 호출
+            //배열에 요소가 없을 경우 for문이 실행되지 않으므로 undefined에 의한 에러 방지
+            for(let i=0; i<bulletArray.length; i++){
+                let bullet = bulletArray[i];
+                bullet.move();
+            }
+        }
+
+        addEventListener("load", function(){
+            let bt = document.querySelector("button");
+            bt.addEventListener("click", function(){
+                fire();
+            });
+            setInterval(gameLoop, 50);
+        });
+    </script>
+</head>
+<body>
+    <button>발사</button>
+</body>
+</html>
