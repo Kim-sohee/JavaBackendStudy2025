@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        let arrowList = [];     //화살을 무수히 담는 배열
+        /*
+        oop가 나오기 이전 시대의 절차지향언어(C)로도 현실을 반영할 수 있었음,
+        하지만, 절차지향 언어의 함수만으로는 현실 반영 시 코드 중복이 발생함.
+        객체지향언어는 현실의 사물을 반영할 때, 상태는 변수로, 동작이나 상태의 변경은 함수로 표현하되
+        이 둘의 조합이 곧 사물임을 깨닫게 된 상황에서 탄생된 언어이다.
+
+        즉, 신기술이 아니라 현실을 반영하는 방법을 바꾼 것 뿐이다.
+        */
+        class Arrow {   //화살을 대량으로 생산할 수 있는 화살 거푸집 선언
+            //ES6부터 지원하는 클래스는 자바 언어와 100% 일치하지 않는다.
+            //클래스가 보유한 변수는 생성자 함수 내에 작성해야 하고, 클래스가 보유한 변수 앞에는 this.를 명시
+            constructor(){
+                this.span;
+                this.x = 0;      //화살의 좌표
+                this.velX = 5;   //화살의 속도
+
+                this.span = document.createElement("span"); //inline이므로 너비, 높이, 마진, 패딩 불가
+                this.span.innerText = "→";
+
+                this.span.style.position = "absolute";
+                this.span.style.left = this.x + "px";
+                this.span.style.top = 100 + "px";
+                this.span.style.fontSize = 20 + "px";
+                this.span.style.color = "red";
+
+                document.body.appendChild(this.span);
+                
+            }
+            //화살 움직임 메서드
+            move(){
+                this.x = this.x + this.velX;
+                this.span.style.left = this.x + "px";
+            }
+        }
+        
+        function gameLoop(){
+            for(let i=0; i<arrowList.length; i++){
+                arrowList[i].move();
+            }
+            console.log("game loop called ...");
+        }
+
+        //로드 되는 시점에
+        addEventListener("load",function(){
+            setInterval(gameLoop, 10);
+            
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>

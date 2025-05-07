@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./js/Rect.js"></script>
+    <script src="../lib/common.js"></script>
+    <script>
+        let width = 30;  //막대 너비
+        let height = 400; //막대 높이
+        let count = 15;     //생성할 막대 수
+
+        let colorArray = ["red", "blue", "yellow", "orange", "green", "pink", "aqua", "beige"];
+
+        //화살표 함수 내에서 this는 상위 스코프
+        let test = ()=>{
+            console.log("나 호출했어?", this);
+        }
+
+        //원하는 수 만큼의 막대를 만들어서 부모에 부착, 부모의 크기는 자식의 크기와 수에 비례
+        //자바스크립트 언어는 함수를 일급시민 취급
+        //컴퓨터공학에서 일급시민이란 어떤 대상을 일반 데이터 처럼 취급할 수 있는 것을 말함.
+        //js는 함수를 변수에 담거나, 함수를 매개변수로 전달하거나 함수를 리턴할 수 있음.
+        let init = ()=>{
+            let wrapper = document.createElement("div");
+            wrapper.style.width = width * count + "px";
+            wrapper.style.height = height + "px";
+            wrapper.style.margin = "auto";
+            wrapper.style.background = "lightgray";
+            wrapper.style.position = "relative";
+            wrapper.style.transform = "scaleX(-1)";
+            wrapper.style.overflow = "hidden";
+            document.body.appendChild(wrapper);
+
+            for(let i=0; i<count; i++){
+                new Rect(wrapper, i*width, 0, width, height, colorArray[getRandom(colorArray.length-1)]);
+            }
+        }
+
+        addEventListener("load", function(){
+            init();
+        });
+    </script>
+</head>
+<body> 
+</body>
+</html>
