@@ -12,6 +12,7 @@
         let count = 15;     //생성할 막대 수
 
         let colorArray = ["red", "blue", "yellow", "orange", "green", "pink", "aqua", "beige"];
+        let rectArray=[];
 
         //화살표 함수 내에서 this는 상위 스코프
         let test = ()=>{
@@ -29,17 +30,23 @@
             wrapper.style.margin = "auto";
             wrapper.style.background = "lightgray";
             wrapper.style.position = "relative";
-            wrapper.style.transform = "scaleX(-1)";
+            wrapper.style.transform = "scaleY(-1)";
             wrapper.style.overflow = "hidden";
             document.body.appendChild(wrapper);
 
             for(let i=0; i<count; i++){
-                new Rect(wrapper, i*width, 0, width, height, colorArray[getRandom(colorArray.length-1)]);
+                let rect = new Rect(wrapper, i*width, 0, width, height, colorArray[getRandom(colorArray.length-1)]);
+                rectArray.push(rect);
             }
+        }
+
+        function gameLoop(){
+            rectArray[parseInt(Math.random()*rectArray.length)].targetH=Math.random()*450;
         }
 
         addEventListener("load", function(){
             init();
+            setInterval(gameLoop, 1);
         });
     </script>
 </head>

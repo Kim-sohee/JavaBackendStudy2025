@@ -9,7 +9,7 @@ class Rect {
         this.height = height;
         this.bg = bg;
 
-        this.targetH = parseInt(Math.random()*100);
+        this.targetH = 450;
 
         //style
         this.div.style.position = "absolute";

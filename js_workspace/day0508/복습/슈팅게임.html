@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #stage{
+            width: 1600px;
+            height: 576px;
+            margin: auto;
+            background-image: url(../../../images/plane/bg.jpg);
+            position: relative;
+            background-size: 1600px 576px;
+            overflow: hidden;
+        }
+    </style>
+    <script src="./Hero.js"></script>
+    <script src="./Bullet.js"></script>
+    <script>
+        let bgX = 0;
+        let hero;
+        let bulletArray = [];
+        let isPause = false;
+        let bg;
+
+        //배경 흘러가기 이펙트
+        function bgEffect(){
+            let stage = document.getElementById("stage");
+            stage.style.backgroundPositionX = bgX-- + "px";
+        }
+
+        //캐릭터 생성
+        function createHero(){
+            hero = new Hero(document.getElementById("stage"), 100, 200, 200, 0, 0);
+        }
+
+        //공 발사
+        function fire(){
+            bulletArray.push(new Bullet(document.getElementById("stage"), hero.x+hero.width*(4/10), hero.y+hero.height*(4/10), 40, 10, 0));
+        }
+
+        //일시정지
+        function pause(){
+            isPause = !isPause;
+        }
+
+        function blockBg(){
+            bg = document.createElement("div");
+            bg.style.position = "absolute";
+            bg.style.left = 0 + "px";
+            bg.style.top = 0 + "px";
+            
+            bg.style.width = 1600 + "px";
+            bg.style.height = 576 + "px";
+            bg.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+
+            document.getElementById("stage").appendChild(bg);
+        }
+
+        function gameLoop(){
+            if(!isPause){
+                bgEffect();
+                hero.move();
+    
+                for(let i=0; i<bulletArray.length; i++){
+                    bulletArray[i].move();
+                }
+                // document.getElementById("stage").removeChild(bg);
+            }else{
+                // blockBg();
+            }
+        }
+
+        addEventListener("load", function(){
+            createHero();
+
+            //키보드로 상하좌우 캐릭터 움직이기
+            addEventListener("keydown", function(e){
+                switch (e.keyCode){
+                    case 37: hero.velX=-5; break;
+                    case 38: hero.velY=-5; break;
+                    case 39: hero.velX=5; break;
+                    case 40: hero.velY=5; break;
+                    case 32: fire(); break;
+                    case 27: pause(); break;
+                }
+            });
+            addEventListener("keyup", function(e){
+                console.log(e.keyCode);
+                switch (e.keyCode){
+                    case 37: hero.velX=0; break;
+                    case 38: hero.velY=0; break;
+                    case 39: hero.velX=0; break;
+                    case 40: hero.velY=0; break;
+                }
+            });
+
+            setInterval(gameLoop, 10);
+        });
+    </script>
+</head>
+<body>
+    <div id="stage"></div>
+</body>
+</html>
