@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #hour, #min, #sec{
+            font-size: 100px;
+            color: red;
+            background-color: ivory;
+            width: 150px;
+            height: 150px;
+            border: 2px solid gray;
+            border-radius: 3px;
+            text-align: center;
+            display: inline-block;
+        }
+    </style>
+    <script src="../lib/common.js"></script>
+    <script>
+        //표현식에 의한 함수정의(함수를 데이터처럼 변수로 받을 수 있다)
+        let showTime = function(){
+            let d = new Date();
+
+            let h = d.getHours();   //시간 만 추출
+            let hour = document.getElementById("hour");
+            hour.innerText = zeroString(h);
+
+            let min = document.getElementById("min");
+            min.innerText = zeroString(d.getMinutes());
+
+            let sec = document.getElementById("sec");
+            sec.innerText = zeroString(d.getSeconds());
+        }
+
+        addEventListener("load", ()=>{
+            setInterval(showTime, 1000);
+        });
+    </script>
+</head>
+<body>
+    <div id="hour"></div>
+    <div id="min"></div>
+    <div id="sec"></div>
+</body>
+</html>
