@@ -54,13 +54,10 @@
                 let cell = new Cell(document.getElementById("days"), cellWidth, 40, "pink", 1, "violet", convertDay(i,"eng"));
             }
 
-            let count=0;    //순번의 확인을 위한 숫자
-
             for(let a=0; a<6; a++){  //6층
                 for(let i=0; i<7; i++){  //7호(일주일)
                     let cell = new Cell(document.getElementById("section"), cellWidth, cellHeight, "begie", cellBorder, "grey", "");
                     cellArray.push(cell);
-                    count++;
                 }
             }
         }
