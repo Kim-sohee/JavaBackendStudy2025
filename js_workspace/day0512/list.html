@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        let storeList = window.opener.storeList;
+
+        // store1 = {
+        //     store_name: "김밥천국",
+        //     tel: "02-666-4444",
+        //     pos: "53.4532, 123.324",
+        // };
+        // store2 = {
+        //     store_name: "종로 돈까스",
+        //     tel: "02-123-4567",
+        //     pos: "46.324142, 127.562453",
+        // };
+        // store3 = {
+        //     store_name: "강남횟집",
+        //     tel: "02-0000-1234",
+        //     pos: "36.4532000, 128.532487",
+        // };
+        // storeList.push(store1);
+        // storeList.push(store2);
+        // storeList.push(store3);
+
+        //등록 시 누적된 맛집들의 리스트를 테이블로 동적 출력
+        function printTable(){
+            let tag = "<table width='100%' border='1px'>";
+            tag += "<tr>";
+            tag += "<td>No</td>";
+            tag += "<td>상호명</td>";
+            tag += "<td>연락처</td>";
+            tag += "<td>위도, 경도</td>";
+            tag += "<td>대표사진</td>";
+            tag += "</tr>";
+            let n = storeList.length;
+
+            for(let i=0; i<storeList.length; i++){
+                tag += "<tr>";
+                tag += `<td>${n--}</td>`;
+                tag += `<td>${storeList[i].store_name}</td>`;
+                tag += `<td>${storeList[i].tel}</td>`;
+                tag += `<td>${storeList[i].pos}</td>`;
+                tag += "<td>대표사진</td>";
+                tag += "</tr>";
+            }
+
+            tag += "</table>";
+            document.body.innerHTML = tag;
+        }
+        
+        addEventListener("load", function(){
+            printTable();
+        });
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
