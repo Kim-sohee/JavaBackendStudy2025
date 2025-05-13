@@ -1,0 +1,19 @@
+{
+    "name": "철수",
+    "age" : 30,
+    "car" : false
+}
+
+{
+    "name" : "영희",
+    "age" : 28,
+    "animal" : [{
+        "type": "dog",
+        "name": "뽀미",
+        "gender":"여"
+    },{
+        "type": "cat",
+        "name": "냥",
+        "gender":"남"
+    }]
+}

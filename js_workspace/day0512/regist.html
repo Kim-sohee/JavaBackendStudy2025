@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            margin: 0%;
+        }
+        #header{
+            height: 40px;
+            background-color: yellow;
+            line-height: 40px;
+        }
+        #header input{
+            width: 70%;
+        }
+        #content{
+            height: 500px;
+            background-color: cornsilk;
+        }
+        #footer{
+            height: 50px;
+            background-color: orange;
+            line-height: 50px;
+        }
+    </style>
+    <script>
+        let obj;
+        //사용자가 선택한 정보를 알고 있는 이벤트 객체를 전달받아서, 파일을 읽어들이자.
+        function loadData(e){
+            let file = e.target.files[0];
+
+            //파일 읽기
+            let reader = new FileReader();
+            reader.onload=function(data){
+                obj = JSON.parse(data.target.result);
+
+                printTable(obj);
+            }
+            reader.readAsText(file);
+        }
+
+        //등록 시 누적된 맛집들의 리스트를 테이블로 동적 출력
+        function printTable(obj){
+            let storeList = obj.storeList;
+            let tag = "<table width='100%' border='1px'>";
+            tag += "<tr>";
+            tag += "<td>No</td>";
+            tag += "<td>상호명</td>";
+            tag += "<td>연락처</td>";
+            tag += "<td>위도, 경도</td>";
+            tag += "<td>대표사진</td>";
+            tag += "</tr>";
+            let n = storeList.length;
+
+            for(let i=0; i<storeList.length; i++){
+                tag += "<tr>";
+                tag += `<td>${n--}</td>`;
+                tag += `<td>${storeList[i].store_name}</td>`;
+                tag += `<td>${storeList[i].tel}</td>`;
+                tag += `<td>${storeList[i].pos}</td>`;
+                tag += `<td>${storeList[i].iconImg}</td>`;
+                tag += "</tr>";
+            }
+
+            tag += "</table>";
+            document.getElementById("content").innerHTML = tag;
+        }
+
+        //부모 창에 마크 아이콘 띄우기
+        function showIcons(){
+            window.opener.registAll(obj);
+            window.close(); //나의 윈도우 자동 닫기
+        }
+        
+        addEventListener("load", function(){
+            document.querySelector("#header input[type='file']").addEventListener("change", function(e){
+                loadData(e)
+            });
+
+            document.querySelector("#footer button").addEventListener("click", function(){
+                showIcons();
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="header">
+        <input type="file">
+    </div>
+    <div id="content"></div>
+    <div id="footer">
+        <button>지도에 적용하기</button>
+    </div>
+</body>
+</html>
