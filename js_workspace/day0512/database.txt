@@ -1,0 +1,64 @@
+{
+    "storeList": [
+        {
+            "store_name": "커피빈",
+            "tel": "02-552-9311",
+            "pos": "37.51070, 127.0540",
+            "iconImg": "../../images/map/smile.png"
+        },
+        {
+            "store_name": "키헤이커피",
+            "tel": "02-7143-1252",
+            "pos": "37.51181, 127.0532",
+            "iconImg": "../../images/map/smile.png"
+        },
+        {
+            "store_name": "리버벨커피",
+            "tel": "010-3241-9843",
+            "pos": "37.51058, 127.0533",
+            "iconImg": "../../images/map/heart.png"
+        },
+        {
+            "store_name": "오더 에스프레소",
+            "tel": "02-132-9874",
+            "pos": "37.51147, 127.0554",
+            "iconImg": "../../images/map/heart.png"
+        },
+        {
+            "store_name": "매일낙지",
+            "tel": "02-552-9311",
+            "pos": "37.51142, 127.0541",
+            "iconImg": "../../images/map/flag.png"
+        },
+        {
+            "store_name": "대도식당",
+            "tel": "02-552-9311",
+            "pos": "37.51021, 127.0544",
+            "iconImg": "../../images/map/flag.png"
+        },
+        {
+            "store_name": "AK골프 삼성점",
+            "tel": "010-5432-8756",
+            "pos": "37.50937, 127.0549",
+            "iconImg": "../../images/map/pin.png"
+        },
+        {
+            "store_name": "루나아시아",
+            "tel": "02-345-3234",
+            "pos": "37.50991, 127.0566",
+            "iconImg": "../../images/map/pin.png"
+        },
+        {
+            "store_name": "유리엔 호텔",
+            "tel": "010-3243-1342",
+            "pos": "37.50894, 127.0576",
+            "iconImg": "../../images/map/star.png"
+        },
+        {
+            "store_name": "페이토 호텔",
+            "tel": "010-8765-1342",
+            "pos": "37.50845, 127.0587",
+            "iconImg": "../../images/map/star.png"
+        }
+    ]
+}

@@ -24,6 +24,12 @@
             width: 85%;
             margin: 0px 3px;
         }
+        #preview{
+            width: 120px;
+            height: 120px;
+            border: 2px solid red;
+            border-radius: 5px;
+        }
         #content{
             width: 1000px;
             height: 100%;
@@ -65,6 +71,7 @@
 
         var storeList=[];
         let map;
+        let profileData;
 
         //구글 맵이 로드가 완료되는 시점에 개발자가 미리 정의해놓은 함수를 호출(콜백함수)
         function initMap(){
@@ -77,11 +84,48 @@
         }
 
         //맛집 하나를 등록하려면, 객체 한개가 필요하므로, js객체 리터럴을 사용
+        function registAll(obj){
+            //지도에 마커 출력
+
+            for(let i=0; i<obj.storeList.length; i++){
+                let store = obj.storeList[i];
+
+                let latLon = store.pos.split(",");
+                let pos = new google.maps.LatLng(parseFloat(latLon[0]), parseFloat(latLon[1]));
+                let marker = new google.maps.Marker({
+                    position: pos,
+                    animation:google.maps.Animation.BOUNCE,
+                    icon: {
+                        url: store.iconImg,
+                        scaledSize: new google.maps.Size(45, 45)
+                    }
+                });
+
+                marker.setMap(map);
+                
+                
+                //마커 이벤트
+                google.maps.event.addListener(marker,'click',function() {
+                    map.setZoom(18);
+                    map.setCenter(marker.getPosition());    //마커를 중심으로 시점 이동
+                    
+                    //새창 띄우기
+                    let infowindow = new google.maps.InfoWindow({
+                        content:store.store_name
+                    });
+                    infowindow.open(map,marker);
+                });
+            }
+        }
+
         function regist(){
             let store = {
                 store_name: document.getElementById("store_name").value,
                 tel: document.getElementById("tel").value,
-                pos: document.getElementById("pos").value
+                pos: document.getElementById("pos").value,
+                profileImg: profileData,
+                iconImg: document.getElementById("icon").value,
+
             };
             //한개의 상점을 배열에 담기
             storeList.push(store);
@@ -95,13 +139,25 @@
                 position: pos,
                 animation:google.maps.Animation.BOUNCE,
                 icon: {
-                    url: "../../images/map/smile.png",
+                    url: store.iconImg,
                     scaledSize: new google.maps.Size(45, 45)
                 }
             });
 
             marker.setMap(map);
             
+            
+            //마커 이벤트
+            google.maps.event.addListener(marker,'click',function() {
+                map.setZoom(18);
+                map.setCenter(marker.getPosition());    //마커를 중심으로 시점 이동
+                
+                //새창 띄우기
+                let infowindow = new google.maps.InfoWindow({
+                    content:"여기 맛있어요."
+                });
+                infowindow.open(map,marker);
+            });    
         }
 
         //지금까지 누적된 가게들의 목록을 새창으로 보여주기
@@ -109,13 +165,52 @@
             window.open("list.html", "_blank", "width=550px, height=500px");
         }
 
+        //대표사진 미리보기
+        function previewImg(e){
+            //js는 사용자의 하드디스크 접근 가능
+            //js는 사용자의 pc에 접근할 수 없다.(보안상), 
+            // input file 컴포넌트에 의해 사용자가 파일을 선택하게 되면 해당 파일에 대해서는 접근 수락하고 제어 가능하다.
+            // 브라우저가 읽어들인 파일을 제어할 수 있도록 제공되는 객체는 FileReader이다.
+            let reader = new FileReader();
+            //모든 파일은 사람이 읽을 수 있을지 여부를 기준으로 할 때 2가지로 분류
+            //문서파일: ex)메모장(.txt, .java, csv ...)
+            //바이너리파일: ex)이미지, 동영상, psd, excel, class ... 
+
+            //크롬 브라우저가 다 읽으면 우측에 정의한 함수를 호출해줌(콜백)
+            reader.onload = function(data){   //매개변수로 읽어들인 결과를 준다
+                console.log(data.target.result);
+                document.getElementById("preview").src = data.target.result;
+                profileData = data.target.result;
+            }
+
+            reader.readAsDataURL(e.target.files[0]);    //파일 읽기
+        }
+
+        //일괄 등록용 새창을 띄워서, 메모장을 선택하게 한 후, 적용을 누르면 지도에 마커와 정보가 출력
+        function batchRegist(){
+            let url="regist.html";
+            let name="pop"; 
+            let options = "width=500px, height=500px";
+
+            window.open(url, name, options);
+        }
+
         addEventListener("load", function(){
+
+            //대표 사진 파일 선택했을 때
+            document.getElementById("profile").addEventListener("change", function(e){
+                previewImg(e);
+            });
+
+
             //등록 버튼
             document.querySelector("#aside_regist :nth-child(7)").addEventListener("click",function(){
                 regist();
             });
             //일괄 등록 버튼
-            document.querySelector("#aside_regist :nth-child(8)").addEventListener("click",function(){});
+            document.querySelector("#aside_regist :nth-child(8)").addEventListener("click",function(){
+                batchRegist();
+            });
             //목록 보기 버튼
             document.querySelector("#aside_regist :nth-child(9)").addEventListener("click",function(){
                 getList();
@@ -130,13 +225,13 @@
             <input type="text" placeholder="연락처" id="tel">
             <input type="text" placeholder="위도, 경도" id="pos">
             <input type="file" id="profile">
-            <div id="preview">사진 미리보기 영역</div>
-            <select name="" id="icon">
-                <option value="">스마일</option>
-                <option value="">핀</option>
-                <option value="">하트</option>
-                <option value="">별</option>
-                <option value="">깃발</option>
+            <img id="preview"></img>
+            <select id="icon">
+                <option value="../../images/map/smile.png">스마일</option>
+                <option value="../../images/map/pin.png">핀</option>
+                <option value="../../images/map/heart.png">하트</option>
+                <option value="../../images/map/star.png">별</option>
+                <option value="../../images/map/flag.png">깃발</option>
             </select>
             <button>등록</button>
             <button>일괄등록</button>
