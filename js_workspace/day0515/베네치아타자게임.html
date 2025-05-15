@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrapper{
+            width: 1250px;
+            height: 700px;
+            background-color: antiquewhite;
+            margin: auto;
+        }
+        #aside{
+            width: 150px;
+            height: 100px;
+            background-color: aquamarine;
+            float: left;
+        }
+        #aside *{
+            width: 90%;
+        }
+        #content{
+            width: 1100px;
+            height: 100%;
+            background-color: bisque;
+            float: left;
+            background-image: url(../../images/bene.webp);
+            background-size: 1100px 700px;
+            position: relative;
+            overflow: hidden;
+        }
+        #content span{
+            background-color: yellow;
+        }
+    </style>
+    <script src="../lib/common.js"></script>
+    <script src="./js/Word.js"></script>
+    <script>
+        let wordArray;  //4레벨까지 게임 가능한 데이터
+        let level = 0;  //레벨선택(n레벨 == n번째 배열)
+
+        let wordList = [];  //레벨 별 배열
+        let st; //interval undefined -> 게임 on/off flag로 사용
+        let speed = 600;    //게임의 속도, 레벨이 올라갈수록 감소(interval의 sec로 입력하기 때문)
+        
+
+        //메모장의 JSON 문자열을 파싱한 후 객체로 변환하여 사용
+        function loadData(e){
+            let file = e.target.files[0];   //사용자가 업로드한 파일
+
+            //파일 내용 읽기
+            let reader = new FileReader();
+            reader.onload = function(data){
+                // console.log("메모장으로 읽은 데이터는 ", data);
+                let jsonString = data.target.result;
+                let obj = JSON.parse(jsonString);
+                
+                wordArray = obj.wordList;
+
+                createWord();
+
+
+
+            }
+            reader.readAsText(file);
+        }
+
+        //단어 생성
+        function createWord(){
+            let content = document.getElementById("content");
+
+            for(let i=0; i<wordArray[level].length; i++){
+                let word = new Word(content, 70+(i*95), getRandomByRange(-10, -150), wordArray[level][i], "red");
+                wordList.push(word);    //배열에 인스턴스 추가 -> word가 여러개니까 배열로 관리
+            }
+        }
+
+        //모든 단어를 대상으로 tick, render
+        function nextStep(){
+            for(let i=0; i<wordList.length; i++){
+                wordList[i].tick();
+                wordList[i].render();
+            }
+        }
+
+        //Level UP 판단
+        function checkLevel(){
+            //wordList의 길이가 0에 도달하면 레벨을 올리기
+            if(wordList.length == 0){
+                alert("레벨 " +(level+1)+ "통과를 축하드립니다!");
+                level++;
+                speed -= 200;
+                createWord();
+            }
+        }
+
+        //단어 알아맞추기 함수
+        function checkText(obj){
+            console.log(obj.value);
+
+            //화면의 배열수만큼 비교
+            for(let i=0; i<wordList.length; i++){
+                if(wordList[i].text == obj.value){
+                    wordList[i].span.style.background = "blue";
+
+                    //제거 (화면 + 배열)
+                    let content = document.getElementById("content");
+                    content.removeChild(wordList[i].span);  //화면에서 제거
+
+                    wordList.splice(i, 1);  //배열에서 제거
+
+                    checkLevel();   //레벨 UP 판단 유무
+                }
+            }
+        }
+
+        function gameLoop(){
+            nextStep(); //단어 내려오기
+        }
+
+        //초기화하는 함수
+        function init(){
+            //파일 읽기
+            document.querySelector("input[type='file']").addEventListener("change", function(e){
+                loadData(e);
+            });
+            
+            //Start 버튼 제어
+            document.querySelector("#aside button").addEventListener("click", function(){
+                if(st==undefined){  //가동된 인터벌이 없으면
+                    st = setInterval(gameLoop, speed);  //게임 시작
+                    this.innerText = "Pause";
+                }else{
+                    clearInterval(st);  //pause 버튼 클릭 시
+                    st = undefined;
+                    this.innerText = "Start";
+                }
+            });
+
+            //단어 입력 처리
+            document.querySelector("#aside input[type='text']").addEventListener("keyup", function(e){
+                if(e.keyCode == 13){    //Push Enter
+                    //input text에 입력된 단어와 화면에 생존해 있는 단어 인스턴스 내부의 span innerText와 비교
+                    checkText(this);
+                    document.querySelector("#aside :nth-child(3)").value="";    //input text 초기화
+                }
+            });
+        }
+
+        //로드될 때
+        addEventListener("load", function(){
+            init();
+        });
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="aside">
+            <input type="file">
+            <button>Start!!</button>
+
+            <input type="text" placeholder="단어입력">
+        </div>
+        <div id="content"></div>
+    </div>
+</body>
+</html>
