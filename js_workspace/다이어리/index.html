@@ -153,6 +153,13 @@
 
             //현재 셀에 대한 전역변수인 currentCell에 obj를 보관해놓자.
             currentCell = obj;
+
+            for(let i=0; i<diaryArray.length; i++){
+                if(diaryArray[i].year == currentCell.year && diaryArray[i].month == currentCell.month && diaryArray[i].date == currentCell.date){
+                    document.getElementById("t_title").value = diaryArray[i].title;
+                    document.getElementById("t_detail").value = diaryArray[i].detail;
+                }
+            }
         }
         
         function closeDialog(){
