@@ -40,6 +40,24 @@
             let d = new Date(year, month+1, 0);
             return d.getDate();
         }
+        
+        /* --------------------------------------------------------------------
+            달력과 다이어리 비교하여 렌더링 처리
+        -------------------------------------------------------------------- */
+        function checkData(cellObj, year, month, date){
+            //다이어리에 등록된 데이터와 현재 값 날짜 비교
+            //년, 월, 일이 같은 경우는 다이어리에 등록된 날짜로 간주
+            for(let k=0; k<diaryArray.length; k++){
+                let diary = diaryArray[k];
+                if(diary.year == year && diary.month == month && diary.date == date){
+                    //다이어리 제목 출력
+                    cellObj.titleDiv.innerText = diary.title;
+                    //아이콘 출력
+                    cellObj.renderIcon(diary.icon, 25);
+                }
+            }
+
+        }
 
         /* --------------------------------------------------------------------
             해당 년, 월의 달력의 숫자 출력
@@ -53,6 +71,7 @@
                 for(let a=0; a<7; a++){
                     if(index >= getStartDay(currentYear, currentMonth) && date<=getLastDate(currentYear, currentMonth)){
                         cellArray[i][a].setDate(currentYear, currentMonth, date++);
+                        checkData(cellArray[i][a], currentYear, currentMonth, date);
                     }
                     index++;
                 }
@@ -92,7 +111,9 @@
                     cellArray[i][a].titleDiv.innerText = "";
 
                     // 2) 등록된 아이콘이 있으면 제거
-
+                    if(cellArray[i][a].iconDiv.children.length > 0){
+                        cellArray[i][a].iconDiv.removeChild(cellArray[i][a].icon);
+                    }
                 }
             }
         }
@@ -198,12 +219,40 @@
                     closeDialog();
                 }
             });
+
+            //이미지를 클릭하면 파일 탐색기를 강제 클릭시키자
+            document.querySelector("#info img").addEventListener("click", ()=>{
+                //강제 클릭
+                document.getElementById("fileChooser").click(); //프로그래밍적 클릭
+
+                //파일 탐색기에서 파일을 선택한 순간에 파일 읽어들이기
+                document.getElementById("fileChooser").addEventListener("change", (e)=>{
+                    let file = e.target.files[0];
+                    //파일 읽어들이는 객체 사용
+                    let reader = new FileReader();
+                    reader.onload = function(data){
+                        //읽어들인 데이터는 단순한 문자열에 불과하므로 객체 접근이 불가능
+                        let obj = JSON.parse(data.target.result);
+                        diaryArray = obj.diaryList;
+
+                        //기존의 div에 기록된 데이터 삭제
+                        printTitle();
+                        clearCell();
+                        printNum();
+                    }
+                    reader.readAsText(file);
+                });
+
+            });
         });
     </script>
 </head>
 <body>
     <div id="wrapper">
-        <div id="info"></div>
+        <div id="info">
+            <input type="file" style="display:none;" id="fileChooser">
+            <img src="../../images/icon/upload.png" alt="파일 첨부" style="width: 50px;">
+        </div>
         <div id="header">
             <a href="javascript:prev()">이전</a>
             <h2></h2>
