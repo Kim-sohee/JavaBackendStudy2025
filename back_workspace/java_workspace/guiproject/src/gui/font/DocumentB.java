@@ -7,6 +7,7 @@ import java.awt.Choice;
 import java.awt.Button;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.TextArea;
 
 class DocumentB extends Frame{
 	Panel p_center;
@@ -15,15 +16,17 @@ class DocumentB extends Frame{
 	Choice c_font;
 	Choice c_color;
 	Button bt;
+	TextArea area;
 	
 	//생성자
-	public DocumentB(){
+	public DocumentB(TextArea area){
 		p_center = new Panel();
 		la_font = new Label("Font Size");
 		la_color = new Label("Color");
 		c_font = new Choice();
 		c_color = new Choice();
 		bt = new Button("적용");
+		this.area = area;
 		
 		p_center.setLayout(new FlowLayout());
 		
