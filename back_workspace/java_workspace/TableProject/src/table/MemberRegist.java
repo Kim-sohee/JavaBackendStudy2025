@@ -5,8 +5,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,6 +18,7 @@ import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -22,7 +26,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.TableModel;
 
-public class MemberRegist extends JFrame implements ActionListener, WindowListener{
+public class MemberRegist extends JFrame implements ActionListener, WindowListener, MouseListener{
 	//서쪽 영역
 	JPanel p_west;
 	JTextField t_id;
@@ -35,10 +39,27 @@ public class MemberRegist extends JFrame implements ActionListener, WindowListen
 	JTable table;
 	JScrollPane scroll;
 	
+	JPanel p_south;	//남쪽에 정보 패널 추가
+	JLabel la_id;
+	JLabel la_value;
+	JLabel la_name;
+	JLabel la_tel;
+	JTextField t_name2;
+	JTextField t_tel2;
+	JButton bt_edit;
+	JButton bt_del;
+	
+	
+	
 	TableModel model;
 	int index = 0;	//몇번째 층에 회원을 넣을지 결정짓는 인덱스
 	
 	Connection conn=null;	//접속은 윈도우창 생성 시 한번 시도되며, 창 닫을 때 접속해제
+
+	int selectPk = 0;	//현재 사용자가 보고 있는 회원의 pk 값
+	
+	//현재 유저가 선택한 한 회원의 모든 정보
+	String[] member;
 	
 	public MemberRegist() {
 		//생성
@@ -48,14 +69,32 @@ public class MemberRegist extends JFrame implements ActionListener, WindowListen
 		t_tel = new JTextField();
 		bt = new JButton("가입");
 		
+		
+		//애플리케이션의 퀄리티를 높이기 위해 이미지 적용해보기
+		//단, 이미지 경로는 플랫폼에 의존적인 경로 말고, 중립적인 클래스패스를 기준으로 가져오자.
+		Class myClass = this.getClass();
+		URL url = myClass.getClassLoader().getSystemResource("write.png");
+		
 		p_center = new JPanel();
 		//생성자에 2차원 배열을 넣는 방식은 불편하다. 
 		//-> 테이블 생성 시점부터 데이터가 있어야 하는 전제조건이 불편
 		//생성자의 인수에 이 테이블에 보여줘야 할 데이터 또는 데이터처리 객체
 		//JTable은 MVC 패턴을 어느정도 반영한 컴포넌트(완벽하지 않음: 모델 + 컨트롤러)
-		model = new MyModel();
+		model = new MyModel(this);
 		table = new JTable(model);		//JTable은 껍데기에 지나지 않기 때문에, 실제 보여질 데이터는 모델이 결정
 		scroll = new JScrollPane(table);
+		
+		//추가된 센터 영역 컴포넌트
+		p_south = new JPanel();
+		la_id = new JLabel("ID");
+		la_value = new JLabel("");
+		la_name = new JLabel("NAME");
+		la_tel = new JLabel("TEL");
+		t_name2 = new JTextField();
+		t_tel2 = new JTextField();
+		bt_edit = new JButton("수정");
+		bt_del = new JButton("삭제");
+		
 		
 		//style 적용
 		p_west.setBackground(Color.ORANGE);
@@ -66,7 +105,21 @@ public class MemberRegist extends JFrame implements ActionListener, WindowListen
 		t_name.setPreferredSize(d);
 		t_tel.setPreferredSize(d);
 		
-		scroll.setPreferredSize(new Dimension(435, 490));
+		scroll.setPreferredSize(new Dimension(435, 350));
+		
+		//새로운 컴포넌트에 대한 스타일
+		p_south.setPreferredSize(new Dimension(450, 145));
+		p_south.setBackground(Color.YELLOW);
+		
+		Dimension d2 = new Dimension(200, 30);
+		la_id.setPreferredSize(d2);
+		la_name.setPreferredSize(d2);
+		la_tel.setPreferredSize(d2);
+
+		Dimension d3 = new Dimension(370, 30);
+		la_value.setPreferredSize(d3);
+		t_name2.setPreferredSize(d3);
+		t_tel2.setPreferredSize(d3);
 		
 		//조립
 		p_west.add(t_id);
@@ -78,11 +131,27 @@ public class MemberRegist extends JFrame implements ActionListener, WindowListen
 		p_center.add(scroll);
 		add(p_center);
 		
+		add(p_south, BorderLayout.SOUTH);
+		//남쪽 패널에 부착
+		p_south.add(la_id);
+		p_south.add(la_value);
+		p_south.add(la_name);
+		p_south.add(t_name2);
+		p_south.add(la_tel);
+		p_south.add(t_tel2);
+		p_south.add(bt_edit);
+		p_south.add(bt_del);
+		
 		bt.addActionListener(this);
+		bt_edit.addActionListener(this);
+		bt_del.addActionListener(this);
 		
 		//윈도우 창과 리스너와의 연결
 		this.addWindowListener(this);
 		
+		//테이블과 리스너와의 연결
+		table.addMouseListener(this);
+				
 		setBounds(500, 300, 600, 500);
 		setVisible(true);
 		//setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -149,7 +218,7 @@ public class MemberRegist extends JFrame implements ActionListener, WindowListen
 		
 	}
 	
-	//데이터 가져오기
+	//모든 회원 데이터 가져오기
 	public void selectAll() {
 		String sql = "select * from member4";
 		PreparedStatement pstmt = null;	//finally에서 닫으려고 한줄로 처리 안함
@@ -168,7 +237,7 @@ public class MemberRegist extends JFrame implements ActionListener, WindowListen
 			
 			//rs자체는 MyModel이 보유하고 있는 2차원 배열 자체가 아니므로, 
 			//rs 데이터를 2차원 배열로 변환하여 MyModel이 보유한 배열 대신 사용해야 함.
-			((MyModel)model).rows = new String[total][3];
+			((MyModel)model).rows = new String[total][4];
 			
 			//마지막 위치로 보냈던, rs 커서를 다시 처음으로 복귀시킨다. 레코드를 처음부터 차례대로 접근하기 위해
 			rs.beforeFirst();	//이 커서의 자유로움은 pstmt 생성시 부여한 상수 옵션 때문이다.
@@ -179,7 +248,8 @@ public class MemberRegist extends JFrame implements ActionListener, WindowListen
 				String[] record = {
 					rs.getString("id"),
 					rs.getString("name"),
-					rs.getString("tel")
+					rs.getString("tel"),
+					rs.getString("member4_id")
 				};
 				((MyModel)model).rows[idx++] = record;
 			}
@@ -206,8 +276,128 @@ public class MemberRegist extends JFrame implements ActionListener, WindowListen
 		}
 	}
 	
+	//선택된 회원만 가져오기
+	public void select(int member4_id){
+//		System.out.println("사원 선택했어?");
+		String sql = "select * from member4 where member4_id="+member4_id;
+//		System.out.println(sql);
+		
+		//쿼리문이 검증되었으므로, JDBC 통해 네트웍으로 전송하자
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			pstmt = conn.prepareStatement(sql);	//쿼리문 객체 생성
+			rs=pstmt.executeQuery();	//레코드 결과
+			
+			//화면에 출력
+			if(rs.next()) {		//레코드가 있다면 아래의 코드 수행(회원이 있을때)
+				la_value.setText(rs.getString("id"));
+				t_name2.setText(rs.getString("name"));
+				t_tel2.setText(rs.getString("tel"));
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if(rs!=null) {
+				try {
+					rs.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+	}
+	
+	//선택된 회원 한 명 삭제하기
+	public void delete(int member4_id) {
+		String sql = "delete from member4 where member4_id="+member4_id;
+//		System.out.println(sql);
+		
+		PreparedStatement pstmt = null;
+		try {
+			pstmt = conn.prepareStatement(sql);		//쿼리 객체 생성
+			
+			//DML 수행 시, 이 쿼리 수행에 의해 영향을 받을 레코드 수가 반환된다.
+			//개발자는 이 반환값으로 실행 성공 여부를 판단해야 하는데, 만일 반환값이 0인 경우 실패!(에러X)
+			int result = pstmt.executeUpdate();
+			if(result >0) {
+				JOptionPane.showMessageDialog(this, "삭제되었습니다.");
+				//MyModel이 보유한 예전 2차원 배열을 업데이트 하도록 처리
+				selectAll();
+				//table.updateUI();  //차이점: 개발자가 그린 그림을 다시 그릴 때 repaint()사용
+			}else {
+				JOptionPane.showMessageDialog(this, "삭제되지 않았습니다.");				
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			if(pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		
+	}
+	
+	//선택된 회원 정보 수정하기
+	//한 사람에 대한 정보를 담은 배열을 매개변수로 선언
+	//따라서 이 메서드를 호출하려면 한 사람에 대한 정보를 배열로 담아서 전달
+	public void edit(String[] record) {		
+		String sql = "update member4 set id='"+record[0]+"', name='"+record[1]+"', tel='"+record[2]+"'"
+				+ " where member4_id="+record[3];
+		PreparedStatement pstmt = null;
+		try {
+			pstmt = conn.prepareStatement(sql);
+			int result = pstmt.executeUpdate();	//update DML 수행
+			if(result > 0) {
+				JOptionPane.showMessageDialog(this, "수정성공");
+				selectAll();	//MyModel의 2차원 배열 갱신 및 테이블 updateUI 포함
+			}else {
+				JOptionPane.showMessageDialog(this, "변경 사항이 반영되지 않았습니다.");				
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			if(pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	public void actionPerformed(ActionEvent e) {
-		regist();
+		Object obj = e.getSource();
+		
+		if(obj == bt) {		//등록
+			regist();			
+		}else if(obj == bt_edit) {	//수정
+			int result = JOptionPane.showConfirmDialog(this, "수정하시겠습니까?");
+			if(result == JOptionPane.OK_OPTION) {
+				//edit 메서드 호출 전에, 배열을 우리가 입력한 데이터를 반영하여 조작을 가하자
+				member[1] = t_name2.getText();
+				member[2] = t_tel2.getText();
+				
+				edit(member);	//이미 멤버변수로 선언된 회원 1명 정보를 담는 배열로 전달
+			}
+		}else if(obj == bt_del) {	//삭제
+			int result = JOptionPane.showConfirmDialog(this, "삭제하시겠습니까?");
+			if(result == JOptionPane.OK_OPTION) {
+				delete(selectPk);	//pk 넘겨줘야 함
+			}
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -222,6 +412,17 @@ public class MemberRegist extends JFrame implements ActionListener, WindowListen
 	//윈도우 창을 닫는 순간 호출되는 메서드 이므로 무언가 연결되어있던 자원을 해제하는 용도로서 적합
 	public void windowClosing(WindowEvent e) {
 		System.out.println("windowClosing");
+		
+		//데이터베이스 접속 끊기
+		try {
+			conn.close();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		
+		//프로세스 종료
+		System.exit(0);
+		
 	}
 
 	@Override
@@ -247,6 +448,44 @@ public class MemberRegist extends JFrame implements ActionListener, WindowListen
 	@Override
 	public void windowDeactivated(WindowEvent e) {
 		System.out.println("windowDeactivated");
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		//테이블을 마우스로 클릭 시, JTable의 메서드 중 유저가 선택한 row와 col 정보를 반환하는 메서드
+		int row = table.getSelectedRow();	//유저가 선택한 층
+		int col = table.getSelectedColumn();	//유저가 선택한 호수
+		
+		
+		//방법1)
+//		System.out.println("PK: "+((MyModel)model).rows[row][3] );
+		
+		//방법2) JTable 자체에 자신의 셀의 정보 반환
+//		Object value = table.getValueAt(row, col);
+//		System.out.println(value);
+		
+		member =((MyModel)model).rows[row];
+		
+		//아래의 코드는 이미 member정보를 보관한 1차원 배열에 의해 불필요한 코드이지만,
+		//이미 삭제하기를 구현할 때 사용했으므로, 그냥 유지
+		selectPk = Integer.parseInt(((MyModel)model).rows[row][3]);
+		select(selectPk);
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
 	}
 
 }
