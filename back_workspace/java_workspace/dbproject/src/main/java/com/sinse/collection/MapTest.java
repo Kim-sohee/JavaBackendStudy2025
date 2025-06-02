@@ -1,7 +1,9 @@
 package com.sinse.collection;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 public class MapTest {
 	public static void main(String[] args) {
@@ -12,7 +14,13 @@ public class MapTest {
 		map.put("A2", "허쉬초콜릿");
 		map.put("A3", "abc초콜릿");
 		
-		System.out.println(map.values());
+		Set set = map.keySet();
+		Iterator<String> it = set.iterator();
+		
+		while(it.hasNext()) {
+			String key = it.next();			
+			System.out.println(map.get(key));	//기존 맵에서 key를 이용하여 접근
+		}
 		
 	}
 }
