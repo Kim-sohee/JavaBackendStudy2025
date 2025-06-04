@@ -3,12 +3,14 @@ package com.sinse.shopadmin;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.sql.Connection;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.sinse.shopadmin.common.config.Config;
+import com.sinse.shopadmin.security.model.Admin;
 
 public class AppMain extends JFrame{
 	JPanel p_north;
@@ -21,8 +23,13 @@ public class AppMain extends JFrame{
 	JLabel la_member;
 	JLabel la_cs;
 	JLabel la_config;
+	Connection con;
+	Admin admin;
 	
-	public AppMain() {
+	public AppMain(Connection con, Admin admin) {
+		this.con = con;
+		this.admin = admin;
+		
 		//생성
 		p_north = new JPanel();
 		p_west = new JPanel();
