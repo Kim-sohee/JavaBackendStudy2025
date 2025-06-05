@@ -11,16 +11,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import com.sinse.shopadmin.AppMain;
+import com.sinse.shopadmin.common.config.Config;
+import com.sinse.shopadmin.common.util.StringUtil;
+import com.sinse.shopadmin.common.view.Page;
 import com.sinse.shopadmin.security.model.Admin;
 
-public class LoginForm extends JFrame{
+public class LoginForm extends Page{
 	JLabel la_id;
 	JLabel la_pwd;
 	JTextField t_id;
@@ -28,9 +30,8 @@ public class LoginForm extends JFrame{
 	JButton bt_login;
 	JButton bt_join;
 	
-	Connection con;
-	
-	public LoginForm() {
+	public LoginForm(AppMain appMain) {
+		super(appMain);
 		//생성
 		la_id = new JLabel("아이디");
 		la_pwd = new JLabel("비밀번호");
@@ -55,7 +56,6 @@ public class LoginForm extends JFrame{
 		add(bt_login);
 		add(bt_join);
 		
-		connect();
 		
 		bt_login.addActionListener(new ActionListener() {	
 			@Override
@@ -64,33 +64,17 @@ public class LoginForm extends JFrame{
 			}
 		});
 		
-		setBounds(650, 400, 270, 145);
-		setVisible(true);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		bt_join.addActionListener(new ActionListener() {	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				appMain.showPage(Config.JOIN_PAGE);
+			}
+		});
+		
+		this.setPreferredSize(new Dimension(270, 145));
 		
 	}
-	
-	//DB 연결
-	public void connect() {
-		String url = "jdbc:mysql://localhost:3306/shop";
-		String user = "shop";
-		String pass = "1234";
 
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			con = DriverManager.getConnection(url, user, pass);
-			if(con != null) {
-				this.setTitle("접속 중");
-			}else {
-				this.setTitle("접속 불가");
-			}
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	//로그인 버튼 눌렀을 때
 	public void loginCheck() {
 		String id = t_id.getText();	//일반 텍스트 컴포넌트의 스트링 값 얻기
@@ -101,25 +85,29 @@ public class LoginForm extends JFrame{
 		ResultSet rs = null;
 		
 		try {
-			pstmt = con.prepareStatement(sql);
+			pstmt = appMain.con.prepareStatement(sql);
 			//쿼리문을 수행하기 위해, 바인드 변수를 먼저 지정해야 한다.
 			pstmt.setString(1, id);
-			pstmt.setString(2, pwd);
+			pstmt.setString(2, StringUtil.getSecurePass(pwd));
 			rs = pstmt.executeQuery();		// select문은 표를 반환한다.
 			
-			if(rs.next()) {	//한칸 전진 후 true가 반환되면 일치하는 데이터ㅏ 있다는 것이고,
+			if(rs.next()) {	//한칸 전진 후 true가 반환되면 일치하는 데이터가 있다는 것이고,
 									//일치하는 데이터가 있다는 것은 로그인 성공
-				JOptionPane.showMessageDialog(this, "로그인 성공");
+				JOptionPane.showMessageDialog(this, "로그인 성공");				
+				
 				//로그인 성공한 사람의 정보 담기
 				Admin admin = new Admin();	//empty 상태의 객체 생성
 				admin.setAdmin_id(rs.getInt("admin_id"));
 				admin.setId(rs.getString("id"));
 				admin.setPwd(rs.getString("pwd"));
 				admin.setName(rs.getString("name"));
+				//AppMain이 보유하고 있는 Admin 모델객체의 현재 null값을 위에서 생성한 Admin으로 대체
+				appMain.admin = admin;
 				
-				AppMain appMain = new AppMain(con, admin);
-				this.setVisible(false); 	//자기 자신은 안 보여야 함.
+				
 				//주의: System.exit(0)은 전체 프로그램이 끝나버림
+				//현재 유저가 보고 있는 페이지가 MainPage로 교체
+				appMain.showPage(Config.MAIN_PAGE);
 				
 			}else {
 				JOptionPane.showMessageDialog(this, "로그인 삭제");				
@@ -142,8 +130,5 @@ public class LoginForm extends JFrame{
 				}
 			}
 		}
-	}
-	public static void main(String[] args) {
-		new LoginForm();
 	}
 }
