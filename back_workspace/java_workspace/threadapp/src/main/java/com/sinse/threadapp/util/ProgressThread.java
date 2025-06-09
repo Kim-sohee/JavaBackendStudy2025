@@ -2,30 +2,27 @@ package com.sinse.threadapp.util;
 
 import javax.swing.JProgressBar;
 
-import com.sinse.threadapp.ani.ProgressTest;
-
 public class ProgressThread extends Thread{
-	ProgressTest pg;
+
 	JProgressBar bar;
-	boolean flag;
-	int time=0;
+	int n;
+	int velX;
 	
-	public ProgressThread(JProgressBar bar, boolean flag, int time, ProgressTest pg) {
+	public ProgressThread(JProgressBar bar, int velX) {
 		this.bar = bar;
-		this.flag = flag;
-		this.time = time;
-		this.pg = pg;
+		this.velX = velX;
 	}
 	
 	@Override
 	public void run() {
-		while(flag) {
+		while(true) {			
 			try {
-				Thread.sleep(time);
-				pg.move(bar);				
+				Thread.sleep(velX);
+				bar.setValue(n);
+				n++;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}		
+		}
 	}
 }
