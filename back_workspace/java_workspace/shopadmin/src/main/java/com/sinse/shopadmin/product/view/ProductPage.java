@@ -2,14 +2,25 @@ package com.sinse.shopadmin.product.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Vector;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -17,6 +28,8 @@ import com.sinse.shopadmin.AppMain;
 import com.sinse.shopadmin.common.view.Page;
 import com.sinse.shopadmin.product.model.SubCategory;
 import com.sinse.shopadmin.product.model.TopCategory;
+import com.sinse.shopadmin.product.repository.ColorDAO;
+import com.sinse.shopadmin.product.repository.SizeDAO;
 import com.sinse.shopadmin.product.repository.SubCategoryDAO;
 import com.sinse.shopadmin.product.repository.TopCategoryDAO;
 
@@ -40,18 +53,25 @@ public class ProductPage extends Page{
 	JTextField t_brand;
 	JTextField t_price;
 	JTextField t_discount;
-	JTextField t_color;
-	JTextField t_size;
+	JList t_color;
+	JList t_size;
+	JScrollPane scroll_color;
+	JScrollPane scroll_size;
 	
 	JPanel p_preview; 		//관리자가 선택한 상품 이미지를 미리보기 한다.
 	JTextArea t_introduce;	//상품 소개
 	JTextArea t_detail;
 	JButton bt_regist; //상품 등록
 	JButton bt_list; //상품 목록
-
+	
 	TopCategoryDAO topCategoryDAO;
 	SubCategoryDAO subCategoryDAO;
+	ColorDAO colorDAO;
+	SizeDAO sizeDAO;
 	
+	JFileChooser chooser;
+	Image[] imgArray;		//유저가 선택한 파일로부터 생성된 배열
+
 	public ProductPage(AppMain appMain) {
 		super(appMain);
 		setBackground(Color.CYAN);
@@ -75,15 +95,32 @@ public class ProductPage extends Page{
 		t_brand = new JTextField();
 		t_price = new JTextField();
 		t_discount = new JTextField();
-		t_color = new JTextField();
-		t_size = new JTextField();
-		p_preview = new JPanel();
+		t_color = new JList();
+		t_size = new JList();
+		scroll_color = new JScrollPane(t_color);
+		scroll_size = new JScrollPane(t_size);
+		p_preview = new JPanel() {
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				//유저가 선택한 파일 수 만큼 반복하면서 이미지를 그려주자.
+				if(imgArray != null) {	//배열이 존재할 때만 그리자.
+					for(int i=0; i<imgArray.length; i++) {
+						g.drawImage(imgArray[i], 5+(i*50), 5, 45, 45, appMain);
+						
+					}
+				}
+			}
+		};
 		t_introduce = new JTextArea();
 		t_detail = new JTextArea();
 		bt_regist = new JButton("등록");
 		bt_list = new JButton("목록");
 		topCategoryDAO = new TopCategoryDAO();
 		subCategoryDAO = new SubCategoryDAO();
+		colorDAO = new ColorDAO();
+		sizeDAO = new SizeDAO();
+		chooser = new JFileChooser("C:\\dev\\lecture_space\\images");
+		chooser.setMultiSelectionEnabled(true);
 		
 		//스타일
 		Dimension d = new Dimension(400, 30);
@@ -105,8 +142,8 @@ public class ProductPage extends Page{
 		t_brand.setPreferredSize(d);
 		t_price.setPreferredSize(d);
 		t_discount.setPreferredSize(d);
-		t_color.setPreferredSize(d);
-		t_size.setPreferredSize(d);
+		scroll_color.setPreferredSize(new Dimension(400, 80));
+		scroll_size.setPreferredSize(new Dimension(400, 80));
 		p_preview.setPreferredSize(new Dimension(400, 80));
 		t_introduce.setPreferredSize(new Dimension(400, 50));
 		t_detail.setPreferredSize(new Dimension(400, 60));
@@ -128,9 +165,9 @@ public class ProductPage extends Page{
 		add(la_discount);
 		add(t_discount);
 		add(la_color);
-		add(t_color);
+		add(scroll_color);
 		add(la_size);
-		add(t_size);
+		add(scroll_size);
 		add(bt_open);
 		add(p_preview);
 		add(la_introduce);
@@ -153,15 +190,8 @@ public class ProductPage extends Page{
 					//내가 선택한 아이템의 pk를 출력해보기
 					TopCategory topCategory = (TopCategory)cb_topcategory.getSelectedItem();
 					
-					//모든 하위 카테고리 콤보 아이템 지우기
-					cb_subcategory.removeAllItems();
-					
 					//하위 카테고리 목록 가져오기
-					List<SubCategory> subList = subCategoryDAO.selectByTop(topCategory);
-					for(int i=0; i<subList.size(); i++) {
-						cb_subcategory.addItem(subList.get(i));
-					}
-					
+					getSubCategory(topCategory);			
 				}
 			}
 		});
@@ -169,6 +199,28 @@ public class ProductPage extends Page{
 		//최상위 카테고리 불러오기
 		getTopCategory();
 		
+		getColorList();
+		getSizeList();
+		
+		//파일 탐색기 띄우기
+		bt_open.addActionListener(e->{
+			chooser.showOpenDialog(ProductPage.this);
+			
+			//유저가 선택한 파일에 대한 정보 얻기
+			File[] files = chooser.getSelectedFiles();
+			imgArray = new Image[files.length];	//유저가 선택한 파일의 수에 맞게 이미지 배열 준비
+			//파일은 파일일 뿐, 이미지가 아니므로 파일을 이용하여 이미지를 만들자.
+			try {
+				for(int i=0; i<files.length; i++) {
+					BufferedImage buffrImg = ImageIO.read(files[i]);				
+					imgArray[i] = buffrImg.getScaledInstance(45, 45, Image.SCALE_SMOOTH);
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			//그림 다시 그리기
+			p_preview.repaint();
+		});
 	}
 	
 	//DAO를 통해 얻어온 List를 이용하여 콤보박스 채우기
@@ -184,5 +236,29 @@ public class ProductPage extends Page{
 		for(int i=0; i<topList.size(); i++) {
 			cb_topcategory.addItem(topList.get(i));
 		}
+	}
+	
+	public void getSubCategory(TopCategory topCategory) {
+		//하위 카테고리 목록 가져오기
+		List<SubCategory> subList = subCategoryDAO.selectByTop(topCategory);
+		
+		//모든 하위 카테고리 콤보아이템 지우기
+		cb_subcategory.removeAllItems();
+		
+		SubCategory dummy = new SubCategory();
+		dummy.setSub_name("하위 카테고리를 선택하세요");
+		dummy.setSubcategory_id(0);
+		cb_subcategory.addItem(dummy);
+		
+		for(int i=0; i<subList.size(); i++) {
+			cb_subcategory.addItem(subList.get(i));
+		}
+	}
+	
+	public void getColorList() {
+		t_color.setListData(new Vector(colorDAO.selectAll()));
+	}
+	public void getSizeList() {
+		t_size.setListData(new Vector(sizeDAO.selectAll()));
 	}
 }

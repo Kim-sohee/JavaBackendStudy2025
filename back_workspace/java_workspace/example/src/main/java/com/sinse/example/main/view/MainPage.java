@@ -31,9 +31,6 @@ public class MainPage extends JFrame{
 	UserDAO userDAO;
 	
 	public MainPage() {
-		List<UserModel> users = userDAO.selectAll();
-		DataModel.fillTable(model, users);
-		
 		//생성
 		p_north = new JPanel();
 		bt_excel = new JButton("일괄 등록하기");
@@ -53,6 +50,13 @@ public class MainPage extends JFrame{
 		
 		add(p_north, BorderLayout.NORTH);
 		add(table);
+		
+		List<UserModel> users = userDAO.selectAll();
+		DataModel.fillTable(model, users);
+		
+		for(int i=0; i<users.size(); i++) {
+			System.out.println(users.get(i).getEname());
+		}
 		
 		//엑셀 선택하여 읽기
 		bt_excel.addActionListener(new ActionListener() {	
