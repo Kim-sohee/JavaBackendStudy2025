@@ -19,6 +19,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -71,6 +72,8 @@ public class ProductPage extends Page{
 	
 	JFileChooser chooser;
 	Image[] imgArray;		//유저가 선택한 파일로부터 생성된 배열
+	File[] files;		//파일을 복사, 즉 업로드를 진행하려면 이미지가 아닌 파일을 대상으로 할 수 있다.
+						//FileInputStream, FileOutputSteam의 대상은 File 이기 때문임..
 
 	public ProductPage(AppMain appMain) {
 		super(appMain);
@@ -204,10 +207,25 @@ public class ProductPage extends Page{
 		
 		//파일 탐색기 띄우기
 		bt_open.addActionListener(e->{
-			chooser.showOpenDialog(ProductPage.this);
-			
-			//유저가 선택한 파일에 대한 정보 얻기
-			File[] files = chooser.getSelectedFiles();
+			int result = chooser.showOpenDialog(ProductPage.this);
+			if(result==JFileChooser.APPROVE_OPTION) {				
+				preview();
+			}
+		});
+		
+		//등록 버튼과 리스너 연결
+		bt_regist.addActionListener(e->{
+			regist();
+		});
+	}
+	
+	public void preview() {
+		//유저가 선택한 파일에 대한 정보 얻기
+		files = chooser.getSelectedFiles();
+		
+		if(files.length > 6) {
+			JOptionPane.showMessageDialog(this, "이미지는 최대 6개까지 가능합니다");
+		}else {
 			imgArray = new Image[files.length];	//유저가 선택한 파일의 수에 맞게 이미지 배열 준비
 			//파일은 파일일 뿐, 이미지가 아니므로 파일을 이용하여 이미지를 만들자.
 			try {
@@ -220,7 +238,7 @@ public class ProductPage extends Page{
 			}
 			//그림 다시 그리기
 			p_preview.repaint();
-		});
+		}
 	}
 	
 	//DAO를 통해 얻어온 List를 이용하여 콤보박스 채우기
@@ -260,5 +278,48 @@ public class ProductPage extends Page{
 	}
 	public void getSizeList() {
 		t_size.setListData(new Vector(sizeDAO.selectAll()));
+	}
+	
+	public void upload() {
+		//시각적 효과를 위해, 각 이미지의 업로드 진행율을 보여주자. (새창으로...)
+		UploadDialog dialog = new UploadDialog(this);
+		System.out.println("여기 실행");
+	}
+	
+	//mysql에 상품 등록 관련 쿼리 수행
+	public void insert() {
+		
+	}
+	
+	//이미지 업로드 및 DB insert
+	public void regist() {
+		//양식을 제대로 입력했을 때
+		//상위 카테고리 유효성 체크
+		if(cb_topcategory.getSelectedIndex() == 0) {
+			JOptionPane.showMessageDialog(this, "상위 카테고리를 선택해야 합니다.");
+		}else if(cb_subcategory.getSelectedIndex() == 0) {
+			JOptionPane.showMessageDialog(this, "하위 카테고리를 선택해야 합니다.");
+		}else if(t_product_name.getText().length() <1) {
+			JOptionPane.showMessageDialog(this, "상품명을 입력하세요.");
+		}else if(t_brand.getText().length() < 1) {
+			JOptionPane.showMessageDialog(this, "브랜드를 입력하세요.");
+		}else if(t_price.getText().length() < 1) {
+			JOptionPane.showMessageDialog(this, "가격을 입력하세요.");
+		}else if(t_discount.getText().length() < 1) {
+			JOptionPane.showMessageDialog(this, "할인가격을 입력하세요.");
+		}else if(t_color.getMinSelectionIndex() < 0) {
+			JOptionPane.showMessageDialog(this, "1개 이상의 색상을 선택하세요.");
+		}else if(t_size.getMinSelectionIndex() < 0) {
+			JOptionPane.showMessageDialog(this, "1개 이상의 사이즈를 선택하세요.");
+		}else if(files.length < 1) {
+			JOptionPane.showMessageDialog(this, "상품 이미지를 선택하세요.");
+		}else if(t_introduce.getText().length() < 1) {
+			JOptionPane.showMessageDialog(this, "상품 소개를 입력하세요.");
+		}else if(t_detail.getText().length() < 1) {
+			JOptionPane.showMessageDialog(this, "상세내용을 입력하세요.");
+		}else {
+			upload();
+			insert();	//mysql
+		}
 	}
 }
