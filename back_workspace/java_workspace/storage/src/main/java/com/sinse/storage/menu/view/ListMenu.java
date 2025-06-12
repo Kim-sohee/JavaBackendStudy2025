@@ -11,6 +11,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.sinse.storage.config.util.ImageUtil;
+
 public class ListMenu extends JPanel{
 	JPanel p_center;
 	JLabel la_title;
@@ -32,33 +34,39 @@ public class ListMenu extends JPanel{
 	JLabel la_report;
 	//사용자 관리
 	JLabel la_management;
+	ImageUtil icon;
+	
+	private static final int ICON_WIDTH= 60;
+	private static final int ICON_HIGHT= 60;
 	
 	public ListMenu() {
 		//생성
+		icon = new ImageUtil();
 		p_center = new JPanel();
 		la_title = new JLabel("관리자 페이지");
-		la_inbound = new JLabel("입고");
+		la_inbound = new JLabel("입고", icon.getIcon("images/icon/list0.png", ICON_WIDTH, ICON_HIGHT), JLabel.LEFT);
 		la_inCurrent = new JLabel("입고 현황");
 		la_inRequest = new JLabel("입고 요청");
 		la_inInspect = new JLabel("입고 검수");
-		la_outbound = new JLabel("출고");
+		la_outbound = new JLabel("출고", icon.getIcon("images/icon/list1.png", ICON_WIDTH, ICON_HIGHT), JLabel.LEFT);
 		la_outCurrent = new JLabel("출고 현황");
 		la_outRequest = new JLabel("출고 요청");
 		la_outInspect = new JLabel("출고 검수");
-		la_inventory = new JLabel("재고 현황");
-		la_statsReport = new JLabel("통계 및 보고서");
+		la_inventory = new JLabel("재고 현황", icon.getIcon("images/icon/list2.png", ICON_WIDTH, ICON_HIGHT), JLabel.LEFT);
+		la_statsReport = new JLabel("통계 및 보고서", icon.getIcon("images/icon/list3.png", ICON_WIDTH, ICON_HIGHT), JLabel.LEFT);
 		la_stats = new JLabel("입/출고 현황 통계");
 		la_report = new JLabel("입/출고 현황 보고서");
-		la_management = new JLabel("사용자 관리");
+		la_management = new JLabel("사용자 관리", icon.getIcon("images/icon/list4.png", ICON_WIDTH, ICON_HIGHT), JLabel.LEFT);
 		
 		//스타일
 		p_center.setBorder(BorderFactory.createLineBorder(Color.black));
-		la_title.setPreferredSize(new Dimension(340, 200));
+		p_center.setBackground(new Color(227, 227, 227));
+		la_title.setPreferredSize(new Dimension(300, 200));
 		la_title.setFont(new Font("SansSerif", Font.BOLD, 45));
 		la_title.setForeground(new Color(38,  124,  181));
 		
 		//상위 항목 스타일 지정
-		Dimension top = new Dimension(330, 100);
+		Dimension top = new Dimension(330, 80);
 		la_inbound.setPreferredSize(top);
 		la_outbound.setPreferredSize(top);
 		la_inventory.setPreferredSize(top);
