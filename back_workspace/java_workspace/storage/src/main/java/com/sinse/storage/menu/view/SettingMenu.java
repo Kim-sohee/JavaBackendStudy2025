@@ -3,16 +3,16 @@ package com.sinse.storage.menu.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Insets;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import com.sinse.storage.config.util.ImageUtil;
 
-public class SettingMenu extends JFrame{
+public class SettingMenu extends JPanel{
 	JButton bt_user;
 	JButton bt_sns;
 	JButton bt_search;
@@ -39,6 +39,11 @@ public class SettingMenu extends JFrame{
 		p_bottom = new JPanel();
 		
 		//스타일
+		//배경 지정
+		p_top.setBackground(new Color(38, 124, 181));
+		p_center.setBackground(new Color(38, 124, 181));
+		p_bottom.setBackground(new Color(38, 124, 181));
+		
 		//버튼 크기 지정
 		Dimension d = new Dimension(ICON_WIDTH, ICON_HIGHT);
 		bt_user.setPreferredSize(d);
@@ -72,26 +77,21 @@ public class SettingMenu extends JFrame{
 		//조립
         p_top.add(Box.createVerticalStrut(40));
 		p_top.add(bt_user);
-		p_top.add(Box.createVerticalStrut(20));
+		p_top.add(Box.createVerticalStrut(30));
 		p_top.add(bt_sns);
-		p_top.add(Box.createVerticalStrut(20));
+		p_top.add(Box.createVerticalStrut(30));
 		p_top.add(bt_search);
 		
 		p_bottom.add(bt_help);
-		p_bottom.add(Box.createVerticalStrut(20));
+		p_bottom.add(Box.createVerticalStrut(30));
 		p_bottom.add(bt_setting);
 		p_bottom.add(Box.createVerticalStrut(40));
 		
 		p_center.add(p_top, BorderLayout.NORTH);
 		p_center.add(p_bottom, BorderLayout.SOUTH);
+		setLayout(new BorderLayout());
 		add(p_center);
 		
-		setSize(100, 960);
-		setVisible(true);
-	}
-	
-	//이후에 삭제
-	public static void main(String[] args) {
-		new SettingMenu();
+		setPreferredSize(new Dimension(100, 960));
 	}
 }
