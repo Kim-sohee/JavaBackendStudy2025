@@ -16,11 +16,14 @@ public class UploadDialog extends JDialog{
 		dialog.setLocationRelativeTo(productPage);
 		dialog.setLayout(new FlowLayout());
 		
+		//우리가 미리보기한 사진의 수만큼 배열을 확보
+		productPage.newFiles = new File[productPage.files.length];
+		
 		//커스텀 된 바를 임시로 6개 화면에 부착해보자.
 		for(int i=0; i<productPage.files.length; i++) {
 			//어디에 저장할 지 디렉토리 결정
 			File dest = FileUtil.createFile(Config.PRODUCT_IMG_PATH, FileUtil.getExt(productPage.files[i].getName()));
-			
+			productPage.newFiles[i] = dest;		//상품 등록 폼에 파일 정보를 대입해주기 위함
 			MyBar bar = new MyBar(productPage.files[i], dest);
 			Thread thread = new Thread(bar);
 			thread.start();
