@@ -23,8 +23,8 @@ public class SettingMenu extends JFrame{
 	JPanel p_bottom;
 	ImageUtil icon;
 	
-	private static final int ICON_WIDTH= 90;
-	private static final int ICON_HIGHT= 60;
+	private static final int ICON_WIDTH= 80;
+	private static final int ICON_HIGHT= 50;
 	
 	public SettingMenu() {
 		//생성
@@ -40,7 +40,7 @@ public class SettingMenu extends JFrame{
 		
 		//스타일
 		//버튼 크기 지정
-		Dimension d = new Dimension(90, 60);
+		Dimension d = new Dimension(ICON_WIDTH, ICON_HIGHT);
 		bt_user.setPreferredSize(d);
 		bt_sns.setPreferredSize(d);
 		bt_search.setPreferredSize(d);

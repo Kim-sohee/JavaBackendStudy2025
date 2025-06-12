@@ -1,6 +1,5 @@
 package com.sinse.shopadmin.product.view;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -27,9 +25,19 @@ import javax.swing.JTextField;
 
 import com.sinse.shopadmin.AppMain;
 import com.sinse.shopadmin.common.view.Page;
+import com.sinse.shopadmin.product.model.Color;
+import com.sinse.shopadmin.product.model.Product;
+import com.sinse.shopadmin.product.model.ProductColor;
+import com.sinse.shopadmin.product.model.ProductImg;
+import com.sinse.shopadmin.product.model.ProductSize;
+import com.sinse.shopadmin.product.model.Size;
 import com.sinse.shopadmin.product.model.SubCategory;
 import com.sinse.shopadmin.product.model.TopCategory;
 import com.sinse.shopadmin.product.repository.ColorDAO;
+import com.sinse.shopadmin.product.repository.ProductColorDAO;
+import com.sinse.shopadmin.product.repository.ProductDAO;
+import com.sinse.shopadmin.product.repository.ProductImgDAO;
+import com.sinse.shopadmin.product.repository.ProductSizeDAO;
 import com.sinse.shopadmin.product.repository.SizeDAO;
 import com.sinse.shopadmin.product.repository.SubCategoryDAO;
 import com.sinse.shopadmin.product.repository.TopCategoryDAO;
@@ -69,15 +77,21 @@ public class ProductPage extends Page{
 	SubCategoryDAO subCategoryDAO;
 	ColorDAO colorDAO;
 	SizeDAO sizeDAO;
+	ProductDAO productDAO;
+	ProductColorDAO productColorDAO;
+	ProductSizeDAO productSizeDAO;
+	ProductImgDAO productImgDAO;
 	
 	JFileChooser chooser;
 	Image[] imgArray;		//유저가 선택한 파일로부터 생성된 배열
 	File[] files;		//파일을 복사, 즉 업로드를 진행하려면 이미지가 아닌 파일을 대상으로 할 수 있다.
 						//FileInputStream, FileOutputSteam의 대상은 File 이기 때문임..
 
+	File[] newFiles;	//업로드 다이얼로그에 의해 새롭게 생성된(업로드) 파일들에 대한 정보
+	
 	public ProductPage(AppMain appMain) {
 		super(appMain);
-		setBackground(Color.CYAN);
+		setBackground(java.awt.Color.CYAN);
 		
 		//생성
 		la_topcategory = new JLabel("최상위 카테고리");
@@ -122,6 +136,11 @@ public class ProductPage extends Page{
 		subCategoryDAO = new SubCategoryDAO();
 		colorDAO = new ColorDAO();
 		sizeDAO = new SizeDAO();
+		productDAO = new ProductDAO();
+		productColorDAO = new ProductColorDAO();
+		productSizeDAO = new ProductSizeDAO();
+		productImgDAO = new ProductImgDAO();
+		
 		chooser = new JFileChooser("C:\\dev\\lecture_space\\images");
 		chooser.setMultiSelectionEnabled(true);
 		
@@ -288,7 +307,55 @@ public class ProductPage extends Page{
 	
 	//mysql에 상품 등록 관련 쿼리 수행
 	public void insert() {
+		//ProductDAO에게 일 시키기
 		
+		//모델 인스턴스 1개를 만들어 상품 등록폼의 데이터를 채워넣자.
+		Product product = new Product();
+		
+		product.setSubCategory((SubCategory)cb_subcategory.getSelectedItem());
+		product.setProduct_name(t_product_name.getText());
+		product.setBrand(t_brand.getText());
+		product.setPrice(Integer.parseInt(t_price.getText()));
+		product.setDiscount(Integer.parseInt(t_discount.getText()));
+		product.setIntroduce(t_introduce.getText());
+		product.setDetail(t_detail.getText());
+		
+		int result = productDAO.insert(product);
+		System.out.println("등록결과"+result);
+		
+		int product_id = productDAO.selectRecentPk();
+		product.setProduct_id(product_id);
+//		System.out.println(product_id);
+		
+		//상품에 딸려 있는 색상들 등록하기
+		List<Color> colorList = t_color.getSelectedValuesList();
+		for(Color color: colorList) {
+			ProductColor productColor = new ProductColor();
+			productColor.setProduct(product);
+			productColor.setColor(color);
+			
+			productColorDAO.insert(productColor);
+		}
+		
+		//상품에 딸려있는 사이즈를 등록
+		List<Size> sizeList = t_size.getSelectedValuesList();
+		for(Size size: sizeList) {
+			ProductSize productSize = new ProductSize();
+			productSize.setProduct(product);
+			productSize.setSize(size);
+			productSizeDAO.insert(productSize);
+		}
+		
+		//상품에 딸려있는 이미지 등록
+		for(int i=0; i<newFiles.length; i++) {
+			File file = newFiles[i];		//업로드된 파일 객체를 꺼내보자
+			
+			ProductImg productImg = new ProductImg();
+			productImg.setProduct(product);
+			productImg.setFilename(file.getName());
+			
+			productImgDAO.insert(productImg);
+		}
 	}
 	
 	//이미지 업로드 및 DB insert
