@@ -35,6 +35,15 @@ public class DBManager {
 	}
 	
 	//DB 자원 해제
+	public void release(Connection con) {
+		if(con != null) {
+			try {
+				con.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	public void release(PreparedStatement pstmt) {
 		if(pstmt != null) {
 			try {

@@ -5,11 +5,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
+import java.sql.Connection;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -18,7 +20,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -33,11 +34,11 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
-import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.sinse.example.main.model.UserModel;
+import com.sinse.example.common.util.DBManager;
+import com.sinse.example.main.model.UserDataModel;
 import com.sinse.example.main.repository.UserDAO;
 
 public class MainPage extends JFrame{
@@ -49,21 +50,25 @@ public class MainPage extends JFrame{
 	JScrollPane scroll;
 	JFileChooser chooser;
 	
-	DefaultTableModel tableModel;
 	UserDAO userDAO;
 	String[] columnNames = {"empno", "ename", "job", "mgr", "hiredate", "sal", "comm", "deptno"};
+	UserDataModel userDataModel;
+	
+	public DBManager dbManager = DBManager.getInstance();
+	public Connection con;
 	
 	public MainPage() {
 		//생성
+		userDAO = new UserDAO();
+		userDataModel = new UserDataModel();
 		p_north = new JPanel();
 		bt_excel = new JButton("일괄 등록하기");
 		bt_download = new JButton("엑셀 다운로드");		
 		bt_pdf = new JButton("pdf 다운로드");
-		tableModel = new DefaultTableModel(columnNames, 0);	//컬럼명 정의
-		table = new JTable(tableModel);
+
+		table = new JTable(userDataModel);
 		scroll = new JScrollPane(table);
 		chooser = new JFileChooser();
-		userDAO = new UserDAO();
 		
 		//스타일
 		p_north.setBackground(Color.LIGHT_GRAY);
@@ -76,22 +81,6 @@ public class MainPage extends JFrame{
 		
 		add(p_north, BorderLayout.NORTH);
 		add(scroll);
-		
-		//테이블띄우기
-		List<UserModel> users = userDAO.selectAll();
-		for(UserModel user: users) {
-			tableModel.addRow(new Object[] {
-					user.getEmpno(),
-					user.getEname(),
-					user.getJob(),
-					user.getMgr(),
-					user.getHiredate(),
-					user.getSal(),
-					user.getComm(),
-					user.getDeptno()
-			});
-		}
-		tableModel.fireTableDataChanged();
 
 		
 		//엑셀 선택하여 읽기
@@ -109,13 +98,23 @@ public class MainPage extends JFrame{
 		//엑셀 다운로드
 		bt_download.setToolTipText("아래 데이터를 엑셀 파일로 다운로드 할 수 있습니다.");
 		bt_download.addActionListener(e->{
-			exportToExcel(columnNames, tableModel);
+			exportToExcel(columnNames, userDataModel);
 		});
 		
 		//PDF 다운로드
 		bt_pdf.setToolTipText("아래 데이터를 pdf 파일로 다운로드 할 수 있습니다.");
 		bt_pdf.addActionListener(e->{
-			exportToPdf(columnNames, tableModel);
+			exportToPdf(columnNames, userDataModel);
+		});
+		
+		//페이지 닫히면 db 연결 끊기
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				//데이터베이스 접속 끊기
+				dbManager.release(con);
+				System.exit(0);
+			}
 		});
 		
 		setSize(600, 500);
@@ -123,7 +122,7 @@ public class MainPage extends JFrame{
 		
 	}
 	
-	public void exportToExcel(String[] title, DefaultTableModel tableModel) {
+	public void exportToExcel(String[] title, UserDataModel tableModel) {
 		Workbook workbook = new XSSFWorkbook();
 		Sheet sheet = workbook.createSheet("download");
 		
@@ -161,7 +160,7 @@ public class MainPage extends JFrame{
 	}
 	
 	//PDF 다운로드하기
-	public void exportToPdf(String[] titleArray, DefaultTableModel tableModel) {
+	public void exportToPdf(String[] titleArray, UserDataModel tableModel) {
 		//다운로드 폴더에 저장하도록 유도
 		String downloadPath = System.getProperty("user.home") + File.separator + "Downloads";
 	    String pdfFilePath = getUniqueFileName(downloadPath, "UserData", ".pdf");
