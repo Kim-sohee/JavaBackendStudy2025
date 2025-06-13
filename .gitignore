@@ -2,5 +2,10 @@
 images/
 js_workspace/key
 back_workspace/java_workspace/guiproject/res/
+<<<<<<< HEAD
 **/target/
 *.project
+=======
+target/
+**/target/
+>>>>>>> 5df3a4d9731f969945aef6edad10f42227882d76

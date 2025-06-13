@@ -2,14 +2,18 @@ package com.sinse.shop.common.config;
 
 //유저용 쇼핑몰에서 사용되는 모든 상수를 관리하는 클래스 
 public class Config {
+	public static final String url = "jdbc:mysql://localhost:3306/shop";
+	public static final String user = "shop";
+	public static final String pass = "1234";
+	
 	/*------------------------------------------------------------
 	 	페이지 정의
 	------------------------------------------------------------*/
 	public static final int MAIN_PAGE = 0;
-	public static final int PRODUCT_PAGE = 1;
-	public static final int CUSTOMER_PAGE = 2;
-	public static final int LOGIN_PAGE = 3;
-	public static final int JOIN_PAGE = 4;
+	public static final int JOIN_PAGE = 1;
+	public static final int PRODUCT_PAGE = 2;
+	public static final int CUSTOMER_PAGE = 3;
+	public static final int LOGIN_PAGE = 4;
 	public static final int CART_PAGE = 5;
 	public static final int WISHLIST_PAGE = 6;
 	
