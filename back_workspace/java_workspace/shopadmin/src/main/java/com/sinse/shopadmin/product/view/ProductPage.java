@@ -8,6 +8,8 @@ import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
 
@@ -24,6 +26,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import com.sinse.shopadmin.AppMain;
+import com.sinse.shopadmin.common.config.Config;
+import com.sinse.shopadmin.common.exception.ProductColorException;
+import com.sinse.shopadmin.common.exception.ProductException;
+import com.sinse.shopadmin.common.exception.ProductImgException;
+import com.sinse.shopadmin.common.exception.ProductSizeException;
+import com.sinse.shopadmin.common.util.DBManager;
 import com.sinse.shopadmin.common.view.Page;
 import com.sinse.shopadmin.product.model.Color;
 import com.sinse.shopadmin.product.model.Product;
@@ -73,6 +81,7 @@ public class ProductPage extends Page{
 	JButton bt_regist; //상품 등록
 	JButton bt_list; //상품 목록
 	
+	DBManager dbManager = DBManager.getInstance();
 	TopCategoryDAO topCategoryDAO;
 	SubCategoryDAO subCategoryDAO;
 	ColorDAO colorDAO;
@@ -99,7 +108,7 @@ public class ProductPage extends Page{
 		la_product_name = new JLabel("상품명");
 		la_brand = new JLabel("브랜드");
 		la_price = new JLabel("가격");
-		la_discount = new JLabel("수량");
+		la_discount = new JLabel("할인율");
 		la_color = new JLabel("색상");
 		la_size = new JLabel("크기");
 		bt_open = new JButton("상품사진 등록");
@@ -236,6 +245,11 @@ public class ProductPage extends Page{
 		bt_regist.addActionListener(e->{
 			regist();
 		});
+		
+		//목록 버튼 리스너 연결
+		bt_list.addActionListener(e->{
+			appMain.showPage(Config.PRODUCT_LIST_PAGE);
+		});
 	}
 	
 	public void preview() {
@@ -307,54 +321,78 @@ public class ProductPage extends Page{
 	
 	//mysql에 상품 등록 관련 쿼리 수행
 	public void insert() {
-		//ProductDAO에게 일 시키기
-		
-		//모델 인스턴스 1개를 만들어 상품 등록폼의 데이터를 채워넣자.
-		Product product = new Product();
-		
-		product.setSubCategory((SubCategory)cb_subcategory.getSelectedItem());
-		product.setProduct_name(t_product_name.getText());
-		product.setBrand(t_brand.getText());
-		product.setPrice(Integer.parseInt(t_price.getText()));
-		product.setDiscount(Integer.parseInt(t_discount.getText()));
-		product.setIntroduce(t_introduce.getText());
-		product.setDetail(t_detail.getText());
-		
-		int result = productDAO.insert(product);
-		System.out.println("등록결과"+result);
-		
-		int product_id = productDAO.selectRecentPk();
-		product.setProduct_id(product_id);
+		//트랜잭션이 적용 되려면 4개의 DAO 모두 같은 Connection 이어야 한다.
+		Connection con = dbManager.getConnection();
+		try {
+			con.setAutoCommit(false);		//start transaction 명령이 포함되어 있으므로 별도로 명시 불필요
+			//이 영역은 트랜잭션을 이루고 있는 업무들의 시도 영역이다. 만일 이 영역에서 에러가 발생하면 실행부가 catch문으로 진입
+			//해당 catch 문으로 트랜잭션을 rollback하고 정상 실행이면 commit 실행
+			
+			//ProductDAO에게 일 시키기
+			//모델 인스턴스 1개를 만들어 상품 등록폼의 데이터를 채워넣자.
+			Product product = new Product();
+			
+			product.setSubCategory((SubCategory)cb_subcategory.getSelectedItem());
+			product.setProduct_name(t_product_name.getText());
+			product.setBrand(t_brand.getText());
+			product.setPrice(Integer.parseInt(t_price.getText()));
+			product.setDiscount(Integer.parseInt(t_discount.getText()));
+			product.setIntroduce(t_introduce.getText());
+			product.setDetail(t_detail.getText());
+			
+			productDAO.insert(product);
+//		System.out.println("등록결과");
+			
+			int product_id = productDAO.selectRecentPk();
+			product.setProduct_id(product_id);
 //		System.out.println(product_id);
-		
-		//상품에 딸려 있는 색상들 등록하기
-		List<Color> colorList = t_color.getSelectedValuesList();
-		for(Color color: colorList) {
-			ProductColor productColor = new ProductColor();
-			productColor.setProduct(product);
-			productColor.setColor(color);
 			
-			productColorDAO.insert(productColor);
-		}
-		
-		//상품에 딸려있는 사이즈를 등록
-		List<Size> sizeList = t_size.getSelectedValuesList();
-		for(Size size: sizeList) {
-			ProductSize productSize = new ProductSize();
-			productSize.setProduct(product);
-			productSize.setSize(size);
-			productSizeDAO.insert(productSize);
-		}
-		
-		//상품에 딸려있는 이미지 등록
-		for(int i=0; i<newFiles.length; i++) {
-			File file = newFiles[i];		//업로드된 파일 객체를 꺼내보자
+			//상품에 딸려 있는 색상들 등록하기
+			List<Color> colorList = t_color.getSelectedValuesList();
+			for(Color color: colorList) {
+				ProductColor productColor = new ProductColor();
+				productColor.setProduct(product);
+				productColor.setColor(color);
+				
+				productColorDAO.insert(productColor);
+			}
 			
-			ProductImg productImg = new ProductImg();
-			productImg.setProduct(product);
-			productImg.setFilename(file.getName());
+			//상품에 딸려있는 사이즈를 등록
+			List<Size> sizeList = t_size.getSelectedValuesList();
+			for(Size size: sizeList) {
+				ProductSize productSize = new ProductSize();
+				productSize.setProduct(product);
+				productSize.setSize(size);
+				productSizeDAO.insert(productSize);
+			}
 			
-			productImgDAO.insert(productImg);
+			//상품에 딸려있는 이미지 등록
+			for(int i=0; i<newFiles.length; i++) {
+				File file = newFiles[i];		//업로드된 파일 객체를 꺼내보자
+				
+				ProductImg productImg = new ProductImg();
+				productImg.setProduct(product);
+				productImg.setFilename(file.getName());
+				
+				productImgDAO.insert(productImg);
+			}
+			con.commit();	//에러가 없으므로 확정
+		} catch (ProductException | ProductColorException | ProductSizeException | ProductImgException e ) {
+			try {
+				con.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();	//개발자를 위한 에러 로그
+			JOptionPane.showMessageDialog(this, e.getMessage());	//유저를 위해 에러 원인을 알려줌
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				con.setAutoCommit(true);		//다시 되돌려 놓기
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}	
 		}
 	}
 	

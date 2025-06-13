@@ -8,6 +8,7 @@ import java.awt.Image;
 
 import javax.swing.JPanel;
 
+import com.sinse.shop.AppMain;
 import com.sinse.shop.common.config.Config;
 import com.sinse.shop.common.util.ImageUtil;
 import com.sinse.shop.common.view.Page;
@@ -18,7 +19,8 @@ public class MainPage extends Page{
 	ImageUtil imageUtil = new ImageUtil();
 	Image image=null;
 	
-	public MainPage() {
+	public MainPage(AppMain appMain) {
+		super(appMain);
 		//생성
 		image = imageUtil.getImage("images/test.jpg", Config.MAIN_VISUAL_WIDTH, Config.MAIN_VISUAL_HEIGHT);
 		//패널을 이름없는 익명 클래스로 재정의하는 코드를 작성
