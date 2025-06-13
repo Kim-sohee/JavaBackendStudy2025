@@ -13,12 +13,13 @@ public class Config {
 	------------------------------------------------------------*/
 	public static final int LOGIN_PAGE = 0;
 	public static final int MAIN_PAGE = 1;
-	public static final int PRODUCT_PAGE = 2;
+	public static final int PRODUCT_PAGE = 2;		//상품 등록 페이지
 	public static final int ORDER_PAGE = 3;
 	public static final int MEMBER_PAGE = 4;
 	public static final int CUSTOMER_PAGE = 5;
 	public static final int CONFIG_PAGE = 6;
 	public static final int JOIN_PAGE = 7;
+	public static final int PRODUCT_LIST_PAGE = 8;	//상품목록 페이지
 	
 	/*------------------------------------------------------------
 	 	관리자 앱 메인 설정

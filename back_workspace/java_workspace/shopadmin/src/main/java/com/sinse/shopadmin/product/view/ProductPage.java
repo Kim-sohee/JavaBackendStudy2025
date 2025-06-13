@@ -26,6 +26,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import com.sinse.shopadmin.AppMain;
+import com.sinse.shopadmin.common.config.Config;
 import com.sinse.shopadmin.common.exception.ProductColorException;
 import com.sinse.shopadmin.common.exception.ProductException;
 import com.sinse.shopadmin.common.exception.ProductImgException;
@@ -107,7 +108,7 @@ public class ProductPage extends Page{
 		la_product_name = new JLabel("상품명");
 		la_brand = new JLabel("브랜드");
 		la_price = new JLabel("가격");
-		la_discount = new JLabel("수량");
+		la_discount = new JLabel("할인율");
 		la_color = new JLabel("색상");
 		la_size = new JLabel("크기");
 		bt_open = new JButton("상품사진 등록");
@@ -243,6 +244,11 @@ public class ProductPage extends Page{
 		//등록 버튼과 리스너 연결
 		bt_regist.addActionListener(e->{
 			regist();
+		});
+		
+		//목록 버튼 리스너 연결
+		bt_list.addActionListener(e->{
+			appMain.showPage(Config.PRODUCT_LIST_PAGE);
 		});
 	}
 	
@@ -381,6 +387,12 @@ public class ProductPage extends Page{
 			JOptionPane.showMessageDialog(this, e.getMessage());	//유저를 위해 에러 원인을 알려줌
 		}catch (SQLException e) {
 			e.printStackTrace();
+		}finally {
+			try {
+				con.setAutoCommit(true);		//다시 되돌려 놓기
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}	
 		}
 	}
 	
