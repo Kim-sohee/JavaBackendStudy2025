@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -12,12 +13,16 @@ import com.sinse.shop.AppMain;
 import com.sinse.shop.common.config.Config;
 import com.sinse.shop.common.util.ImageUtil;
 import com.sinse.shop.common.view.Page;
+import com.sinse.shop.product.model.Product;
+import com.sinse.shop.product.repository.ProductDAO;
+import com.sinse.shop.product.view.ProductItem;
 
 public class MainPage extends Page{
 	JPanel p_visual;		//메인 비주얼 영역(메인 배너영역)
 	JPanel p_content;	//상품이 출력될 영역
 	ImageUtil imageUtil = new ImageUtil();
 	Image image=null;
+	ProductDAO productDAO=new ProductDAO();
 	
 	public MainPage(AppMain appMain) {
 		super(appMain);
@@ -34,7 +39,7 @@ public class MainPage extends Page{
 				g.drawImage(image, 0, 0, Config.MAIN_VISUAL_WIDTH, Config.MAIN_VISUAL_HEIGHT, p_visual);
 			}
 		};
-		p_content = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		p_content = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 20));
 		
 		//스타일
 		p_visual.setPreferredSize(new Dimension(Config.MAIN_VISUAL_WIDTH, Config.MAIN_VISUAL_HEIGHT));
@@ -46,10 +51,26 @@ public class MainPage extends Page{
 		p_visual.setBackground(Color.GREEN);
 		p_content.setBackground(Color.GRAY);
 		
+		//최신 상품 생성하기
+		createRecentList();
+		
 		//조립
 		add(p_visual);
 		add(p_content);
 		
 		setVisible(true);
-	}	
+	}
+	
+	//최신 상품 패널 원하는 수 만큼 p_content에 출력
+	public void createRecentList() {
+		int num = 4;
+		List<Product> productList = productDAO.selectRecentList(num);
+		
+		
+		for(int i=0; i<productList.size(); i++) {
+			Product product = productList.get(i);		//리스트에서 상품을 하나씩 꺼내자.
+			ProductItem productItem = new ProductItem(product);	//상품 하나를 표현하는 디자인 카드
+			p_content.add(productItem);
+		}
+	}
 }
