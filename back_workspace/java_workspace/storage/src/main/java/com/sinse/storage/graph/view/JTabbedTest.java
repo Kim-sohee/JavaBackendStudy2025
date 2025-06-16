@@ -12,11 +12,13 @@ public class JTabbedTest extends JFrame{
 	JPanel p1;
 	JPanel p2;
 	JPanel p3;
+	JPanel p4;
 	JTabbedPane tp;
 	
 	BarChart barChart;
 	CircleChart circleChart;
 	LineChart lineChart;
+	HorizentalBarChart bar3dChart;
 	
 	
 	public JTabbedTest() {
@@ -25,11 +27,13 @@ public class JTabbedTest extends JFrame{
 		p1 = new JPanel();
 		p2 = new JPanel();
 		p3 = new JPanel();
+		p4 = new JPanel();
 		tp = new JTabbedPane();
 		
 		barChart = new BarChart("Bar Chart Demo");
 		circleChart = new CircleChart("Circle Chart Demo");
 		lineChart = new LineChart();
+		bar3dChart = new HorizentalBarChart("Bar Chart Demo");
 		
 		//디자인
 		Dimension d = new Dimension(300, 300);
@@ -43,10 +47,12 @@ public class JTabbedTest extends JFrame{
 		p1.add(barChart);
 		p2.add(circleChart);
 		p3.add(lineChart);
+		p4.add(bar3dChart);
 		
 		tp.add("일별", p1);
 		tp.add("주별", p2);
 		tp.add("월별", p3);
+		tp.add("년별", p4);
 		
 		add(tp);
 		
