@@ -159,14 +159,14 @@ public class Graph extends JPanel{
         frame.setVisible( true );
     }
 
-    public static void main(String[] args)
-    {
-        EventQueue.invokeLater(new Runnable()
-        {
-            public void run()
-            {
-                createAndShowGUI();
-            }
-        });
-    }
+//    public static void main(String[] args)
+//    {
+//        EventQueue.invokeLater(new Runnable()
+//        {
+//            public void run()
+//            {
+//                createAndShowGUI();
+//            }
+//        });
+//    }
 }

@@ -1,9 +1,11 @@
 package com.sinse.storage.graph.view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GradientPaint;
 
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.jfree.chart.ChartFactory;
@@ -15,19 +17,18 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.ui.ApplicationFrame;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-public class BarChart extends ApplicationFrame{
+public class BarChart extends JPanel{
 	//생성자
 	public BarChart(final String title) {
-		super(title);
 		final CategoryDataset dataset = createDataset();
 		final JFreeChart chart = createChart(dataset);
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		chartPanel.setPreferredSize(new Dimension(500, 700));
-		setContentPane(chartPanel);
+		this.setLayout(new BorderLayout());
+		this.add(chartPanel);
 	}
 	
 	//sample dataset
@@ -105,14 +106,5 @@ public class BarChart extends ApplicationFrame{
 		final CategoryAxis domainAxis = plot.getDomainAxis();
 		domainAxis.setCategoryLabelPositions(CategoryLabelPositions.createUpRotationLabelPositions(Math.PI/6.0));
 		return chart;
-	}
-	
-	public static void main(String[] args) {
-		final BarChart demo = new BarChart("Bar Chart Demo");
-		demo.pack();
-		SwingUtilities.invokeLater(()->{
-			demo.setLocationRelativeTo(null);		//Location Center
-		});
-		demo.setVisible(true);
 	}
 }
