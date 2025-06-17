@@ -23,6 +23,8 @@ public class MainPage extends Page{
 	ImageUtil imageUtil = new ImageUtil();
 	Image image=null;
 	ProductDAO productDAO=new ProductDAO();
+	//최신 상품 목록 중 유저가 지금 선택ㅎ한 바로 그 상품
+	public Product product;
 	
 	public MainPage(AppMain appMain) {
 		super(appMain);
@@ -69,7 +71,7 @@ public class MainPage extends Page{
 		
 		for(int i=0; i<productList.size(); i++) {
 			Product product = productList.get(i);		//리스트에서 상품을 하나씩 꺼내자.
-			ProductItem productItem = new ProductItem(product);	//상품 하나를 표현하는 디자인 카드
+			ProductItem productItem = new ProductItem(this, product);	//상품 하나를 표현하는 디자인 카드
 			p_content.add(productItem);
 		}
 	}

@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -14,6 +15,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import com.sinse.networkapp.unicast.ServerThread;
+
 public class GUIServer extends JFrame{
 	JPanel p_north;
 	JTextField t_port;
@@ -21,6 +24,12 @@ public class GUIServer extends JFrame{
 	JTextArea area;
 	JScrollPane scroll;
 	Thread thread;	//서버 가동용 스레드(메인 쓰레드가 대기에 빠지지 않기 위해 필요)
+	
+	//ArrayList도 가능은 하지만 다중 쓰레드 환경에서 쓰레드간의 동기화를 지원하지 않으므로,
+	//운이 없다면, ArrayList 하나의 인덱스에 동시에 쓰레드가 접근하게 되는 상황이 발생할 수 있다.
+	//이 경우 개발자가 Syncronized{} 블럭으로 코드를 감싸면, 특정 쓰레드가 해당 블럭을 실행하는 동안 다른 쓰레드는 대기상태에 걸려서 동기로 실행 가능
+	//Vector는 이미 동기화 처리가 되어 있다.
+	Vector<ServerChatThread> vec = new Vector<>();
 	
 	public GUIServer() {
 		p_north = new JPanel();
@@ -49,7 +58,7 @@ public class GUIServer extends JFrame{
 			thread.start();
 		});
 		
-		setSize(300, 400);
+		setSize(300, 530);
 		setVisible(true);
 	}
 	
@@ -66,6 +75,10 @@ public class GUIServer extends JFrame{
 				
 				ServerChatThread chatThread = new ServerChatThread(this, socket);
 				chatThread.start();		//쓰레드 동작 시작
+				
+				//현재 서버에 접속한 클라이언트 정보인 ServerChatThread를 Vector에 넣는다.
+				vec.add(chatThread);
+				area.append("현재 "+vec.size()+"명이 접속\n");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

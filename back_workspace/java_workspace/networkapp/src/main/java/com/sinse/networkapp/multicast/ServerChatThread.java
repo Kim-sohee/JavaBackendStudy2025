@@ -17,7 +17,7 @@ public class ServerChatThread extends Thread{
 	
 	public ServerChatThread(GUIServer guiServer, Socket socket) {
 		this.socket = socket;
-		
+		this.guiServer = guiServer;
 		try {
 			buffr = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			buffw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -39,9 +39,15 @@ public class ServerChatThread extends Thread{
 			String msg = null;
 			msg = buffr.readLine();		//클라이언트가 전송한 메시지 청취
 			guiServer.area.append(msg+"\n");
-			send(msg);
+			
+			//서버에 접속한 모든 유저와 1:1 대응하는 ServerChatThread 수 만큼 반복하면서 메시지를 보내자.
+			for(int i=0; i<guiServer.vec.size(); i++) {				
+				ServerChatThread st =guiServer.vec.get(i);
+				st.send(msg);
+			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			guiServer.vec.remove(this);		//상대방 클라이언트가 나가버리면(소켓을 끊으면) 나는 더 이상 접속자 명단에 들어있으면 안됨
 		}
 	}
 	
