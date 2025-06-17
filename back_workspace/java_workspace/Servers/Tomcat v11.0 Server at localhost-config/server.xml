@@ -61,7 +61,7 @@
          AJP  Connector: /docs/config/ajp.html
          Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
     -->
-    <Connector connectionTimeout="20000" port="8282" protocol="HTTP/1.1" redirectPort="8443"/>
+    <Connector connectionTimeout="20000" port="8080" protocol="HTTP/1.1" redirectPort="8443"/>
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
@@ -122,17 +122,9 @@
              available for use by the Realm.  -->
         <Realm className="org.apache.catalina.realm.UserDatabaseRealm" resourceName="UserDatabase"/>
       </Realm>
-	  
-	  <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true">
-			
-	<Context docBase="website" path="/website" reloadable="true" source="org.eclipse.jst.jee.server:website"/></Host>
 
-      <Host appBase="webapps" autoDeploy="true" name="127.0.0.1" unpackWARs="true">
-			<Context docBase="C:\dev\lecture_space\back_workspace\javaee_workspace\shop" path="" reloadable="true"/>
-	</Host>
+      <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true">
 
-      <Host appBase="webapps" autoDeploy="true" name="192.168.60.45" unpackWARs="true">
-          <Context docBase="C:\dev\lecture_space\back_workspace\javaee_workspace\mysite" path="" reloadable="true"/>
         <!-- SingleSignOn valve, share authentication between web applications
              Documentation at: /docs/config/valve.html -->
         <!--
@@ -144,7 +136,7 @@
              Note: The pattern used is equivalent to using pattern="common" -->
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t &quot;%r&quot; %s %b" prefix="localhost_access_log" suffix=".txt"/>
 
-      </Host>
+      <Context docBase="website1" path="/website1" reloadable="true" source="org.eclipse.jst.jee.server:website1"/></Host>
     </Engine>
   </Service>
 </Server>
