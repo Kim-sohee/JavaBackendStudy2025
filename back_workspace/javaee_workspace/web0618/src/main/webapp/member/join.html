@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+
+input[type=text], select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  resize: vertical;
+}
+
+input[type=submit] {
+  background-color: #04AA6D;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+.container {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
+</style>
+
+<script type="text/javascript">
+	window.addEventListener("load", ()=>{
+		let bt = document.querySelector("input[type='button']");
+		bt.addEventListener("click", ()=>{
+			//유저가 작성한 폼 양식을, java 기반의 서버로 전송하자.
+			//JS 코드는 html과 함께 작성되므로 보안이란 게 없다. 따라서 직접하지 못하므로 원격지 서버에 간접적으로 부탁만 가능
+			//웹 기반 http 프로토콜 기반에서 클라이언트인 브라우저 측이 서버측에 무언가를 부탁하는 통신 행위를 가리켜 요청(request)라 한다.
+			let form = document.querySelector("form");
+			form.submit();
+		});
+	});	
+</script>
+
+</head>
+<body>
+
+<h3>Contact Form</h3>
+
+<div class="container">
+<!-- form의 역할: 서버로 전송할 전송 변수(파라미터)의 범위를 설정하는 태그, 
+		즉 html의 입력양식을 이루는 컴포넌트를 대상으로 어디부터 어디까지 전송할지를 결정
+		action:어느서버에 전송할지 결정짓는 주소 
+		서버에 데이터 전송 시, html에 부여된 name 속성은 전송 파라미터(변수)가 된다.
+		action="/"의 의미는? /는 이 html을 배포한 원천 서버의 주소를 의미한다-->
+  <form action="/member/regist" method="post">
+    <label for="fname">ID</label>
+    <input type="text" id="fname" name="id" placeholder="Your name..">
+
+    <label for="lname">PassWord</label>
+    <input type="text" id="lname" name="pwd" placeholder="Your last name..">
+
+    <label for="subject">Name</label>
+    <input type="text" name="name" placeholder="Write something..">
+
+    <input type="button" value="Submit">
+  </form>
+</div>
+
+</body>
+</html>
