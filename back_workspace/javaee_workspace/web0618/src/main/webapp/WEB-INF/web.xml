@@ -2,6 +2,27 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
   <display-name>web0618</display-name>
   
+    <servlet>
+  		<servlet-name>studyServlet</servlet-name>
+  		<servlet-class>com.sinse.web0618.StudyServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  		<servlet-name>studyServlet</servlet-name>
+  		<url-pattern>/study</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 서블릿 생명주기를 테스트하는 서블릿 -->
+    <servlet>
+  		<servlet-name>testServlet</servlet-name>
+  		<servlet-class>com.sinse.web0618.TestServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  		<servlet-name>testServlet</servlet-name>
+  		<url-pattern>/hello</url-pattern>
+  </servlet-mapping>
+  
   <servlet>
   		<servlet-name>myServlet</servlet-name>
   		<servlet-class>com.sinse.web0618.MyServlet</servlet-class>
