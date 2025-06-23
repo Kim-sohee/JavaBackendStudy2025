@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script type="text/javascript">
+	$(()=>{
+		$("button").click(()=>{
+			//http 전송을 위해 필요한 정보
+			//1. Get, Post 방식 지정 -> Post로 보내기
+			$("form").attr("method", "post");
+			//2. 서버에 누구에게 요청? (html, js, jsp, servlet...)
+			$("form").attr("action", "/upload/regist");
+			$("form").submit();
+			
+		});
+	});
+</script>
+</head>
+<body>
+	<!-- 폼으로 부터 전송될 수 있는 데이터가 바이너리 파일이 포함되어 있음을 설정 -->
+	<form enctype="multipart/form-data">
+		<input type="text" placeholder="제목입력" name="title">
+		<input type="file" name="photo">
+		<button type="button">전송</button>
+	</form>
+</body>
+</html>
