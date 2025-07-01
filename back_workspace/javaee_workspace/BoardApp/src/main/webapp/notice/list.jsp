@@ -1,10 +1,22 @@
-<%@ page contentType="text/html; charset=UTF-8"%> 
+<%@page import="com.sinse.boardapp.model.Notice"%>
+<%@page import="java.util.List"%>
+<%@page import="com.sinse.boardapp.repository.NoticeDAO"%>
+<%@ page contentType="text/html; charset=UTF-8"%>
+<%!
+	//list.jsp가 톰켓에 의해, 서블릿으로 작성될 때 멤버 영역(선언부)
+	NoticeDAO noticeDAO;
+%>
+
+<%
+	//요청을 받는 service() 메서드 영역
+	noticeDAO=new NoticeDAO();
+	List<Notice> list=noticeDAO.selectAll();
+%>
 <!DOCTYPE html>
 <html>
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta charset="UTF-8">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 	<style>
 		table {
 		  border-collapse: collapse;
@@ -22,6 +34,14 @@
 		  background-color: #f2f2f2;
 		}
 	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(()=>{
+			$("button").click(()=>{
+				location.href = "/notice/write.jsp";
+			});
+		});
+	</script>
 </head>
 <body>
 
@@ -30,25 +50,27 @@
 	
 	<table>
 	  <tr>
-	    <th>First Name</th>
-	    <th>Last Name</th>
-	    <th>Points</th>
+	    <th>No</th>
+	    <th>제목</th>
+	    <th>작성자</th>
+	    <th>등록일</th>
+	    <th>조회</th>
 	  </tr>
-	  <tr>
-	    <td>Jill</td>
-	    <td>Smith</td>
-	    <td>50</td>
-	  </tr>
-	  <tr>
-	    <td>Eve</td>
-	    <td>Jackson</td>
-	    <td>94</td>
-	  </tr>
-	  <tr>
-	    <td>Adam</td>
-	    <td>Johnson</td>
-	    <td>67</td>
-	  </tr>
+	  
+	  <%for(int i=0;i<list.size();i++){ %>
+		  <% Notice notice=list.get(i);%>
+		  <tr>
+		    <td>Jill</td>
+		    <td><a href="/notice/content.jsp?notice_id=<%=notice.getNotice_id() %>"><%=notice.getTitle() %></a></td>
+		    <td><%=notice.getWriter() %></td>
+		    <td><%=notice.getRegdate() %></td>
+		    <td><%=notice.getHit() %></td>
+		  </tr>
+		<%} %>
+		<tr>
+			<td colspan="5"><button>글등록</button></td>
+		</tr>
 	</table>
+
 </body>
 </html>

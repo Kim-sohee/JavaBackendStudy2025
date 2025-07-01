@@ -3,26 +3,69 @@ package com.sinse.boardapp.repository;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.mysql.cj.xdevapi.Result;
 import com.sinse.boardapp.exception.NoticeException;
 import com.sinse.boardapp.model.Notice;
+import com.sinse.boardapp.pool.PoolManager;
 
 //CRUD
 public class NoticeDAO {
-	String driver = "com.mysql.cj.jdbc.Driver";
-	String url = "jdbc:mysql://localhost:3306/spring4";
-	String user = "spring4";
-	String pass = "1234";
+	PoolManager poolManager = PoolManager.getInstance();
 	
 	//모든 레코드 가져오기
-	public List selectAll() {
-		return null;
+	public List<Notice> selectAll() {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<Notice> list = new ArrayList<>();
+		
+		try {
+			con = poolManager.getConnection();
+			pstmt = con.prepareStatement("select * from notice order by notice_id desc");
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				Notice notice = new Notice();
+				notice.setNotice_id(rs.getInt("notice_id"));
+				notice.setTitle(rs.getString("title"));
+				notice.setWriter(rs.getString("writer"));
+				notice.setContent(rs.getString("content"));
+				notice.setRegdate(rs.getString("regdate"));
+				notice.setHit(rs.getInt("hit"));
+				
+				list.add(notice);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			poolManager.release(con, pstmt, rs);
+		}
+		
+		return list;
 	}
 	
 	//한 건 가져오기
-	public Notice select() {
+	public Notice select(String notice_id) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		con = poolManager.getConnection();
+		StringBuffer sql = new StringBuffer();
+		sql.append("select * from notice where notice_id=?");
+		try {
+			pstmt = con.prepareStatement(sql.toString());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
 		return null;
 	}
 	
@@ -32,8 +75,7 @@ public class NoticeDAO {
 		PreparedStatement pstmt = null;
 		
 		try {
-			Class.forName(driver);
-			con = DriverManager.getConnection(url, user, pass);		//접속 시도
+			con = poolManager.getConnection();		//접속 시도
 			StringBuffer sql = new StringBuffer();
 			sql.append("insert into notice(title, writer, content) values(?, ?, ?)");
 			pstmt = con.prepareStatement(sql.toString());
@@ -47,24 +89,10 @@ public class NoticeDAO {
 			if(result <1) {
 				throw new NoticeException("글 등록 실패");
 			}
-			
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}finally {
-			if(pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if(con != null) {
-				try {
-					con.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+			poolManager.release(con, pstmt);
 		}
 	}
 	
