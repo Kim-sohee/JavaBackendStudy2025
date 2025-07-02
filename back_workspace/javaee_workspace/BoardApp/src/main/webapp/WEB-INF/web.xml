@@ -5,9 +5,27 @@
   	<servlet-name>registServlet</servlet-name>
   	<servlet-class>com.sinse.boardapp.controller.RegistServlet</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>deleteServlet</servlet-name>
+  	<servlet-class>com.sinse.boardapp.controller.DeleteServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>updateServlet</servlet-name>
+  	<servlet-class>com.sinse.boardapp.controller.UpdateServlet</servlet-class>
+  </servlet>
   
   <servlet-mapping>
   	<servlet-name>registServlet</servlet-name>
   	<url-pattern>/notice/regist</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+  	<servlet-name>deleteServlet</servlet-name>
+  	<url-pattern>/notice/del</url-pattern>
+  </servlet-mapping>
+  
+   <servlet-mapping>
+  	<servlet-name>updateServlet</servlet-name>
+  	<url-pattern>/notice/update</url-pattern>
   </servlet-mapping>
 </web-app>
