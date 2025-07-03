@@ -13,6 +13,22 @@
   	<servlet-name>updateServlet</servlet-name>
   	<servlet-class>com.sinse.boardapp.controller.UpdateServlet</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>newsRegistServlet</servlet-name>
+  	<servlet-class>com.sinse.boardapp.news.controller.RegistServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>newsDeleteServlet</servlet-name>
+  	<servlet-class>com.sinse.boardapp.comment.controller.DeleteServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>newsUpdateServlet</servlet-name>
+  	<servlet-class>com.sinse.boardapp.comment.controller.UpdateServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>commentRegistServlet</servlet-name>
+  	<servlet-class>com.sinse.boardapp.comment.controller.WriteServlet</servlet-class>
+  </servlet>
   
   <servlet-mapping>
   	<servlet-name>registServlet</servlet-name>
@@ -27,5 +43,23 @@
    <servlet-mapping>
   	<servlet-name>updateServlet</servlet-name>
   	<url-pattern>/notice/update</url-pattern>
+  </servlet-mapping>
+
+   <servlet-mapping>
+  	<servlet-name>newsRegistServlet</servlet-name>
+  	<url-pattern>/news/regist</url-pattern>
+  </servlet-mapping>
+   <servlet-mapping>
+  	<servlet-name>newsDeleteServlet</servlet-name>
+  	<url-pattern>/news/del</url-pattern>
+  </servlet-mapping>
+   <servlet-mapping>
+  	<servlet-name>newsUpdateServlet</servlet-name>
+  	<url-pattern>/news/update</url-pattern>
+  </servlet-mapping>
+  
+   <servlet-mapping>
+  	<servlet-name>commentRegistServlet</servlet-name>
+  	<url-pattern>/comment/regist</url-pattern>
   </servlet-mapping>
 </web-app>

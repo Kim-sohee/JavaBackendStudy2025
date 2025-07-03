@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "mybatis-3-mapper.dtd">
+<mapper namespace="News">
+	
+	<!-- Mybatis를 사용하다보면, 자동으로 매핑할 수 없는 경우가 있다.
+			이때는 개발자가 매핑을 수동으로 시도할 수 있다. -->
+	<resultMap type="News" id="CommentMap">
+		<id column="news_id" property="news_id"/>
+		<result column="title" property="title"/>
+		<result column="writer" property="writer"/>
+		<result column="content" property="content"/>
+		<result column="regdate" property="regdate"/>
+		<result column="hit" property="hit"/>
+		<collection column="news_id" javaType="java.util.List" ofType="Comment" property="commentList" 
+		select="Comment.selectByNewsId"/>
+	</resultMap>
+
+	<!-- 모든 레코드 가져오기 -->
+	<select id="selectAll" resultType="News" resultMap="CommentMap">
+		select news_id, title, writer, content, regdate, hit 
+		from news order by news_id desc
+	</select>
+	
+	<!-- 한 건 가져오기 -->
+	<select id="select" parameterType="int" resultType="News">
+		select * from news where news_id=#{news_id}
+	</select>
+
+	<!-- 한 건 등록 -->
+	<insert id="insert" parameterType="News">
+		insert into news(title, writer, content) values(#{title}, #{writer}, #{content})
+	</insert>
+	
+	<!-- 한 건 수정 -->
+	<update id="update" parameterType="News">
+		update news set title=#{title}, writer=#{writer}, content=#{content}
+		where news_id = #{news_id}
+	</update>
+	
+	<!-- 한 건 삭제 -->
+	<delete id="delete" parameterType="int">
+		delete from news where news_id = #{news_id}
+	</delete>
+	
+</mapper>
