@@ -56,7 +56,7 @@
 			$("#bt_regist").click(()=>{
 				$("form").attr({
 					method: "post",
-					action: "test/regist"
+					action: "/0703/0703/news/test"
 				});
 				$("form").submit();
 			});

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Dept">
+	<!-- 부서 목록 출력 -->
+	<resultMap type="Dept" id="DeptEmpMap">
+		<id column="deptno" property="deptno"/>
+		<result column="dname" property="dname"/>
+		<result column="loc" property="loc"/>
+		<collection 
+			column="deptno"
+			javaType="java.util.List" 
+			ofType="Emp" 
+			property="empList"
+			select="Emp.selectByDeptno"/>
+	</resultMap>
+	
+	<select id="selectAll" resultMap="DeptEmpMap">
+		select deptno, dname, loc from dept
+	</select>
+	
+	<select id="select" parameterType="int" resultType="Dept">
+		select * from dept where deptno=#{deptno}
+	</select>
+	
+</mapper>

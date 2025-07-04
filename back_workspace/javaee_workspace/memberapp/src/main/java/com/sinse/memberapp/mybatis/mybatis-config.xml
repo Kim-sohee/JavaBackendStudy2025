@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias type="com.sinse.memberapp.model.Dept" alias="Dept"/>
+		<typeAlias type="com.sinse.memberapp.model.Emp" alias="Emp"/>
+		<typeAlias type="com.sinse.memberapp.model.Member" alias="Member"/>
+	</typeAliases>
+	
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="JNDI">
+        <property name="data_source" value="java:comp/env/jndi/mysql"/>
+      </dataSource>
+    </environment>
+  </environments>
+
+  <mappers>
+    <mapper resource="com/sinse/memberapp/mybatis/DeptMapper.xml"/>
+    <mapper resource="com/sinse/memberapp/mybatis/EmpMapper.xml"/>
+    <mapper resource="com/sinse/memberapp/mybatis/MemberMapper.xml"/>
+  </mappers>
+</configuration>
