@@ -71,15 +71,15 @@
 	<h3>글 등록 하기</h3>
 	
 	<div class="container">
-	  <form action="/action_page.php">
+	  <form>
 	    <label for="fname">Title</label>
-	    <input type="text" id="fname" name="firstname" placeholder="제목을 입력하세요.">
+	    <input type="text" id="fname" name="title" placeholder="제목을 입력하세요.">
 	
 	    <label for="lname">Writer</label>
-	    <input type="text" id="lname" name="lastname" placeholder="작성자를 입력하세요.">
+	    <input type="text" id="lname" name="writer" placeholder="작성자를 입력하세요.">
 	
 	    <label for="subject">Content</label>
-	    <textarea id="content" name="editordata" placeholder="내용을 입력하세요." style="height:200px"></textarea>
+	    <textarea id="content" name="content" placeholder="내용을 입력하세요." style="height:200px"></textarea>
 	
 	    <input type="button" value="등록하기" id="bt_regist">
 	    <input type="button" value="목록보기" id="bt_list">

@@ -4,9 +4,25 @@
   	<servlet-name>registServlet</servlet-name>
   	<servlet-class>com.sinse.boradapp.controller.RegistServlet</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>deleteServlet</servlet-name>
+  	<servlet-class>com.sinse.boradapp.controller.DeleteServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>updateServlet</servlet-name>
+  	<servlet-class>com.sinse.boradapp.controller.UpdateServlet</servlet-class>
+  </servlet>
   
   <servlet-mapping>
   	<servlet-name>registServlet</servlet-name>
   	<url-pattern>/0703/news/test</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>deleteServlet</servlet-name>
+  	<url-pattern>/0703/news/delete</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>updateServlet</servlet-name>
+  	<url-pattern>/0703/news/update</url-pattern>
   </servlet-mapping>
 </web-app>
