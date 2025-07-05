@@ -6,8 +6,20 @@
 		select * from news
 	</select>
 	
+	<select id="select" parameterType="int" resultType="News">
+		select * from news where news_id = #{news_id}
+	</select>
+	
 	<insert id="insert" parameterType="News">
 		insert into news(title, writer, content) values(#{title}, #{writer}, #{content})
 	</insert>
+	
+	<update id="update" parameterType="News">
+		update news set title=#{title}, writer=#{writer}, content=#{content} where news_id = #{news_id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+			delete from news where news_id = #{news_id}
+	</delete>
 	
 </mapper>

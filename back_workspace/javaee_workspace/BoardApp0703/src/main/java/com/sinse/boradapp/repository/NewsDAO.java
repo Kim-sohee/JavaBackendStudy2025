@@ -20,8 +20,11 @@ public class NewsDAO {
 	}
 	
 	//한 건의 데이터 가져오기
-	public News select() {
-		return null;
+	public News select(int news_id) {
+		SqlSession sqlSession = config.getSqlSession();
+		News news = sqlSession.selectOne("News.select", news_id);
+		sqlSession.close();
+		return news;
 	}
 	
 	//데이터 추가하기
@@ -35,5 +38,21 @@ public class NewsDAO {
 		sqlSession.close();
 	}
 	
+	//데이터 수정하기
+	public void update(News news) throws NewsException{
+		SqlSession sqlSession = config.getSqlSession();
+		int result = sqlSession.update("News.update", news);
+		if(result < 1) throw new NewsException("글 수정 실패");
+		sqlSession.commit();
+		sqlSession.close();
+	}
 	
+	//데이터 삭제하기
+	public void delete(int news_id) throws NewsException {
+		SqlSession sqlSession = config.getSqlSession();
+		int result = sqlSession.delete("News.delete", news_id);
+		if(result < 1) throw new NewsException("글 삭제하기 실패");
+		sqlSession.commit();
+		sqlSession.close();
+	}
 }
