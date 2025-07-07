@@ -79,20 +79,26 @@
 				tag += "<option value="+list[i].food_type_id+">"+list[i].title+"</option>";
 			}
 			$("#aside_regist select").html(tag);	//innerHtml
+			$("#aside_detail select").html(tag);
 		}
 		
 		xhttp.send();	//요청 시점이 발생하는 시점
 	}
 	
+	//상세보기 설정
 	function getDetail(store_id){
 		console.log(store_id);
 		let xhttp = new XMLHttpRequest();
 		xhttp.open("GET", "/store/detail?store_id="+store_id);
 		
 		xhttp.onload = function(){
+			let list = JSON.parse(this.responseText);
+
+			$("#aside_detail input[name='detail_store_name']").val(list.store_name);
+			$("#aside_detail input[name='detail_tel']").val(list.tel);
 			
+			$("#aside_detail select").val(list.foodType.food_type_id).prop("selected", true);
 		};
-		
 		xhttp.send();
 	}
 	
@@ -191,8 +197,8 @@
 		</div>
 		<div id="aside_detail">
 			<select></select>
-			<input type="text" placeholder="맛집 상호명">
-			<input type="text" placeholder="연락처">
+			<input type="text" name="detail_store_name" placeholder="맛집 상호명">
+			<input type="text" name="detail_tel" placeholder="연락처">
 			<button>수정</button>
 			<button>삭제</button>
 		</div>
