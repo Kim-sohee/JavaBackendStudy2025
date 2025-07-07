@@ -39,18 +39,7 @@
     <Resource auth="Container" description="User database that can be updated and saved" factory="org.apache.catalina.users.MemoryUserDatabaseFactory" name="UserDatabase" pathname="conf/tomcat-users.xml" type="org.apache.catalina.UserDatabase"/>
     
     <!-- 톰캣이 지원하는 커넥션 풀 -->
-    <Resource 
-    	name="jndi/mysql"
-    	auth="Container"
-    	type="javax.sql.DataSource"
-    	driverClassName="com.mysql.cj.jdbc.Driver"
-    	url="jdbc:mysql://localhost:3306/spring4"
-    	username="spring4"
-    	password="1234"
-    	maxTotal="20"
-    	maxIdle="10"
-    	maxWaitMillis="-1"
-    />
+    <Resource auth="Container" driverClassName="com.mysql.cj.jdbc.Driver" maxIdle="10" maxTotal="20" maxWaitMillis="-1" name="jndi/mysql" password="1234" type="javax.sql.DataSource" url="jdbc:mysql://localhost:3306/spring4" username="spring4"/>
     
   </GlobalNamingResources>
 
@@ -175,16 +164,12 @@
              Note: The pattern used is equivalent to using pattern="common" -->
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t &quot;%r&quot; %s %b" prefix="localhost_access_log" suffix=".txt"/>
 
-      <Context docBase="BoardApp0703" path="/0703" reloadable="false" source="org.eclipse.jst.jee.server:BoardApp0703"/>
-      <Context docBase="memberapp" path="/" reloadable="false" source="org.eclipse.jst.jee.server:memberapp">
+      
+      <Context docBase="memberapp" path="/member" reloadable="false" source="org.eclipse.jst.jee.server:memberapp">
       	<!-- 이클립스 내부 톰켓(테스트 및 개발용일 때) -->
-      	<ResourceLink
-      		name="jndi/mysql"
-      		global="jndi/mysql"
-      		type="javax.sql.DataSource"
-      	/>
+      	<ResourceLink global="jndi/mysql" name="jndi/mysql" type="javax.sql.DataSource"/>
       </Context>
-      </Host>
+      <Context docBase="hiberasync" path="/" reloadable="false" source="org.eclipse.jst.jee.server:hiberasync"/></Host>
     </Engine>
   </Service>
 </Server>
