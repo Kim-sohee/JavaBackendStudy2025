@@ -1,5 +1,6 @@
 package com.sinse.hiberasync.servlet;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -29,7 +31,6 @@ public class UploadServlet extends HttpServlet{
 	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String uploadPath = this.getServletContext().getRealPath("/data");	//jsp 내장객체(request, response, out, session, application) 
 		logger.debug("저장할 실제 경로는" + uploadPath);
 		
 		DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -39,7 +40,24 @@ public class UploadServlet extends HttpServlet{
 		try {
 			List<FileItem> list = servletFileUpload.parseRequest(request);
 			logger.debug("전송된 컴포넌트의 수는 "+list.size());
+			
+			for(FileItem item : list) {		//<input type="text">, <input type="file">
+				if(item.isFormField()) {	//텍스트 컴포넌트의 파라미터라면
+					logger.debug(item.getString("utf-8"));
+				}else {		//파일 컴포넌트의 파라미터라면
+					logger.debug("파일명은"+item.getName());
+					item.write(new File(uploadPath, item.getName()));
+					
+					//세션은 웹 컨테이너가 생성하므로, 개발자가 new 할 수 없다. 단, 이미 생성된 것만 얻어올 수 있다.
+					HttpSession session=request.getSession();
+					session.setAttribute("img", item.getName());
+				}
+			}
+			//클라이언트의 브라우저로 하여금, 이미지를 볼 수 있는 jsp를 재요청하게 만들자
+			response.sendRedirect("/gallery/result.jsp");	//지정된 url로 클라이언트의 브라우저가 재요청하게 함
 		} catch (FileUploadException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
