@@ -22,8 +22,10 @@
   <!-- Security listener. Documentation at /docs/config/listeners.html
   <Listener className="org.apache.catalina.security.SecurityListener" />
   -->
-  <!-- APR library loader. Documentation at /docs/apr.html -->
-  <Listener SSLEngine="on" className="org.apache.catalina.core.AprLifecycleListener"/>
+  <!-- APR connector and OpenSSL support using Tomcat Native -->
+  <Listener className="org.apache.catalina.core.AprLifecycleListener"/>
+  <!-- OpenSSL support using FFM API from Java 22 -->
+  <!-- <Listener className="org.apache.catalina.core.OpenSSLLifecycleListener" /> -->
   <!-- Prevent memory leaks due to use of particular java/javax APIs-->
   <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener"/>
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"/>
@@ -37,10 +39,6 @@
          UserDatabaseRealm to authenticate users
     -->
     <Resource auth="Container" description="User database that can be updated and saved" factory="org.apache.catalina.users.MemoryUserDatabaseFactory" name="UserDatabase" pathname="conf/tomcat-users.xml" type="org.apache.catalina.UserDatabase"/>
-    
-    <!-- 톰캣이 지원하는 커넥션 풀 -->
-    <Resource auth="Container" driverClassName="com.mysql.cj.jdbc.Driver" maxIdle="10" maxTotal="20" maxWaitMillis="-1" name="jndi/mysql" password="1234" type="javax.sql.DataSource" url="jdbc:mysql://localhost:3306/spring4" username="spring4"/>
-    
   </GlobalNamingResources>
 
   <!-- A "Service" is a collection of one or more "Connectors" that share
@@ -88,7 +86,7 @@
                >
         <SSLHostConfig>
             <Certificate certificateKeystoreFile="conf/localhost-rsa.jks"
-                         type="RSA" />
+                         certificateKeystorePassword="changeit" type="RSA" />
         </SSLHostConfig>
     </Connector>
     -->
@@ -164,12 +162,7 @@
              Note: The pattern used is equivalent to using pattern="common" -->
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t &quot;%r&quot; %s %b" prefix="localhost_access_log" suffix=".txt"/>
 
-      
-      <Context docBase="memberapp" path="/member" reloadable="false" source="org.eclipse.jst.jee.server:memberapp">
-      	<!-- 이클립스 내부 톰켓(테스트 및 개발용일 때) -->
-      	<ResourceLink global="jndi/mysql" name="jndi/mysql" type="javax.sql.DataSource"/>
-      </Context>
-      <Context docBase="hiberasync" path="/main" reloadable="false" source="org.eclipse.jst.jee.server:hiberasync"/><Context docBase="hibernate0708" path="/" reloadable="false" source="org.eclipse.jst.jee.server:hibernate0708"/></Host>
+      <Context docBase="hibernate0708" path="/" reloadable="true" source="org.eclipse.jst.jee.server:hibernate0708"/></Host>
     </Engine>
   </Service>
 </Server>
