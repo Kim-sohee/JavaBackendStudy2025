@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<style type="text/css">
+		#wrapper{
+			width: 1200px;
+			height: 800px;
+			margin:auto;
+		}
+		#aside_regist{
+			width: 200px;
+			height: 100%;
+			float: left;
+			background-color: red;
+		}
+		#content{
+			width: 800px;
+			height: 100%;
+			float: left;
+		}
+		#content_header{
+			width: 100%;
+			height: 50px;
+			background-color: black;
+			line-height: 50px;
+			text-align: center;
+		}
+		#list{
+			width: 100%;
+			height: 750px;
+		}
+		
+		#aside_detail{
+			width: 200px;
+			height: 100%;
+			float: left;
+			background-color: yellow;
+		}
+		table {
+		  border-collapse: collapse;
+		  border-spacing: 0;
+		  width: 100%;
+		  border: 1px solid #ddd;
+		}
+		
+		th, td {
+		  text-align: left;
+		  padding: 16px;
+		}
+		
+		tr:nth-child(even) {
+		  background-color: #f2f2f2;
+		}
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		
+		//음식 유형 가져오기
+		function getFoodTypeList(target){
+			let xhttp = new XMLHttpRequest();
+			xhttp.open("get", "/foodtype/list");
+			
+			xhttp.onload = function(){
+				let list = JSON.parse(this.responseText);
+				
+				let tag = "<option value='0'>유형선택</option>";
+				for(let i=0; i<list.length; i++){
+					tag += "<option value="+list[i].food_type_id+">"+list[i].title+"</option>";
+				}
+				$(target).html(tag);
+			}
+			
+			xhttp.send();
+		}
+		
+		//테이블 값 채우기
+		function printList(json){
+			let tag = "<table width='90%'>";
+			tag += "<tr>";
+			tag += "<th>음식 분류</th>";
+			tag += "<th>상호명</th>";
+			tag += "<th>전화번호</th>";			
+			tag += "</tr>";
+			
+			for(let i=0; i<json.length; i++){
+				tag += "<tr>";
+				tag += "<td>"+json[i].foodType.title+"</td>";
+				tag += "<td>"+json[i].store_id+"</td>";
+				tag += "<td>"+json[i].tel+"</td>";			
+				tag += "</tr>";
+			}
+			tag += "</table>";
+		}
+		
+		function getStoreList(){
+			let xhttp = new XMLHttpRequest();
+			xhttp.open("get", "/store/list");
+			
+			xhttp.onload = function(){
+				let store = JSON.parse(this.responseText);
+				printList(store);
+			}
+			xhttp.send();
+		}
+	
+		//로드 시
+		$(()=>{
+			getFoodTypeList("#aside_regist select");
+			getFoodTypeList("#aside_detail select");
+			getStoreList();
+		});
+	</script>
+</head>
+<body>
+	<div id="wrapper">
+		<div id="aside_regist">
+			<select name="food_type_id"></select>
+			<input type="text" name="store_name" placeholder="맛집 상호명">
+			<input type="text" name="tel" placeholder="연락처">
+			<button type="button">등록</button>
+		</div>
+		<div id="content">
+			<div id="content_header">
+				<select>
+					<option>모두</option>
+					<option>상호명</option>
+					<option>연락처</option>
+				</select>
+				<input type="text" placeholder="검색 키워드">
+				<button>Search</button>
+			</div>
+			<div id="list"></div>
+		</div>
+		<div id="aside_detail">
+			<select></select>
+			<input type="hidden" name="store_id" >
+			<input type="text" name="store_name" placeholder="맛집 상호명">
+			<input type="text" name="tel" placeholder="연락처">
+			<button id="bt_edit">수정</button>
+			<button id="bt_del">삭제</button>
+		</div>
+	</div>
+</body>
+</html>

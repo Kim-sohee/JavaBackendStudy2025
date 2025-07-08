@@ -169,7 +169,7 @@
       	<!-- 이클립스 내부 톰켓(테스트 및 개발용일 때) -->
       	<ResourceLink global="jndi/mysql" name="jndi/mysql" type="javax.sql.DataSource"/>
       </Context>
-      <Context docBase="hiberasync" path="/" reloadable="false" source="org.eclipse.jst.jee.server:hiberasync"/></Host>
+      <Context docBase="hiberasync" path="/main" reloadable="false" source="org.eclipse.jst.jee.server:hiberasync"/><Context docBase="hibernate0708" path="/" reloadable="false" source="org.eclipse.jst.jee.server:hibernate0708"/></Host>
     </Engine>
   </Service>
 </Server>

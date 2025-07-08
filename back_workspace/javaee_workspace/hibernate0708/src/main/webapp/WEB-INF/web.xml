@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>hibernate0708</display-name>
+  
+  <!-- 필터 정의 -->
+  <filter>
+  	<filter-name>encodingFilter</filter-name>
+  	<filter-class>com.sinse.hibernate0708.util.CharacterEncodingFilter</filter-class>
+  	
+  	<init-param>
+  		<param-name>encoding</param-name>
+  		<param-value>UTF-8</param-value>
+  	</init-param>
+  </filter>
+  <filter-mapping>
+  	<filter-name>encodingFilter</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- 서블릿 정의 -->
+  
+  <!-- 음식 항목 가져오는 서블릿 매핑 -->
+  <servlet>
+  	<servlet-name>foodTypeList</servlet-name>
+  	<servlet-class>com.sinse.hibernate0708.controller.FoodTypeList</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>foodTypeList</servlet-name>
+  	<url-pattern>/foodtype/list</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 테이블 리스트 가져오는 서블릿 매핑 -->
+  <servlet>
+  	<servlet-name>storeList</servlet-name>
+  	<servlet-class>com.sinse.hibernate0708.controller.StoreList</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>storeList</servlet-name>
+  	<url-pattern>/store/list</url-pattern>
+  </servlet-mapping>
+</web-app>
