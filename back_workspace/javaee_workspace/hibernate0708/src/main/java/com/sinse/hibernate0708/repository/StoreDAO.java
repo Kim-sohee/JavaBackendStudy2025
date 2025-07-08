@@ -20,7 +20,7 @@ public class StoreDAO {
 		
 		try(Session session = config.getSession()){
 			tx = session.beginTransaction();
-			TypedQuery<Store> query = session.createQuery("from store", Store.class);
+			TypedQuery query = session.createQuery("from Store", Store.class);
 			list = query.getResultList();
 			tx.commit();
 		}catch(Exception e) {
