@@ -56,7 +56,7 @@
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script type="text/javascript">
-	function getFoodList(){
+	function getFoodList(target){
 		//화면의 일부 영역을 바꾸기 원함, 따라서 서버로 부터 가져올 대상은 html이 아닌 데이터이다.
 		//js의 실행부는 서버에 데이터를 전송하고, 받는 능력이 없다.
 		//크롬과 같은 브라우저로 하여금, 데이터를 서버에 전송하고, 서버가 응답할 때 데이터를 받아올 수 있도록  브라우저에게 맡겨야 한다.
@@ -78,8 +78,7 @@
 			for(let i=0; i<list.length; i++){
 				tag += "<option value="+list[i].food_type_id+">"+list[i].title+"</option>";
 			}
-			$("#aside_regist select").html(tag);	//innerHtml
-			$("#aside_detail select").html(tag);
+			$(target).html(tag);	//innerHtml
 		}
 		
 		xhttp.send();	//요청 시점이 발생하는 시점
@@ -94,10 +93,11 @@
 		xhttp.onload = function(){
 			let list = JSON.parse(this.responseText);
 
-			$("#aside_detail input[name='detail_store_name']").val(list.store_name);
-			$("#aside_detail input[name='detail_tel']").val(list.tel);
-			
-			$("#aside_detail select").val(list.foodType.food_type_id).prop("selected", true);
+			$("#aside_detail input[name='store_name']").val(list.store_name);
+			$("#aside_detail input[name='tel']").val(list.tel);
+			$("#aside_detail select").val(list.foodType.food_type_id);
+
+			$("#aside_detail input[name='store_id']").val(list.store_id);
 		};
 		xhttp.send();
 	}
@@ -164,13 +164,69 @@
 		xhttp.send(param);	//이 시점부터 js는 자기 할일 하고, 브라우저가 통신을 담당한다. 즉, 비동기가 시작되는 시점이다.
 		
 	}
+	
+	//수정하기
+	function edit(){
+		let xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/store/edit");
+		xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		
+		xhttp.onload = function(){
+			if(this.status == 204){
+				//새롭게 갱신될 목록을 요청
+				getStoreList();
+			}else{
+				let json = JSON.parse(this.reponseText);
+				alert(json.msg);
+			}
+		}
+		
+		let param="store_id="+$("#aside_detail input[name='store_id']").val();
+		param+="&store_name="+$("#aside_detail input[name='store_name']").val();
+		param+="&tel="+$("#aside_detail input[name='tel']").val();
+		param+="&food_type_id="+$("#aside_detail select").val();
+		
+		xhttp.send(param);
+	}
+	
+	//삭제하기
+	function del(){
+		let xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/store/del");
+		xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		
+		xhttp.onload = function(){
+			if(this.status == 204){
+				//새롭게 갱신될 목록을 요청
+				getStoreList();
+			}else{
+				let json = JSON.parse(this.reponseText);
+				alert(json.msg);
+			}
+		}
+		
+		xhttp.send("store_id="+$("#aside_detail input[name='store_id']").val());
+	}
 
 	$(()=>{
-		getFoodList();
+		getFoodList("#aside_regist select");
+		getFoodList("#aside_detail select");
 		getStoreList();
 		
 		$("#aside_regist button").click(()=>{
 			regist();
+		});
+		
+		$("#bt_edit").click(()=>{
+			if(confirm("수정하시겠어요?")){
+				edit();
+			}
+		});
+		
+		$("#bt_del").click(()=>{
+			if(confirm("삭제하시겠어요?")){
+				del();
+			}
 		});
 	});
 </script>
@@ -197,10 +253,11 @@
 		</div>
 		<div id="aside_detail">
 			<select></select>
-			<input type="text" name="detail_store_name" placeholder="맛집 상호명">
-			<input type="text" name="detail_tel" placeholder="연락처">
-			<button>수정</button>
-			<button>삭제</button>
+			<input type="hidden" name="store_id" >
+			<input type="text" name="store_name" placeholder="맛집 상호명">
+			<input type="text" name="tel" placeholder="연락처">
+			<button id="bt_edit">수정</button>
+			<button id="bt_del">삭제</button>
 		</div>
 	</div>
 </body>
