@@ -15,10 +15,10 @@ import com.sinse.mvcapp.color.model.ColorManager;
  * 1) JSP는 View로 사용할 것이므로
  * 2) 웹 기반의 컨트롤러는 클라이언트의 요청을 받을 수 있는 능력이 있어야 하므로*/
 
-public class ColorController {
+public class ColorController implements Controller{
 	ColorManager manager = new ColorManager();
 	
-	protected void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		/*컨트롤러의 5대 업무
 		 * 1) 요청을 받는다.
 		 * 2) 요청을 분석한다.
@@ -35,6 +35,11 @@ public class ColorController {
 		
 		//result.jsp를 클라이언트가 보도록 처리
 		//즉, 톰켓이 응답정보를 이용하여 응답 컨텐츠를 보내고 나서, 클라이언트가 다시 접속할 주소..
-		response.sendRedirect("/color/result.jsp");	//클라이언트로 하여금 지정된 url로 다시 요청을 시도하도록 강제
+		//response.sendRedirect("/color/result/view");	//클라이언트로 하여금 지정된 url로 다시 요청을 시도하도록 강제
+	}
+	
+	@Override
+	public String getViewPage() {
+		return "/color/result/view";
 	}
 }
