@@ -32,27 +32,14 @@ public class DispatcherServlet extends HttpServlet{
 		/*매 요청마다 1:1 대응되는 매핑을 피하기 위해 하나의 진입점으로 몰았으나,
 		 * 진입점이 되는 클래스가 매 요청마다 1:1 대응되는 if 조건문이 작성되고 있다.*/
 		if(request.getRequestURI().equals("/blood.do")) {	//클라이언트의 요청이 혈액형이면...
-			//요청을 받는다.
-			String blood = request.getParameter("blood");
-			//요청을 분석한다.(생략)
-			//일시킨다.
-			BloodManager manager = new BloodManager();
-			String result = manager.getAdvice(blood);
-			
-			HttpSession session  = request.getSession();	//이 요청에 의해 접근할 수 있는 세션 얻기
-			session.setAttribute("msg", result);	 	//저장
-			
-			//알맞는 view 선택
-			response.sendRedirect("/blood/result.jsp"); 	//클라이언트의 재접속 강제
-			
+			//혈액형을 전문적으로 처리하는 컨트롤러에게 업무 분담!
+			//요청에 대한 처리를 1:1 대응하는 객체로 처리하는 개발 패턴을 가리켜 Command Pattern
+			BloodController controller = new BloodController();
+			controller.execute(request, response);
+
 		}else if(request.getRequestURI().equals("/color.do")) {
-			String color = request.getParameter("color");
-			ColorManager colorManager = new ColorManager();
-			String result = colorManager.getAdvice(color);
-			
-			HttpSession session = request.getSession();
-			session.setAttribute("msg", result);
-			response.sendRedirect("/color/result.jsp");
+			ColorController controller = new ColorController();
+			controller.execute(request, response);
 		}
 	}
 }
