@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>myframework</display-name>
+  <!-- 웹 사이트의 요청을 분기 (관리자와 일반 유저의 요청) > DispatcherServlet이 두개로 구분 -->
+  <filter>
+  	<filter-name>encodingFilter</filter-name>
+  	<filter-class>myframework.web.util.CharacterEncodingFilter</filter-class>
+  	<init-param>
+  		<param-name>encoding</param-name>
+  		<param-value>UTF-8</param-value>
+  	</init-param>
+  </filter>
+  <filter-mapping>
+  	<filter-name>encodingFilter</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- 일반 유저 -->
+  <servlet>
+  	<servlet-name>userDispatcher</servlet-name>
+  	<servlet-class>myframework.web.servlet.DispatcherServlet</servlet-class>
+  	<init-param>
+  		<param-name>contextConfigLocation</param-name>
+  		<param-value>/WEB-INF/user-servlet.json</param-value>
+  	</init-param>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>userDispatcher</servlet-name>
+  	<url-pattern>/shop/*</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 관리자 -->
+  <servlet>
+  	<servlet-name>adminDispatcher</servlet-name>
+  	<servlet-class>myframework.web.servlet.DispatcherServlet</servlet-class>
+  	<init-param>
+  		<param-name>contextConfigLocation</param-name>
+  		<param-value>/WEB-INF/admin-servlet.json</param-value>
+  	</init-param>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>adminDispatcher</servlet-name>
+  	<url-pattern>/admin/*</url-pattern>
+  </servlet-mapping>
+  
+  
+</web-app>
