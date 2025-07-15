@@ -166,7 +166,7 @@
 
       
       
-      <Context docBase="springmvc" path="/" reloadable="false" source="org.eclipse.jst.jee.server:springmvc"/></Host>
+      <Context docBase="springmvc" path="/spring" reloadable="false" source="org.eclipse.jst.jee.server:springmvc"/><Context docBase="mall" path="/" reloadable="false" source="org.eclipse.jst.jee.server:mall"/></Host>
     </Engine>
   </Service>
 </Server>
