@@ -165,11 +165,8 @@
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t &quot;%r&quot; %s %b" prefix="localhost_access_log" suffix=".txt"/>
 
       
-      <Context docBase="memberapp" path="/member" reloadable="false" source="org.eclipse.jst.jee.server:memberapp">
-      	<!-- 이클립스 내부 톰켓(테스트 및 개발용일 때) -->
-      	<ResourceLink global="jndi/mysql" name="jndi/mysql" type="javax.sql.DataSource"/>
-      </Context>
-      <Context docBase="hiberasync" path="/hiber" reloadable="false" source="org.eclipse.jst.jee.server:hiberasync"/><Context docBase="mvcapp" path="/mvc" reloadable="false" source="org.eclipse.jst.jee.server:mvcapp"/><Context docBase="mvcproject" path="/mvcproject" reloadable="false" source="org.eclipse.jst.jee.server:mvcproject"/><Context docBase="myframework" path="/" reloadable="false" source="org.eclipse.jst.jee.server:myframework"/></Host>
+      
+      <Context docBase="springmvc" path="/spring" reloadable="false" source="org.eclipse.jst.jee.server:springmvc"/><Context docBase="mall" path="/" reloadable="false" source="org.eclipse.jst.jee.server:mall"/></Host>
     </Engine>
   </Service>
 </Server>
