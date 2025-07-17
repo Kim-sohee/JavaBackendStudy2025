@@ -10,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import lombok.extern.slf4j.Slf4j;
 import mall.domain.Notice;
-import mall.notice.model.NoticeService;
+import mall.model.notice.NoticeService;
 
 @Controller
 @Slf4j

@@ -26,15 +26,8 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 /*스프링의 고전적 설정을 담당하는 xml을 대신하는 자바클래스*/
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = {"mall.admin.controller"})
-public class AdminWebConfig {
-	/*하위 컨트롤러가 3,4 단계를 수행한 후, DispatcherServlet에게 정확한 파일명을 알려주는 것이 아니라
-	 * 파일의 일부 단서만 반환한다(ModelAndView에 심어서), 따라서 이 객체를 넘겨받은 DispatcherServlet은
-	 * 일부 단서를 직접 해석하지 않고, 뷰에 대한 해석을 담당하는 전담객체에게 맡긴다..
-	 * 이 뷰 영역을 전담하는 객체들을 가리켜 스프링에서는 ViewResolver라 한다.
-	 * JSP 사용시 주로 사용되는 ViewResolver는 InternalResourceViewResolver가 있음
-	 * 
-	 * 예시) 하위 컨트롤러가 notice/list를 심어서 보내면 --> /WEB-INF/views/notice/list.jsp 를 알려줘야 함*/
+@ComponentScan(basePackages = {"mall.shop.controller"})
+public class UserWebConfig {
 	@Bean
 	public InternalResourceViewResolver viewResolver() {
 		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
@@ -42,9 +35,4 @@ public class AdminWebConfig {
 		resolver.setSuffix(".jsp");
 		return resolver;
 	}
-	
-	
-	
-	
-	 
 }

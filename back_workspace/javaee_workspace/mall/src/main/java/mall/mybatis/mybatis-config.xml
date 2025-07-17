@@ -5,6 +5,8 @@
 <configuration>
 	<typeAliases>
 		<typeAlias type="mall.domain.Notice" alias="Notice"/>
+		<typeAlias type="mall.domain.TopCategory" alias="TopCategory"/>
+		<typeAlias type="mall.domain.SubCategory" alias="SubCategory"/>
 	</typeAliases>
   <environments default="development">
     <environment id="development">
@@ -16,5 +18,7 @@
   </environments>
   <mappers>
     <mapper resource="mall/mybatis/NoticeMapper.xml"/>
+    <mapper resource="mall/mybatis/TopCategoryMapper.xml"/>
+    <mapper resource="mall/mybatis/SubCategoryMapper.xml"/>
   </mappers>
 </configuration>
