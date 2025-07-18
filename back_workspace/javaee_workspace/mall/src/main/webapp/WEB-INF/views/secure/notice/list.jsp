@@ -31,7 +31,7 @@
 	<script type="text/javascript">
 		$(()=>{
 			$("button").click(()=>{
-				location.href = "/notice/write.jsp";
+				location.href = "/admin/notice/registform";
 			});
 		});
 	</script>

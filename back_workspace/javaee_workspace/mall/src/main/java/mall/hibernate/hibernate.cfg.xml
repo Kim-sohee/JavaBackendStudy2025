@@ -5,5 +5,6 @@
     	<property name="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</property>
     	
     	<mapping class="mall.domain.Notice"/>
+    	<mapping class="mall.domain.TopCategory"/>
     </session-factory>
 </hibernate-configuration>

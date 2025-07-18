@@ -1,34 +1,24 @@
 package mall.spring.config;
 
 
-import javax.naming.NamingException;
-import javax.sql.DataSource;
+import java.util.List;
 
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.hibernate.SessionFactory;
-import org.mybatis.spring.SqlSessionFactoryBean;
-import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jndi.JndiTemplate;
-import org.springframework.orm.hibernate5.HibernateTransactionManager;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 
 /*스프링의 고전적 설정을 담당하는 xml을 대신하는 자바클래스*/
 @Configuration
 @EnableWebMvc
-@EnableTransactionManagement
-@ComponentScan(basePackages = {"mall.admin.controller, mall.notice.model"})
-public class AdminWebConfig {
+@ComponentScan(basePackages = {"mall.admin.controller"})
+public class AdminWebConfig extends WebMvcConfigurerAdapter{
 	/*하위 컨트롤러가 3,4 단계를 수행한 후, DispatcherServlet에게 정확한 파일명을 알려주는 것이 아니라
 	 * 파일의 일부 단서만 반환한다(ModelAndView에 심어서), 따라서 이 객체를 넘겨받은 DispatcherServlet은
 	 * 일부 단서를 직접 해석하지 않고, 뷰에 대한 해석을 담당하는 전담객체에게 맡긴다..
@@ -44,71 +34,20 @@ public class AdminWebConfig {
 		return resolver;
 	}
 	
-	//어던 데이터베이스를 사용할 지 선택
-	public DataSource dataSource() throws NamingException{
-		JndiTemplate jndi = new JndiTemplate();
-		return jndi.lookup("java:comp/env/jndi/mysql", DataSource.class);
+	//어노테이션으로 하지 않을 경우, xml로 설정해야 한다.
+	@Override
+	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+		//pom.xml에 추가한 jackson-bind 라이브러리의 객체 추가
+		converters.add(new MappingJackson2HttpMessageConverter());
 	}
 	
-	/*----------------------------------------------------------------------------------
-	 * Mybatis 관련
-	 * ---------------------------------------------------------------------------------*/
-	 //스프링을 사용하는 이유는 기업용 애플리케이션 개발 시, 개발자가 일일이 처리해야 하는 반복된 작업을 대신 해주기 때문
-	//스프링 이전 시대에슨 이 작업을 EJB 기술이었음.
-	//규모가 큰 작업에서 개발자들의 반복된 작업을 대신하는 대표적 업무(트랜잭션 처리, 로깅, 보안 처리...)
-	//JDBC 사용 시 데이터 소스가 결정되었다면, 그 다음은 적절한 트랜잭션 매니저를 등록해야 한다.
-	//사용 기술이 JDBC 기반: DataSourceTransactionManager 객체를 등록해야 하고,
-	//사용 기술이 Mybatis 기반:  DataSourceTransactionManager 객체를 등록해야 하고,
-	//사용 기술이 Hibernate 기반: HibernateTransactionManager 객체를 등록해야 한다.
-	//이 객체를 등록한 이후부터는,
-	//1) 트랜잭션 개발자가 직접 처리하지 않아도 알아서 처리(commit, rollback 호출하지 않음)
-	//2) 어떠한 기술을 사용하더라도, 코드에 변함이 없음(일관된 코드)
-
-	//Mybatis에 사용할 트랜잭션 매니저 선택
+	//파일 업로드를 위한 설정
+	//아파치 파일 업로드를 스프링에서 내부적으로 처리한 업로드 빈
+	//클라이언트가 파일을 전송할 때 사용
 	@Bean
-	public PlatformTransactionManager platformTransactionManager(SqlSessionFactory sqlSessionFactory) {
-		return new DataSourceTransactionManager(sqlSessionFactory.getConfiguration().getEnvironment().getDataSource());
+	public CommonsMultipartResolver multipartResolver() {
+		CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+		resolver.setMaxUploadSize(10 * 1024 * 1024); 	//10M
+		return resolver;
 	}
-	 
-	//Mybatis의 SqlSession이 모여져 있는 Factory를 빈으로 등록
-	@Bean
-	public SqlSessionFactory sqlSessionFactory() throws Exception {
-		SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-		sqlSessionFactoryBean.setConfigLocation(new ClassPathResource("mall/mybatis/mybatis-config.xml")); 	//mybatis 설정 파일 위치
-		//SqlSessionFactoryBean에게 사용할 DB를 알려줘야 함.
-		sqlSessionFactoryBean.setDataSource(dataSource());
-		return sqlSessionFactoryBean.getObject();
-	}
-	 
-	 //SqlSessionFactoryBean으로 부터 쿼리문을 수행하는 객체의 원래 명칭은 SqlSession 이지만, mybatis-spring에서는
-	//이 객체를 랩핑한 객체인 SqlSessionTemplte 객체를 사용해야 한다.
-	//결론: 순수 mybatis에서의 SqlSessionFactory는 mybatis-spring 명칭이 SqlSessionFactoryBean으로 바뀌고,
-	//		순수 mybatis에서의 SqlSession은 SqlSessionTemplate으로 명칭이 바뀐것이다.
-	//DAO가 사용할 SqlSessionTemplate 등록
-	@Bean
-	public SqlSessionTemplate sqlSessionTemplate() throws Exception{
-		return new SqlSessionTemplate(sqlSessionFactory());
-	}
-	 
-	/*----------------------------------------------------------------------------------
-	 * Hibernate 관련
-	 * ---------------------------------------------------------------------------------*/
-	@Bean
-	public LocalSessionFactoryBean sessionFactory() throws NamingException {
-		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
-		//어떤 데이터베이스를 사용할 지
-		factoryBean.setConfigLocation(new ClassPathResource("mall/hibernate/hibernate.cfg.xml"));
-		factoryBean.setDataSource(dataSource());
-		return factoryBean;
-	}
-	
-	//트랜잭션 매니저 등록
-	@Primary	//여러개의 트랜잭션 매니저 중 최우선 순위를 등록
-	@Bean
-	public HibernateTransactionManager transactionManager(SessionFactory sessionFactory) {
-		return new HibernateTransactionManager(sessionFactory);
-	}
-	
-	
-	 
 }
