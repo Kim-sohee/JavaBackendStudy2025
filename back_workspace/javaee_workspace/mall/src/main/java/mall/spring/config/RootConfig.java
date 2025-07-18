@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration		//xml 설정 파일 대신 역할을 하겠다.
 @EnableTransactionManagement
-@ComponentScan(basePackages ={"mall.model"})
+@ComponentScan(basePackages ={"mall.model, mall.util"})
 public class RootConfig {
 	//어던 데이터베이스를 사용할 지 선택
 		public DataSource dataSource() throws NamingException{
@@ -47,7 +47,7 @@ public class RootConfig {
 
 		//Mybatis에 사용할 트랜잭션 매니저 선택
 		@Bean
-		//@Primary
+		@Primary
 		public PlatformTransactionManager platformTransactionManager(SqlSessionFactory sqlSessionFactory) {
 			return new DataSourceTransactionManager(sqlSessionFactory.getConfiguration().getEnvironment().getDataSource());
 		}
@@ -85,7 +85,7 @@ public class RootConfig {
 		}
 		
 		//트랜잭션 매니저 등록
-		@Primary	//여러개의 트랜잭션 매니저 중 최우선 순위를 등록
+		//@Primary	//여러개의 트랜잭션 매니저 중 최우선 순위를 등록
 		@Bean
 		public HibernateTransactionManager transactionManager(SessionFactory sessionFactory) {
 			return new HibernateTransactionManager(sessionFactory);

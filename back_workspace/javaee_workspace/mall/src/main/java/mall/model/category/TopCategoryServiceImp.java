@@ -13,11 +13,11 @@ import mall.domain.TopCategory;
 public class TopCategoryServiceImp implements TopCategoryService{
 
 	//DAO를 느슨하게 보유
-	@Qualifier("hibernateTopCategoryDAO")
+	@Qualifier("mybatisTopCategoryDAO")
 	@Autowired
 	TopCategoryDAO topCategoryDAO; 
 	
-	@Transactional
+	//@Transactional
 	public List selectAll() {
 		return topCategoryDAO.selectAll();
 	}
