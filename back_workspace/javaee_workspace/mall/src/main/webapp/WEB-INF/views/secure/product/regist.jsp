@@ -123,6 +123,7 @@
                         <span class="input-group-text">Upload</span>
                       </div>
                     </div>
+                    <div id="priview" style="width:100%;">미리보기</div>
                   </div>
                 </div>
                 <!-- /.card-body -->
@@ -216,6 +217,20 @@
 			}
 		});
 	}
+	
+	/*크롬브라우저에서 지원하는 e.target.files 유사 배열은 읽기 전용이라서, 개발자가 쓰기가 안되므로 배열을 하나 선언하여 담아서 처리
+	주의) 아래의 배열은, 개발자가 정의한 배열일 뿐이지, form 태그가 전송할 컴포넌트는 아니므로, submit 시, selectedFile에 들어있는 파일을 전송할 수는 없다.
+	해결책? form태그에 인식을 시켜야 한다.. (javascript로 프로그래밍적 formData 객체를 사용해야 한다.)*/
+	let selectedFile = [];
+
+    function regist(){
+		$("form").attr({
+			action:"/admin/admin/product/regist",
+			method: "post",
+			enctype: "multipart/form-data"
+		});
+		$("form").submit();
+	}
 
   $(function () {
     // Summernote
@@ -231,19 +246,34 @@
     //사이즈 목록 가져오기
     getSizeList();
 
-    function regist(){
-		$("form").attr({
-			action:"/admin/admin/product/regist",
-			method: "post",
-			enctype: "multipart/form-data"
-		});
-		$("form").submit();
-	}
     
     //상위 카테고리의 값을 변경 시 하위 카테고리 가져오기
     $("#topcategory").change(function(){
 		getSubCategory($(this).val());
     });
+    
+  	//파일 컴포넌트의 값 변경 시 이벤트 연결 
+   $("#photo").change(function(e){
+		console.log(e);
+		//e.target.files 안에는 브라우저가 읽어들인, 파일의 정보가 배열유사 객체인 FileList에 담겨져 있다.
+		let files=e.target.files;//배열 유사 객체 얻기
+		
+		//첨부된 파일 수 만큼 반복
+		for(let i=0;i<files.length;i++){
+			selectedFile[i]=files[i]; //읽기 전용에 들어있었던 각 file들을,우리만의 배열로 옮기자 
+			
+			//파일을 읽기위한 스트림 객체 생성 
+			const reader = new FileReader();
+			
+			reader.onload=function(e){ //파일을 스트림으로 읽어들인 정보가 e에 들어있음 
+				console.log("읽은 결과 ", e);		
+				
+				//개발자 정의 클래스 인스턴스 생성 container, src, width, height 
+				let productImg = new ProductImg(document.getElementById("preview"), files[i]  ,e.target.result, 100,100);
+			}				
+			reader.readAsDataURL(files[i]); //지정한 파일을 읽기
+		}
+   });
     
     //등록버튼 이벤트 연결
     $("#bt_regist").click(()=>{
