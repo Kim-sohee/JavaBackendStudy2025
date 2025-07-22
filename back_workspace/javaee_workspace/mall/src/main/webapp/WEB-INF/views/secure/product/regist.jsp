@@ -54,7 +54,7 @@
               </div>
               <!-- /.card-header -->
               <!-- form start -->
-              <form>
+              <form id="form1">
                 <div class="card-body">
                 	<!-- 카테고리 영역 시작 -->
                 	<div class="row">
@@ -92,12 +92,12 @@
                     <input type="text" class="form-control" name="introduce" placeholder="간단 소개 100자 이하">
                   </div>
                   <div class="form-group">
-                     <select class="form-control" id="color">
+                     <select class="form-control" id="color" name="color" multiple="multiple">
                        <option>색상선택</option>
                      </select>
                    </div>
                    <div class="form-group">
-                     <select class="form-control" id="size">
+                     <select class="form-control" name="size" id="size" multiple="multiple">
                        <option>사이즈선택</option>
                      </select>
                      </div>
@@ -221,15 +221,40 @@
 	/*크롬브라우저에서 지원하는 e.target.files 유사 배열은 읽기 전용이라서, 개발자가 쓰기가 안되므로 배열을 하나 선언하여 담아서 처리
 	주의) 아래의 배열은, 개발자가 정의한 배열일 뿐이지, form 태그가 전송할 컴포넌트는 아니므로, submit 시, selectedFile에 들어있는 파일을 전송할 수는 없다.
 	해결책? form태그에 인식을 시켜야 한다.. (javascript로 프로그래밍적 formData 객체를 사용해야 한다.)*/
+	//HTML 작성된 기존 폼에서 텍스트 입력 관련된 컴포넌트는 사용하되, 이미지 업로드 컴포넌트는 재설정해야 한다.
 	let selectedFile = [];
 
     function regist(){
-		$("form").attr({
-			action:"/admin/admin/product/regist",
-			method: "post",
-			enctype: "multipart/form-data"
+		//기존 폼을 이용하되, file 컴포넌트 파라미터만 새로 교체(selectedFile 배열로 대체)
+		//js에서 프로그래밍 적 form을 생성
+		let formData = new FormData(document.getElementById("form1"));
+		
+		//formData는 동기/비동기 둘다 지원하지만, 대부분은 비동기방식을 많이 쓴다.
+		//Jquery Ajax 자체에서 formData를 비동기 방식으로 간단하게 사용할 수 있는 코드를 지원
+		//기존 photo 버리고, 우리가 선언한 배열로 대체
+		//formData.append("email", "sohee1234@naver.com");	//<input type="text" name="email">과 동일
+		//formData는 개발자가 명시하지 않아도, 디폴트로 multipart/form-data가 지정되어 있다.
+		
+		formData.delete("photo"); //기존의 photo 파라미터 제거하기 append의 반대
+		
+		for(let i=0; i<selectedFile.length; i++){			
+			formData.append("photo", selectedFile[i]);
+		}
+		
+		//파일마저도 비동기로 업로드 가능!
+		$.ajax({
+			url: "/admin/admin/product/regist",
+			type: "post",
+			data: formData,
+			processData: false,		/*form 이루는 대상으로, 문자열로 변환되는 것을 방지(바이너리 파일 포함 때문)*/
+			contentType: false,		/*브라우저가 자동으로 content-type을 설정하도록 하는 것을 방지*/
+			success: function(result, status, xhr){
+				alert("업로드 성공");
+			},
+			error: function(xhr, status, err){
+				alert(err);
+			}
 		});
-		$("form").submit();
 	}
 
   $(function () {
