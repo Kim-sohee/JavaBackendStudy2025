@@ -1,9 +1,12 @@
 package mall.admin.controller;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +46,8 @@ public class ProductController {
 	//상품 등록 요청을 처리
 	@PostMapping("/admin/product/regist")
 	@ResponseBody
-	public String regist(Product product, int[] color, int[] size, MultipartFile[] photo,HttpServletRequest request) {
-		//MultipartFile 변수와 html 이름이 동일하면 매핑된다.
-		log.debug("업로드한 파일의 수는 "+photo.length);
+	public String regist(Product product, int[] color, int[] size, HttpServletRequest request) {
+		
 		
 		//Product 객체의 멤버변수로 직접 html과 매핑이 될 수 없는 경우엔, 우회하면 된다.
 		//우회란? 파라미터를 별도로 받아서, 다시 product에 넣어준다.
@@ -83,7 +85,9 @@ public class ProductController {
 		//해결책: 클라이언트의 파라미터를 받는 용도의 객체를 별도로 둔다(DTO = Data Transfer Object)
 		//DTO에서 Model 객체로 옮겨야 한다.
 		
-		productService.regist(product);
+		String savePath = request.getServletContext().getRealPath("/data");
+		
+		productService.regist(product, savePath);
 		
 //		log.debug("product= "+product);
 //		ServletContext context = request.getServletContext();		//jsp application 내장 객체, 애플리케이션과 생명을 같이 함
