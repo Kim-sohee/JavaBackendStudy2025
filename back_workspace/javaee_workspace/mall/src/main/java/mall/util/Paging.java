@@ -4,13 +4,21 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.stereotype.Component;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+@Data
+@Slf4j
+@Component		//개발자가 정의한 컴포넌트, (Controller, Service, Repository 외의 컴포넌트)
 public class Paging {
 	private int totalRecord;
 	private int pageSize = 10;
 	private int totalPage;
 	
 	private int blockSize = 10;
-	private int currentPage = 0;
+	private int currentPage = 1;
 	private int firstPage;
 	private int lastPage;
 	
@@ -28,5 +36,12 @@ public class Paging {
 		lastPage = firstPage + (blockSize-1);
 		curPos = (currentPage-1) * pageSize;
 		num = totalRecord - curPos;
+		
+		log.debug("totalRecord="+totalRecord);
+		log.debug("totalPage="+totalPage);
+		log.debug("currentPage="+currentPage);
+		log.debug("firstPage="+firstPage);
+		log.debug("lastPage="+lastPage);
+		log.debug("curPos="+curPos);
 	}
 }
