@@ -1,4 +1,9 @@
+<%@page import="mall.domain.ProductImg"%>
+<%@page import="mall.domain.Product"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
+<%
+	Product product = (Product)request.getAttribute("product");
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,12 +35,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">상품 등록</h1>
+            <h1 class="m-0">상품 확인</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">상품관리>상품등록</li>
+              <li class="breadcrumb-item active">상품관리>상품확인</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -51,7 +56,7 @@
             <!-- 상품 등록 폼 시작 -->
             <div class="card card-primary">
               <div class="card-header">
-                <h3 class="card-title">상품 등록 폼</h3>
+                <h3 class="card-title">상품 내용 보기</h3>
               </div>
               <!-- /.card-header -->
               <!-- form start -->
@@ -75,19 +80,19 @@
 	                  </div>
                 	<!-- 카테고리 영역 끝 -->
                   <div class="form-group">
-                    <input type="text" class="form-control" name="product_name" placeholder="상품명 입력">
+                    <input type="text" class="form-control" name="product_name" value="<%=product.getProduct_name() %>" placeholder="상품명 입력">
                   </div>
                   <div class="form-group">
-                    <input type="text" class="form-control" name="brand" placeholder="브랜드 입력">
+                    <input type="text" class="form-control" name="brand" value="<%=product.getBrand() %>" placeholder="브랜드 입력">
                   </div>
                   <div class="form-group">
-                    <input type="text" class="form-control" name="price" placeholder="가격 입력">
+                    <input type="text" class="form-control" name="price" value="<%=product.getPrice() %>" placeholder="가격 입력">
                   </div>
                   <div class="form-group">
-                    <input type="text" class="form-control" name="discount" placeholder="할인가 입력">
+                    <input type="text" class="form-control" name="discount" value="<%=product.getDiscount() %>" placeholder="할인가 입력">
                   </div>
                   <div class="form-group">
-                    <input type="text" class="form-control" name="introduce" placeholder="간단소개 100자 이하 ">
+                    <input type="text" class="form-control" name="introduce" value="<%=product.getIntroduce() %>" placeholder="간단소개 100자 이하 ">
                   </div>
 				   <div class="form-group">
                        <select class="form-control" name="color" id="color" multiple="multiple">
@@ -261,15 +266,59 @@
 			}
 		});
 	}
-	   
+	
+	//비동기 방식으로, 서버의 이미지를 다운로드 받기
+	function getImgList(dir, filename){
+		console.log("넘겨받은 파일명은 ", dir, "/", filename);
+		
+		$.ajax({
+			url:"/data/"+dir+"/"+filename,
+			type: "GET",
+			/*서버로부터 가져온 이미지 정보는 img src로 표현되려면, 
+				1) 서버로부터 가져온 정보를 Blob 형태로 가져와서
+				2) 웹 브라우저 지원 객체인 File로 변환
+				3) 이 파일을 읽어들인 후 e.target.result 형태로 img src에 대입*/
+			//XMLHttpRequest 객체를 이용해야 함
+			xhr: function(){
+				const xhr = new XMLHttpRequest();
+				xhr.responseType = "blob";	//blob 형태의 데이터 요청
+				
+				//blob이란? Binary Large Object의 준말로 이미지, 비디오, 오디오, 일반 파일 등의 
+				//이진 데이터를 담을 수 있는 자바스크립트 객체
+				return xhr;		
+			},
+			success: function(result, status, xhr){
+				console.log("서버로 부터받은 바이너리 정보는 ", result);
+				//서버로부터 전송받은 바이너리 데이터를 이용하여 File 객체로 만들기
+				const file = new File([result], filename, {type: result.type});
+				
+				//생성된 File을 읽어들여, img src 속성에 대입!
+				const reader = new FileReader();
+				reader.onload = function(e){
+					console.log("읽어들인 정보", e);
+					
+					let productImg = new ProductImg(document.getElementById("preview"), file, e.target.result, 100, 100);
+				}
+				reader.readAsDataURL(file);		//대상 파일 읽기
+			}
+		});
+
+	}
+		   
 	$(()=>{
 	   $('#summernote').summernote({
 		height:200,
-		placeholder:"상품 상세 설명을 채우세요"
+		code:"<%=product.getDetail()%>"
 	   });
+	   
 	   getTopCategory(); //상위 카테고리 가져오기 
 	   getColorList(); //색상 목록 가져오기 
 	   getSizeList(); //사이즈 목록 가져오기 
+	   
+	   //현재 우리가 가진 정보는 filename밖에 없으므로 실제 이미지를 onLoad 시점에 서버로부터 다운로드 받자
+	   <%for(ProductImg productImg : product.getImgList()){%>
+	   		getImgList("p_<%=product.getProduct_id()%>", "<%=productImg.getFilename()%>");
+	   <%}%>
 	   
 	   //상위 카테고리의 값을 변경시, 하위 카테고리 가져오기 
 	   $("#topcategory").change(function(){

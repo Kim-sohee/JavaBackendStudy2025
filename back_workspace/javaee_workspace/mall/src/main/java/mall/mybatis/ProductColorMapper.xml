@@ -6,5 +6,23 @@
 		insert into product_color(product_id, color_id)
 		values(#{product.product_id}, #{color.color_id})
 	</insert>
+
+	<!-- 특정 상품에 등록된 색상 목록 -->	
+	<!-- 자동 매핑이 불가능하므로, resultMap 사용하자 -->
+	<resultMap type="ProductColor" id="colorMap">
+		<id column="product_color_id" property="product_color_id"/>
+		<association column="color_id" property="color" javaType="Color" select="Color.select"/>
+		
+		<!-- mybatis에서 조인문을 사용하지 않고 객체간의 관계만 잘 명시하면, 코드가 간결해질 수 있다.
+			주의할 점: 서로 참조 관계를 명시하다 보면 무한 루프에 빠질 수 있다. -->
+		<!-- <association column="product_id" property="product" javaType="Product"
+			select="Product.select"/> -->
+		
+	</resultMap>
+	
+	<select id="selectByProductId" parameterType="int" resultMap="colorMap">
+		select product_color_id, product_id, color_id 
+		from product_color where product_id = #{product_id}
+	</select>
 	
 </mapper>

@@ -1,20 +1,19 @@
 package mall.admin.controller;
 
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import lombok.extern.slf4j.Slf4j;
 import mall.domain.Color;
@@ -24,6 +23,7 @@ import mall.domain.ProductSize;
 import mall.domain.Size;
 import mall.model.category.TopCategoryService;
 import mall.model.product.ProductService;
+import mall.util.Paging;
 
 @Slf4j
 @Controller
@@ -35,6 +35,10 @@ public class ProductController {
 	//서비스에게 일시킴 (느슨하게 보유, 즉 결합도 낮추어서 보유, 따라서 인터페이스로 보유)
 	@Autowired
 	private TopCategoryService topCategoryService;
+	
+	//페이징 처리 객체를 보유
+	@Autowired
+	private Paging paging;
 	
 	//localhost:8888/admin/admin/product/registform
 	@RequestMapping(value="/admin/product/registform")
@@ -87,7 +91,12 @@ public class ProductController {
 		
 		String savePath = request.getServletContext().getRealPath("/data");
 		
-		productService.regist(product, savePath);
+		try {
+			productService.regist(product, savePath);
+		} catch (Exception e) {
+			productService.remove(product, savePath);
+			e.printStackTrace();
+		}
 		
 //		log.debug("product= "+product);
 //		ServletContext context = request.getServletContext();		//jsp application 내장 객체, 애플리케이션과 생명을 같이 함
@@ -96,5 +105,33 @@ public class ProductController {
 		
 		//4단계: DML은 저장할 게 없다.
 		return "ok";
+	}
+	
+	//목록 요청 처리: 요청이 들어오면 list.jsp를 응답 정보로 보내야 한다. 따라서 ResponseBody가 아닌 ModelAndView로 반환해야 한다.
+	@GetMapping("/admin/product/list")
+	public ModelAndView getList(HttpServletRequest request) {
+		//3단계: 목록 가져오기
+		List productList = productService.selectAll();
+		
+		paging.init(productList, request);
+		
+		//4단계: 결과 저장하기
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("productList", productList);		//request.setAttribute("productList", productList);와 같음
+		mav.addObject("paging", paging);		//페이징 처리 객체도 담기
+		mav.setViewName("secure/product/list");
+		return mav;
+	}
+	
+	//상세 요청에 대한 처리
+	@GetMapping("/admin/product/detail")
+	public String getDetail(int product_id, Model model) {
+		//3단계: 상세 내용 가져오기
+		Product product = productService.select(product_id);
+		
+		//4단계: 저장하기
+		model.addAttribute("product", product);
+		
+		return "secure/product/detail";
 	}
 }
