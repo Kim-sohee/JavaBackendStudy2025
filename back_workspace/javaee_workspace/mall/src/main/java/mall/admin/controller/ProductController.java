@@ -85,7 +85,12 @@ public class ProductController {
 		
 		String savePath = request.getServletContext().getRealPath("/data");
 		
-		productService.regist(product, savePath);
+		try {
+			productService.regist(product, savePath);
+		} catch (Exception e) {
+			productService.remove(product, savePath);
+			e.printStackTrace();
+		}
 		
 //		log.debug("product= "+product);
 //		ServletContext context = request.getServletContext();		//jsp application 내장 객체, 애플리케이션과 생명을 같이 함
@@ -100,10 +105,11 @@ public class ProductController {
 	@GetMapping("/admin/product/list")
 	public ModelAndView getList() {
 		//3단계: 목록 가져오기
-		
+		List productList = productService.selectAll();
 		
 		//4단계: 결과 저장하기
 		ModelAndView mav = new ModelAndView();
+		mav.addObject("productList", productList);		//request.setAttribute("productList", productList);와 같음
 		mav.setViewName("secure/product/list");
 		return mav;
 	}
