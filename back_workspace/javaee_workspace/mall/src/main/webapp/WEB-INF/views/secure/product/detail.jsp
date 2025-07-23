@@ -307,9 +307,9 @@
 		   
 	$(()=>{
 	   $('#summernote').summernote({
-		height:200,
-		code:"<%=product.getDetail()%>"
+		height:200
 	   });
+	   $('#summernote').summernote('code', "<%=product.getDetail()%>");
 	   
 	   getTopCategory(); //상위 카테고리 가져오기 
 	   getColorList(); //색상 목록 가져오기 
