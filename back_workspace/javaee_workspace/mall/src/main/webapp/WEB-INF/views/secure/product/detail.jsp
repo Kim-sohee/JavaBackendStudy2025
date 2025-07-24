@@ -1,8 +1,24 @@
+<%@page import="com.fasterxml.jackson.databind.ObjectMapper"%>
 <%@page import="mall.domain.ProductImg"%>
 <%@page import="mall.domain.Product"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%
 	Product product = (Product)request.getAttribute("product");
+
+	//Java를 JSON 문자열로 변환
+	ObjectMapper mapper = new ObjectMapper();		//java -- json
+	int[] colorArray = new int[product.getColorList().size()];
+	for(int i=0; i<colorArray.length; i++){
+		colorArray[i] = product.getColorList().get(i).getColor().getColor_id();
+	}
+	String colorJson = mapper.writeValueAsString(colorArray);
+	//out.print("colorJson은 "+colorJson);
+	
+	int[] sizeArray = new int[product.getSizeList().size()];
+	for(int i=0; i<sizeArray.length; i++){
+		sizeArray[i] = product.getSizeList().get(i).getSize().getSize_id();
+	}
+	String sizeJson = mapper.writeValueAsString(sizeArray);
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -158,7 +174,7 @@
 	<%@ include file="../inc/footer_link.jsp" %>
 	<script src="/static/admin/custom/ProductImg.js"></script>
 	<script>
-	function printCategory(obj, list){
+	function printCategory(obj, list, v){
 		let tag="<option value='0'>카테고리 선택</option>";
 		
 		for(let i=0;i<list.length;i++){
@@ -174,53 +190,56 @@
 		}
 		
 		$(obj).html(tag);  // innerHTML=태그 동일
+		
+		//현재 select 객체의 값 설정
+		$(obj).val(v);
 	}
 	
 	//비동기 방식으로 서버에 요청을 시도하여, 데이터 가져오기 
-	function getTopCategory(){
+	function getTopCategory(v){
 		$.ajax({
 			url:"/admin/admin/topcategory/list",
 			type:"get",
 			success:function(result, status, xhr){ //200번대의 성공 응답 시, 이 함수 실행
 				console.log("서버로부터 받은 결과는 ", result);
 				//화면에 출력하기 
-				printCategory("#topcategory",result);
+				printCategory("#topcategory",result, v);
 			},
 			error:function(xhr, status, err){
 			}
 		});
 	}
 	
-	function getSubCategory(topcategory_id){
+	function getSubCategory(topcategory_id, v){
 		$.ajax({
 			url :"/admin/admin/subcategory/list?topcategory_id="+topcategory_id,
 			type:"get",
 			success:function(result, status, xhr){
 				console.log(result);
-				printCategory("#subcategory",result);
+				printCategory("#subcategory",result, v);
 			}
 		});
 	}
 	
-	function getColorList(){
+	function getColorList(v){
 		$.ajax({
 			url:"/admin/admin/color/list",
 			type:"get",
 			success:function(result, status, xhr){
 				
-				console.log("색상은 ",result);
-				
-				printCategory("#color", result);
+				//console.log("색상은 ",result);
+				console.log("전달받은 색상은 ", v);
+				printCategory("#color", result, v);
 			}
 		});
 	}
 	
-	function getSizeList(){
+	function getSizeList(v){
 		$.ajax({
 			url:"/admin/admin/size/list",
 			type:"get",
 			success:function(result, status, xhr){
-				printCategory("#size", result);
+				printCategory("#size", result, v);
 			}
 		});
 	}
@@ -311,9 +330,11 @@
 	   });
 	   $('#summernote').summernote('code', "<%=product.getDetail()%>");
 	   
-	   getTopCategory(); //상위 카테고리 가져오기 
-	   getColorList(); //색상 목록 가져오기 
-	   getSizeList(); //사이즈 목록 가져오기 
+	   getTopCategory(<%=product.getSubcategory().getTopCategory().getTopcategory_id()%>); //상위 카테고리 가져오기 
+	   getSubCategory(<%=product.getSubcategory().getTopCategory().getTopcategory_id()%>, <%=product.getSubcategory().getSubcategory_id()%>);
+	   
+	   getColorList(<%=colorJson%>); //색상 목록 가져오기 
+	   getSizeList(<%=sizeJson%>); //사이즈 목록 가져오기 
 	   
 	   //현재 우리가 가진 정보는 filename밖에 없으므로 실제 이미지를 onLoad 시점에 서버로부터 다운로드 받자
 	   <%for(ProductImg productImg : product.getImgList()){%>
