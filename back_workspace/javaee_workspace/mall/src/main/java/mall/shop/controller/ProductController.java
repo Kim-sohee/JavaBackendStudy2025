@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import mall.domain.Product;
 import mall.model.category.TopCategoryService;
 import mall.model.product.ProductService;
 
@@ -29,10 +30,26 @@ public class ProductController {
 		ModelAndView mav = new ModelAndView("shop/list");
 		//3단계: 최상위 카테고리 가져오기
 		List topList = topCategoryService.selectAll();
+		List productList = productService.selectAll();
 		
 		//4단계: 저장
 		mav.addObject("topList", topList);
+		mav.addObject("productList", productList);
+		
 		return mav;
 	}
 	
+	//상세 요청 처리
+	@GetMapping("/product/detail")
+	public ModelAndView getDetail(int product_id) {
+		ModelAndView mav = new ModelAndView("shop/detail");
+		
+		//3단계: 최상위 카테고리 가져오기
+		List topList = topCategoryService.selectAll();
+		Product product = productService.select(product_id);
+		
+		mav.addObject("topList", topList);
+		mav.addObject("product", product);
+		return mav;
+	}
 }
