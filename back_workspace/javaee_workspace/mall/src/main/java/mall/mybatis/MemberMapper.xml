@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Member">
+	<!-- 이미 존재하는 회원인지 조회 -->
+	<select id="checkDuplicate" parameterType="String" resultType="Member">
+		select * from member where id = #{id}	
+	</select>
+
+	<!-- 가입 -->
+	<insert id="insert" parameterType="Member">
+		insert into member(sns_provider_id, id, password, name, email)
+		values (#{snsProvider.sns_provider_id}, #{id}, #{password}, #{name}, #{email})
+	</insert>
+</mapper>
