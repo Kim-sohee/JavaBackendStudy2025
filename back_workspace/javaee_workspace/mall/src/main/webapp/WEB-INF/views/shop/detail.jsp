@@ -6,9 +6,9 @@
 <%@page import="mall.domain.TopCategory"%>
 <%@page import="java.util.List"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
-<% 
-	List<TopCategory> topList = (List)request.getAttribute("topList");
-	Product product = (Product)request.getAttribute("product");
+<%
+	List<TopCategory> topList=(List)request.getAttribute("topList");
+	Product product =(Product)request.getAttribute("product");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,52 +20,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Ashion | Template</title>
-
-    <%@ include file="./inc/head_link.jsp" %>
+	<%@ include file="./inc/head_link.jsp" %>
+	
 </head>
 
 <body>
     <!-- Page Preloder -->
-    <%@ include file="./inc/preloader.jsp" %>
-
+	<%@ include file="./inc/preloader.jsp" %>
+	
     <!-- Offcanvas Menu Begin -->
-    <%@ include file="./inc/offcanvas.jsp" %>
+	<%@ include file="./inc/offcanvas.jsp" %>
     <!-- Offcanvas Menu End -->
 
-    <!-- Header Section Begin -->
-    <%@ include file="./inc/header.jsp" %>
-    <!-- Header Section End -->
 
-	<!-- 내용 시작 -->
-	<!-- Product Details Section Begin -->
+    <!-- Header Section Begin -->
+	<%@ include file="./inc/header.jsp"%>
+    <!-- Header Section End -->
+    
+	<!-- 내용 시작 Begin -->
     <section class="product-details spad">
         <div class="container">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="product__details__pic">
                         <div class="product__details__pic__left product__thumb nice-scroll">
-                            
-                            <%for(int i=0; i< product.getImgList().size(); i++){ %>
-                            <% ProductImg productImg = product.getImgList().get(i); %>
+                           	
+                           	<%for(int i=0;i<product.getImgList().size();i++){ %>
+                           	<%ProductImg productImg = product.getImgList().get(i); %>
                             <a class="pt active" href="#product-1">
-                                <img src="/data/p_<%=product.getProduct_id() %>/<%=productImg.getFilename() %>" alt="">
+                                <img src="/data/p_<%=product.getProduct_id()%>/<%=productImg.getFilename() %>" alt="">
                             </a>
-		                    <% } %>                        
-                            
+                           <%} %>
+                           
                         </div>
                         <div class="product__details__slider__content">
                             <div class="product__details__pic__slider owl-carousel">
-	                           <%for(int i=0; i< product.getImgList().size(); i++){ %>
-	                           <% ProductImg productImg = product.getImgList().get(i); %>
-                                <img data-hash="product-1" class="product__big__img" src="/data/p_<%=product.getProduct_id() %>/<%=productImg.getFilename() %>"  alt="">
-			                    <% } %>                        
+	                           	<%for(int i=0;i<product.getImgList().size();i++){ %>
+	                           	<%ProductImg productImg = product.getImgList().get(i); %>
+                                <img data-hash="product-1" class="product__big__img" src="/data/p_<%=product.getProduct_id()%>/<%=productImg.getFilename() %>" alt="">
+                                <%} %>
+                                
+                                
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="product__details__text">
-                        <h3><%=product.getProduct_name() %> <span>Brand: <%=product.getBrand() %></span></h3>
+                        <h3><%=product.getProduct_name() %><span>Brand: <%=product.getBrand() %></span></h3>
                         <div class="rating">
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
@@ -74,16 +76,20 @@
                             <i class="fa fa-star"></i>
                             <span>( 138 reviews )</span>
                         </div>
-                        <div class="product__details__price"><%=product.getDiscount() %><span><%=product.getPrice() %></span></div>
+                        <div class="product__details__price"><%=product.getDiscount() %> <span><%=product.getPrice() %></span></div>
                         <p><%=product.getIntroduce() %></p>
                         <div class="product__details__button">
                             <div class="quantity">
                                 <span>Quantity:</span>
                                 <div class="pro-qty">
-                                    <input type="text" value="1" id="ea">
+                                    <input type="text" id="ea" value="1">
                                 </div>
                             </div>
-                            <a href="javascript:addCart()" class="cart-btn"><span class="icon_bag_alt"></span> Add to cart</a>
+                            <%if(loginMember !=null){ %>
+                           	 	<a href="javascript:addCart(<%=loginMember.getMember_id()%>)" class="cart-btn"><span class="icon_bag_alt"></span> Add to cart</a>
+							<%}else{ %>
+                            	<a href="javascript:alert('로그인이 필요한 서비스입니다')" class="cart-btn"><span class="icon_bag_alt"></span> Add to cart</a>
+                            <%} %>
                             <ul>
                                 <li><a href="#"><span class="icon_heart_alt"></span></a></li>
                                 <li><a href="#"><span class="icon_adjust-horiz"></span></a></li>
@@ -103,29 +109,26 @@
                                 </li>
                                 <li>
                                     <span>Available color:</span>
+                                    
                                     <div class="color__checkbox">
-                                        
-                                        <% for(ProductColor pc : product.getColorList()){ %>
-                                        <% String color = pc.getColor().getColor_name(); %>
-                                        <label for="<%=color.toLowerCase() %>">
-                                            <input type="radio" name="color" id="<%=color.toLowerCase() %>" value="<%=pc.getColor().getColor_id()%>">
-                                            <span class="checkmark <%=color.toLowerCase() %>-bg"></span>
+                                    	<%for( ProductColor pc : product.getColorList()){ %>
+                                    	<%
+                                    		String color=pc.getColor().getColor_name();
+                                    	%>
+                                        <label for="<%=color.toLowerCase()%>">
+                                            <input type="radio" name="color" id="<%=color.toLowerCase()%>" value="<%=pc.getColor().getColor_id()%>">
+                                            <span class="checkmark <%=color.toLowerCase()%>-bg" style="background:<%=color%>"></span>
                                         </label>
-                                        <% } %>
+            							<%} %>
                                     </div>
                                 </li>
                                 <li>
                                     <span>Available size:</span>
                                     <div class="size__btn">
-                                        
-										<%for(int i=0; i<product.getSizeList().size(); i++){ %>
-										<% ProductSize size = product.getSizeList().get(i); %>     
-                                        <label for="xs-btn" class="active">
-                                            <input type="radio" id="xs-btn">
-                                            <%=size.getSize().getSize_name() %>
-                                        </label>
-                                        <% } %>
-                                        
+                                    	<%for(ProductSize ps  : product.getSizeList()){ %>
+                                          <input type="radio" name="size" value="<%=ps.getSize().getSize_id()%>">
+                                           <%=ps.getSize().getSize_name() %>
+                                        <%}%>
                                     </div>
                                 </li>
                                 <li>
@@ -283,48 +286,61 @@
             </div>
         </div>
     </section>
-    <!-- Product Details Section End -->
-	<!-- 내용 끝 -->
+    
+
+	<!-- 내용 End -->
 
 	<!-- Instagram Begin -->
-	<%@ include file="./inc/instagram.jsp" %>
+	<%@ include file="./inc/instagram.jsp" %>	
 	<!-- Instagram End -->
-	
+
 	<!-- Footer Section Begin -->
 	<%@ include file="./inc/footer.jsp" %>
 	<!-- Footer Section End -->
-	
+
 	<!-- Search Begin -->
 	<%@ include file="./inc/search.jsp" %>
 	<!-- Search End -->
-	
+
 	<!-- Js Plugins -->
 	<%@ include file="./inc/footer_link.jsp" %>
-	
 	<script type="text/javascript">
 		//비동기 요청으로 장바구니 담기
-		function addCart(){
-			//let formData = new FormData();	//개발자가 명시하지 않아도 multipart/form-data가 이미 적용
-															//파일 업로드가 아니더라도 사용 가능
-			//formData.append("product_id", <%=product.getProduct_id()%>);
+		function getSelectedValue(array){
+			let selectedValue=0; //색상, 사이즈의 pk
 			
+			for(let i=0;i<array.length;i++){
+				if(array[i].checked){
+					selectedValue = array[i].value;								
+				}
+			}
+			return selectedValue;
+		}
+		
+		function addCart(member_id){
+			//let formData = new FormData();//개발자가 명시하지 않아도 multipart/form-data 가 이미 적용 
+															//파일 업로드가 아니더라도 사용 가능 	'
+			//유저가 선택한 색상
+			
+			
+			//유저가 선택한 사이즈 
+															
 			$.ajax({
-				url:"/shop/cart/regist",
-				type: "post",
-				data: {
+				url:"/shop/cart/regist", 
+				type:"post", 
+				data:{
 					"product.product_id" : <%=product.getProduct_id()%>,
-					"ea": $("#ea").val(),
-					"member_id": 22,
-					
+					"ea" : $("#ea").val(),
+					"member.member_id": member_id,
+					"color.color_id" : getSelectedValue(document.getElementsByName("color")), 
+					"size.size_id" : getSelectedValue(document.getElementsByName("size"))
 				},
-				//processData: false,
-				//contentType:false,
-				success: function(result, status, xhr){
+				success:function(result, status, xhr){
 					console.log(result);
 				}
 			});
-
 		}
+	
 	</script>
 </body>
 

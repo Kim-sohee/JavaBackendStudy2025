@@ -32,6 +32,12 @@ public class MemberController {
 	private OAuth20Service googleAuthService;
 	
 	@Autowired
+	private OAuth20Service naverAuthService;
+	
+	@Autowired
+	private OAuth20Service kakaoAuthService;
+	
+	@Autowired
 	private MemberService memberService;
 	
 	@Autowired
@@ -43,6 +49,14 @@ public class MemberController {
 		return "shop/member/login";
 	}
 	
+	//로그아웃 요청 처리
+	@GetMapping("member/logout")
+	public String logout(HttpSession session) {
+		//세션을 제거할 수는 없으며, 단 세션을 무효화 시켜야 한다.
+		session.invalidate();	//현재 사용중인 세션 무효화.. 따라서 이 시점 부터 기존 세션을 참조할 수 없다.
+		return "redirect:/shop/main";
+	}
+	
 	//인증 동의화면 요청 처리
 	@GetMapping("/member/google/authurl")
 	@ResponseBody
@@ -50,6 +64,9 @@ public class MemberController {
 		return googleAuthService.getAuthorizationUrl();
 	}
 	
+	/*-------------------------------------------------------------------
+	 * 구글 로그인 처리
+	 * ------------------------------------------------------------------*/
 	//구글에 등록해 놓은 콜백 주소로 전송되는 콜백 요청 처리
 	@GetMapping("/callback/sns/google")
 	public String googleCallback(@RequestParam("code") String code, HttpSession session) throws ExecutionException, IOException, InterruptedException{
@@ -81,7 +98,8 @@ public class MemberController {
 		//회원가입 및 등록: 토큰을 통해 얻은 회원 정보가 쇼핑몰에 등록되어 있는지 체크
 		//1)없으면 가입 후 로그인
 		Member member = null;
-		try {
+		member = memberService.selectById(openid);
+		if(member == null) {
 			//계정이 없다면 회원가입 및 로그인 처리
 			//회원 등록
 			member = new Member();
@@ -91,15 +109,93 @@ public class MemberController {
 			member.setName(name);
 			
 			memberService.regist(member);
-		} catch (Exception e) {
-			//동일한 계정이 이미 존재한다면 로그인만 처리
-			member = memberService.checkDuplicate(openid);
 		}
+		//2)있으면 그냥 로그인
 		session.setAttribute("member", member);		//세션이 살아있는 한, Member를 사용할 수 있다.
 		
-		//2)있으면 그냥 로그인
-		
-		
 		return "redirect:/shop/product/list";
+	}
+	
+	/*-------------------------------------------------------------------
+	 * 네이버 로그인 처리
+	 * ------------------------------------------------------------------*/
+	@GetMapping("member/naver/authurl")
+	@ResponseBody
+	public String getNaverAuthUrl() {
+		return naverAuthService.getAuthorizationUrl();
+	}
+	
+	//naver에 등록해 놓은 콜백 주소로 전송되는 콜백 요청 처리
+	@GetMapping("/callback/sns/naver")
+	public String naverCallback(@RequestParam("code") String code, @RequestParam("state") String state, HttpSession session) throws IOException, InterruptedException, ExecutionException {
+		//IDP가 전송한 code와 client Id, client Secret를 조합하여, 토큰을 요청하자!
+		//clientID, client Secret은 빈 등록 시 이미 등록해놓은 걸 사용한다.
+		OAuth2AccessToken accessToken = naverAuthService.getAccessToken(code);
+		
+		log.debug("네이버에서 발급받은 토큰은 "+accessToken);
+		
+		//발급받은 토큰을 이용하여 회원정보 조회
+		OAuthRequest request = new OAuthRequest(Verb.GET, "https://openapi.naver.com/v1/nid/me");
+		naverAuthService.signRequest(accessToken, request);
+		Response response = naverAuthService.execute(request);
+		
+		JsonObject responseJson = JsonParser.parseString(response.getBody()).getAsJsonObject();
+		
+		log.debug("responseJson = "+responseJson);
+		JsonObject userJson = responseJson.getAsJsonObject("response");
+		
+		String id = userJson.get("id").getAsString();
+		String email = userJson.get("email").getAsString();
+		String name = userJson.get("name").getAsString();
+		
+		//회원가입 및 등록: 토큰을 통해 얻은 회원 정보가 쇼핑몰에 등록되어 있는지 체크
+		//1)없으면 가입 후 로그인
+		Member member = null;
+		member = memberService.selectById(id);
+		if(member == null) {
+			//계정이 없다면 회원가입 및 로그인 처리
+			//회원 등록
+			member = new Member();
+			member.setSnsProvider(snsProviderService.selectByName("naver"));
+			member.setId(id);
+			member.setEmail(email);
+			member.setName(name);
+			
+			memberService.regist(member);
+		}
+		//2)있으면 그냥 로그인
+		session.setAttribute("member", member);		//세션이 살아있는 한, Member를 사용할 수 있다.
+		
+		return "redirect:/shop/main";
+	}
+	
+	/*-------------------------------------------------------------------
+	 * 카카오 로그인 처리
+	 * ------------------------------------------------------------------*/
+	//동의 화면 주소 요청 처리
+	@GetMapping("member/kakao/authurl")
+	@ResponseBody
+	public String getKakaoAuthUrl() {
+		return kakaoAuthService.getAuthorizationUrl();
+	}
+	
+	//콜백 요청 처리
+	@GetMapping("/callback/sns/kakao")
+	public String kakaoCallback(String code, HttpSession session) throws IOException, InterruptedException, ExecutionException {
+		OAuth2AccessToken accessToken = kakaoAuthService.getAccessToken(code);
+		
+		log.debug("카카오에서 발급받은 토큰은 "+accessToken);
+		
+		//발급받은 토큰을 이용하여 회원정보 조회
+		OAuthRequest request = new OAuthRequest(Verb.GET, "https://kapi.kakao.com/v2/user/me");
+		kakaoAuthService.signRequest(accessToken, request);
+		Response response = kakaoAuthService.execute(request);
+		
+		JsonObject responseJson = JsonParser.parseString(response.getBody()).getAsJsonObject();
+		
+		log.debug("responseJson = "+responseJson);
+		JsonObject userJson = responseJson.getAsJsonObject("response");
+		
+		return null;
 	}
 }

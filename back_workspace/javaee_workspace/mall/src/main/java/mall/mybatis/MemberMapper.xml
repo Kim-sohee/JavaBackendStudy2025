@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="Member">
-	<!-- 이미 존재하는 회원인지 조회 -->
-	<select id="checkDuplicate" parameterType="String" resultType="Member">
+	<!-- 아이디를 이용하여 회원정보 가져오기 -->
+	<select id="selectById" parameterType="String" resultType="Member">
 		select * from member where id = #{id}	
 	</select>
 
