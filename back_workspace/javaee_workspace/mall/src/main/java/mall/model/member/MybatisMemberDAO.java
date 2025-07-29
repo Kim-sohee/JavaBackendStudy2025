@@ -13,12 +13,8 @@ public class MybatisMemberDAO implements MemberDAO{
 	private SqlSessionTemplate sqlSessionTemplate;
 	
 	@Override
-	public Member checkDuplicate(String id) throws MemberException {
-		Member member = (Member)sqlSessionTemplate.selectOne("Member.checkDuplicate", id);
-		if(member != null) {	//중복된 회원 발견
-			throw new MemberException("중복된 아이디 발견");
-		}
-		return member;
+	public Member selectById(String id){
+		return sqlSessionTemplate.selectOne("Member.selectById", id);
 	}
 
 	@Override
@@ -27,6 +23,24 @@ public class MybatisMemberDAO implements MemberDAO{
 		if(result<1) {
 			throw new MemberException("회원 등록 실패");
 		}
+	}
+
+	@Override
+	public Member selectByEmail(String email) throws MemberException{
+		Member member = sqlSessionTemplate.selectOne("Member.selectByEmail", email);
+		if(member == null) {
+			throw new MemberException("일치하는 정보가 없습니다.");
+		}
+		return member;
+	}
+
+	@Override
+	public Member login(Member member) throws MemberException{
+		Member obj = sqlSessionTemplate.selectOne("Member.login", member);
+		if(obj == null) {
+			throw new MemberException("로그인 정보가 올바르지 않습니다.");
+		}
+		return obj;
 	}
 
 }

@@ -141,7 +141,7 @@ input[type=submit]:hover {
 <p>Resize the browser window to see the responsive effect. When the screen is less than 650px wide, make the two columns stack on top of each other instead of next to each other.</p>
 
 <div class="container">
-  <form action="/action_page.php">
+  <form id="form1">
     <div class="row">
       <h2 style="text-align:center">Login with Social Media or Manually</h2>
       <div class="vl">
@@ -165,9 +165,9 @@ input[type=submit]:hover {
           <p>Or sign in manually:</p>
         </div>
 
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <input type="submit" value="Login">
+        <input type="text" name="email" placeholder="Your email" required>
+        <input type="password" name="password" placeholder="Your Password" required>
+        <input type="button" value="Login" id="bt_login">
       </div>
       
     </div>
@@ -192,10 +192,25 @@ input[type=submit]:hover {
 			url: "/shop/member/"+sns+"/authurl",
 			type: "get",
 			success: function(result){
+				alert(result);
 				location.href = result;		//동의 화면을 요청
 			}
 		});
 	}
+	
+	function homeLogin(){
+		$("#form1").attr({
+			action: "/shop/member/login",
+			method: "post"
+		});
+		$("#form1").submit();
+	}
+	
+	$(()=>{
+		$("#bt_login").click(()=>{
+			homeLogin();
+		});
+	});
 </script>
 
 </body>
