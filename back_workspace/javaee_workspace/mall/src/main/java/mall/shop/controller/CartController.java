@@ -16,14 +16,10 @@ import mall.model.category.TopCategoryService;
 @Slf4j
 @Controller
 public class CartController {
-	@Autowired
-	private TopCategoryService topCategoryService;
 	
 	//장바구니 목록 요청
 	@GetMapping("/cart/list")
 	public String getList(Model model) {
-		List topList = topCategoryService.selectAll();
-		model.addAttribute("topList", topList);
 		return "shop/order/cart_list";
 	}
 	

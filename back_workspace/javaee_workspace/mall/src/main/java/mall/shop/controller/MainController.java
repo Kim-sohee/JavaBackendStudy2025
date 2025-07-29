@@ -14,21 +14,10 @@ import mall.model.category.TopCategoryService;
 @Slf4j
 @Controller
 public class MainController {
-	@Autowired
-	private TopCategoryService topCategoryService;
 	
 	@RequestMapping(value="/main", method=RequestMethod.GET)
 	public ModelAndView getMain() {
-		//3단계: 일 시키기
-		List topList = topCategoryService.selectAll();
-		
-		log.debug("topList" + topList);
-		
 		ModelAndView mav = new ModelAndView("shop/index");
-		
-		//4단계: 저장
-		mav.addObject("topList", topList);
-		
 		return mav;
 	}
 }

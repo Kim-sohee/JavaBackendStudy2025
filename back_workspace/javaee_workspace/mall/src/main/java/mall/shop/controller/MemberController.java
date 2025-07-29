@@ -6,10 +6,14 @@ import java.util.concurrent.ExecutionException;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.model.OAuthRequest;
@@ -21,13 +25,17 @@ import com.google.gson.JsonParser;
 
 import lombok.extern.slf4j.Slf4j;
 import mall.domain.Member;
-import mall.domain.SnsProvider;
+import mall.exception.MemberException;
+import mall.exception.MemberNotFoundException;
+import mall.exception.PasswordEncryptException;
 import mall.model.member.MemberService;
 import mall.model.member.SnsProviderService;
 
 @Slf4j
 @Controller
 public class MemberController {
+
+    private final LocalSessionFactoryBean sessionFactory;
 	@Autowired
 	private OAuth20Service googleAuthService;
 	
@@ -42,6 +50,10 @@ public class MemberController {
 	
 	@Autowired
 	private SnsProviderService snsProviderService;
+
+    MemberController(LocalSessionFactoryBean sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 	
 	//로그인 폼 요청 처리
 	@GetMapping("/member/loginform")
@@ -50,23 +62,49 @@ public class MemberController {
 	}
 	
 	//로그아웃 요청 처리
-	@GetMapping("member/logout")
+	@GetMapping("/member/logout")
 	public String logout(HttpSession session) {
 		//세션을 제거할 수는 없으며, 단 세션을 무효화 시켜야 한다.
 		session.invalidate();	//현재 사용중인 세션 무효화.. 따라서 이 시점 부터 기존 세션을 참조할 수 없다.
 		return "redirect:/shop/main";
 	}
 	
+	//회원가입폼 요청 처리
+	@GetMapping("/member/registform")
+	public String getRegistForm() {
+		return "shop/member/join";
+	}
+	
+	//회원가입 요청 처리
+	@PostMapping("/member/regist")
+	public String regist(Member member) {
+		log.debug("ID "+ member.getId());
+		log.debug("Password "+member.getPassword());
+		log.debug("name "+member.getName());
+		log.debug("email "+member.getEmail());
+		
+		memberService.regist(member);
+		return "redirect:/shop/member/loginform";
+	}
+	
+	//홈페이지 로그인 요청처리
+	@PostMapping("/member/login")
+	public String homeLogin(Member member, HttpSession session) {
+		Member obj = memberService.login(member);
+		session.setAttribute("member", obj);
+		return "redirect:/shop/main";
+	}
+	
+	
+	/*-------------------------------------------------------------------
+	 * 구글 로그인 처리
+	 * ------------------------------------------------------------------*/
 	//인증 동의화면 요청 처리
 	@GetMapping("/member/google/authurl")
 	@ResponseBody
 	public String getGoogleAuthUrl() {
 		return googleAuthService.getAuthorizationUrl();
 	}
-	
-	/*-------------------------------------------------------------------
-	 * 구글 로그인 처리
-	 * ------------------------------------------------------------------*/
 	//구글에 등록해 놓은 콜백 주소로 전송되는 콜백 요청 처리
 	@GetMapping("/callback/sns/google")
 	public String googleCallback(@RequestParam("code") String code, HttpSession session) throws ExecutionException, IOException, InterruptedException{
@@ -198,4 +236,29 @@ public class MemberController {
 		
 		return null;
 	}
+	
+	//현재 컨트롤러의 메서드들 에서 발생하는 예외에 대한 처리
+	@ExceptionHandler(PasswordEncryptException.class)
+	public ModelAndView handle(PasswordEncryptException e) {
+		ModelAndView mav = new ModelAndView("shop/error/result");
+		
+//		mav.addObject("e", e);
+		log.error("암호화에 문제가 생겼습니다.");
+		e.printStackTrace();
+		
+		mav.addObject("msg", "회원가입이 실패하였습니다.");
+		return mav;
+	}
+	
+	@ExceptionHandler({MemberException.class, MemberNotFoundException.class})
+	public ModelAndView handle(Exception e) {
+		ModelAndView mav = new ModelAndView("shop/error/result");
+		
+//		mav.addObject("e", e);
+		
+		mav.addObject("msg", e.getMessage());
+		return mav;
+	}
+	
+	
 }

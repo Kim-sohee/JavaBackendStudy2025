@@ -29,11 +29,9 @@ public class ProductController {
 	public ModelAndView getProductList() {
 		ModelAndView mav = new ModelAndView("shop/list");
 		//3단계: 최상위 카테고리 가져오기
-		List topList = topCategoryService.selectAll();
 		List productList = productService.selectAll();
 		
 		//4단계: 저장
-		mav.addObject("topList", topList);
 		mav.addObject("productList", productList);
 		
 		return mav;
@@ -45,10 +43,8 @@ public class ProductController {
 		ModelAndView mav = new ModelAndView("shop/detail");
 		
 		//3단계: 최상위 카테고리 가져오기
-		List topList = topCategoryService.selectAll();
 		Product product = productService.select(product_id);
 		
-		mav.addObject("topList", topList);
 		mav.addObject("product", product);
 		return mav;
 	}

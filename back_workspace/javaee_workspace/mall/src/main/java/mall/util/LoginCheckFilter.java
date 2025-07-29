@@ -36,9 +36,14 @@ public class LoginCheckFilter implements Filter{
 		String uri = request.getRequestURI();
 		//그냥 가도록 허용
 		if(uri.equals("/shop/main") 
+			//로그인 폼/ 로그인/ 로그아웃
 			|| uri.equals("/shop/member/loginform")
 			|| uri.equals("/shop/member/logout")
+			|| uri.equals("/shop/member/login")
 			
+			//회원가입 및 폼
+			|| uri.equals("/shop/member/registform")
+			|| uri.equals("/shop/member/regist")
 			
 			//동의 화면 관련
 			|| uri.equals("/shop/member/google/authurl")

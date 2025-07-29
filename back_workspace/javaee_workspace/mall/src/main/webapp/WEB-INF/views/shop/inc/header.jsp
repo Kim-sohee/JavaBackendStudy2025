@@ -37,8 +37,8 @@
                         		Member loginMember = (Member)session.getAttribute("member");
                         	%>
                         	<% if(loginMember==null){ %>
-                            <a href="/shop/member/loginform">Login</a>
-                            <a href="#">Register</a>
+                            <a href="/shop/member/rergistform">Login</a>
+                            <a href="/shop/member/registform">Register</a>
                             <%}else{ %>
                             <a href="#"><%=loginMember.getName() %>님</a>
                             <a href="/shop/member/logout">Logout</a>

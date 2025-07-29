@@ -20,7 +20,7 @@ import mall.model.member.NaverApi20;
 @Slf4j
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = {"mall.shop.controller"})
+@ComponentScan(basePackages = {"mall.advice, mall.shop.controller, mall.util"})
 public class UserWebConfig {
 	@Bean
 	public InternalResourceViewResolver viewResolver() {
