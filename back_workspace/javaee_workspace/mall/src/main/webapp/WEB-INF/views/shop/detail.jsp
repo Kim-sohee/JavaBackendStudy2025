@@ -336,7 +336,14 @@
 					"size.size_id" : getSelectedValue(document.getElementsByName("size"))
 				},
 				success:function(result, status, xhr){
-					console.log(result);
+					console.log("성공",result);
+					if(confirm("장바구니에 상품을 담았습니다.\n장바구니로 이동하시겠어요?")){
+						location.href="/shop/cart/list";
+					}
+				},
+				error:function(xhr, status, err){		//200 이외의 응답 코드에 반응(3xx, 4xx, 5xx)
+					console.log("서버의 실패 응답 코드는 ", xhr.status);
+					console.log("서버의 실패 응답 메시지는 ", xhr.responseJSON.msg);
 				}
 			});
 		}

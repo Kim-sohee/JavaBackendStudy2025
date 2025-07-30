@@ -42,7 +42,7 @@ public class UserWebConfig {
 		return builder.build(GoogleApi20.instance());
 	}
 	
-	//네이버 로그인 관련 서비스 객체 등록
+	//네이버 로그인 관련 서비스 객체 등록 
 	@Bean
 	public OAuth20Service naverAuthService() {
 		//클라이언트 ID, Secret, 리소스 owner 접근 범위, 콜백 주소
