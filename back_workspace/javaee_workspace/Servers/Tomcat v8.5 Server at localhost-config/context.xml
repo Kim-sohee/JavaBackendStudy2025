@@ -25,11 +25,4 @@
     <!--
     <Manager pathname="" />
     -->
-    
-    <resource-ref>
-    	<description>MySQL Datasource</description>
-    	<res-ref-name>jndi/mysql</res-ref-name>
-    	<res-type>javax.sql.DataSource</res-type>
-    	<res-auth>Container</res-auth>
-    </resource-ref>
 </Context>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>mymodel2</display-name>
+  
+  <!-- 
+  	ServletContext 수준에서 스프링 컨테이너를 관리하는 법
+  	서버가 가동될 때, ServletContext에 원하는 값들을 전달하기 
+   -->
+   
+   <!-- ServletContext에게 전달할 파라미터가 있을 땐 아래의 태그를 이용
+   		Servlet의 초기화 파라미터와 흡사 -->
+   <context-param>
+   		<param-name>contextClass</param-name>
+   		<param-value>mymodel2.web.context.support.ApplicationContext</param-value>
+   </context-param>
+   <context-param>
+   		<param-name>contextConfigLocation</param-name>
+   		<param-value>WEB-INF/spring/root-context.json</param-value>
+   </context-param>
+   
+   <listener>
+   		<listener-class>mymodel2.web.context.ContextLoaderListener</listener-class>
+   		
+   </listener>
+   
+  
+  <!-- 
+  <servlet>
+  	<servlet-name>shopDispatcher</servlet-name>
+  	<servlet-class>mymodel2.web.servlet.DispatcherServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>shopDispatcher</servlet-name>
+  	<url-pattern>/shop/*</url-pattern>
+  </servlet-mapping>
+   -->
+  </web-app>

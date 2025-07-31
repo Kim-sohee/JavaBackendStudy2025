@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Member">
+	<!-- 아이디를 이용하여 회원정보 가져오기 -->
+	<select id="selectById" parameterType="String" resultType="Member">
+		select * from member where id = #{id}	
+	</select>
+
+	<!-- 가입 -->
+	<insert id="insert" parameterType="Member">
+		insert into member(sns_provider_id, id, password, name, email, salt)
+		values (#{snsProvider.sns_provider_id}, #{id}, #{password}, #{name}, #{email}, #{salt})
+	</insert>
+	
+	<!-- 이메일을 이용한 회원정보 가져오기(salt 가져오기 위해 -->
+	<select id="selectByEmail" parameterType="String" resultType="Member">
+		select * from member where email=#{email}
+	</select>
+	
+	<!-- 로그인 -->
+	<select id="login" parameterType="Member" resultType="Member">
+		select * from member where email=#{email} and password=#{password}
+	</select>
+	
+</mapper>
