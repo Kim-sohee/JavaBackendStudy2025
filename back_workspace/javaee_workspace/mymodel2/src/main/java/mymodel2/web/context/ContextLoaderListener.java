@@ -4,34 +4,31 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import mymodel2.web.context.support.ApplicationContext;
+
 //톰켓이 가동될 때를 감지하는 리스너를 정의
 public class ContextLoaderListener implements ServletContextListener{
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		//ServletContext는 앱과 생명을 같이하는 객체이므로, 톰켓이 가동될 때 이 객체를 이용할 일이 있다면
-		//contextInitialized() 메서드에서 처리한다.
-		ServletContext servletContext = sce.getServletContext();
-		String contextClass = servletContext.getInitParameter("contextClass");		//mymodel2.web.context.support.ApplicationContext
-		String contextConfigLocation = servletContext.getInitParameter("contextConfigLocation");
+		//전역 객체에 스프링 컨테이너 추가하기
+		ServletContext context = sce.getServletContext();	//전역 객체 얻기!
+		String contextClass = context.getInitParameter("contextClass");
+		System.out.println("설정 파일로부터 넘겨받은 빈 컨테이너의 경로는 "+contextClass);
 		
-		System.out.println(contextConfigLocation);
-
+		// 현재로서는 String인 경로이므로, 이 경로를 이용하여 실제 클래스화 시키자!
 		try {
-			Class contextClazz = Class.forName(contextClass);	//지정된 경로의 클래스를 실제 클래스로 로드
-			Object contextInstance = contextClazz.newInstance();		//인스턴스 생성
+			Class contextClazz = Class.forName(contextClass);	//클래스 형식
+			//이거 왜 생성했을까? -> 전역 객체에게 선물로 주려고!
+			ApplicationContext applicationContext = (ApplicationContext)contextClazz.newInstance();		//컨테이너의 인스턴스 생성
+			String realPath = context.getRealPath(context.getInitParameter("contextConfigLocation"));
+			System.out.println(realPath);
+			applicationContext.init(realPath);
+			context.setAttribute("applicationContext", applicationContext);
 			
-			//ServletContext 사용할 ApplicationContext(Bean 컨테이너)를 전달하자.
-			servletContext.setAttribute("applicationContext", servletContext);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
 	}
 
 	@Override
