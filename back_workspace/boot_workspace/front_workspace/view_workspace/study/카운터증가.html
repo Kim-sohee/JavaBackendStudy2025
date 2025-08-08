@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <button type="button" @click="add()">카운터 증가</button>
+        <button type="button" @click="reset()">리셋</button>
+        <h1>{{msg}}</h1>
+    </div>
+
+    <script>
+         const app = Vue.createApp({
+            data(){
+                return{
+                    msg: 0
+                }
+            },
+            methods: {
+                add(){
+                    this.msg++
+                },
+                reset(){
+                    this.msg = 0
+                }
+            }
+         });
+
+         app.mount("#app");
+    </script>
+</body>
+</html>

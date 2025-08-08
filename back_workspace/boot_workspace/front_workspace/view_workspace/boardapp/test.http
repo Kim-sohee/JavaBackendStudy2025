@@ -7,9 +7,9 @@ POST http://localhost:9999/shop/boards
 Content-Type: application/json
 
 {
-    "title": "게시판 등록 테스트123",
+    "title": "게시판 등록3",
     "writer": "sohee",
-    "content": "마이바티스로 보내는 내용"
+    "content": "test"
 }
 
 ### 게시물 한 건 조회
@@ -17,13 +17,13 @@ GET http://localhost:9999/shop/boards/4
 Content-Type: application/json
 
 ### 게시물 수정
-PUT http://localhost:9999/shop/boards/3
+PUT http://localhost:9999/shop/boards/16
 Content-Type: application/json
 
 {
-    "title": "게시판 등록 테스트2",
-    "writer": "sohee123",
-    "content": "내용 없었는데 생겼음"
+    "title": "수정테스트",
+    "writer": "홍길동",
+    "content": "내용"
 }
 
 ### 게시물 한 건 삭제

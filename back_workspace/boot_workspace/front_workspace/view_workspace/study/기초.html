@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Vue 애플리케이션을 개발하는 2가지 방법
+        1) CDN 방식
+            - 개발단계에서만 사용하는 것을 추천
+        2) Project 설정 방식
+            - 실제 제품 개발 단계에서 사용하는 것을 추천
+            - 일종의 프레임워크 기반으로, Node.js가 설치되어 있어야 한다.
+            - Node.js 배울 필요는 없고, 단지 개발도구가 Node.js 기반인 것 뿐임
+    -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+</head>
+<body>
+    <!-- Vue 프레임워크가 자동으로 제어할 디자인 영역을 표현 -->
+    <div id="app">
+        <button type="button" @click="add()">데이터변경</button>
+        <!-- 표현될 데이터는 보간으로 표현 -->
+        <h1>{{msg}}</h1>
+        <ul>
+            <li v-for="member in memberList">{{member.name}}</li>
+        </ul>
+    </div>
+
+    <script>
+        //vue 애플리케이션 생성
+        const app = Vue.createApp({
+            data(){
+                return{
+                    //이 안에 개발자가 다루고자 하는 바인딩 데이터를 선언
+                    //바인딩 데이터란? 데이터를 수정하면 자동으로 Dom ui를 변경할 수 있는 Vue의 데이터를 의미
+                    msg : "우유",
+                    memberList:[
+                        {
+                            name: "scott",
+                            age: 32,
+                            email: "naver.com"
+                        },
+                        {
+                            name: "adams",
+                            age: 24,
+                            email: "google.com"
+                        },
+                        {
+                            name: "king",
+                            age: 53,
+                            email: "daum.net"
+                        }
+                    ]
+                }
+            },
+            methods: {
+                add(){
+                    this.msg = "빵"
+                    //기존 memberList 배열에 사람 추가
+                    //개발자가 데이터만 바꿔도 화면이 실시간으로 갱신(바인딩 데이터를 지원하므로)
+                    //개발자가 UI를 제어하는데 시간을 쏟지 않음
+                    this.memberList.push({
+                        name: "test",
+                        age: 27,
+                        email: "kakao.com"
+                    })
+                },
+            }
+        });
+
+        //Vue 애플리케이션이 제어할 디자인 영역과의 연결
+        app.mount("#app");
+    </script>
+</body>
+</html>
