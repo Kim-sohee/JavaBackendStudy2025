@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <button type="button" @click="regist()">회원 추가</button>
+        <ul>
+            <li v-for="member in memberList">{{member.name}}</li>
+        </ul>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            //3이상에서는 모든 코드를 setup()안에 넣으면 됨
+            setup(){   
+                //바인딩 데이터 선언
+                let count = Vue.ref(0);             //일반 자료형(숫자, 문자, 논리값)
+                                                    //ref()를 통해 선언된 데이터는 사용시 .vlaue로 접근하여 수정 가능
+                let memberList=Vue.reactive([]);
+                
+                //바인딩 메서드 선언
+                const regist = ()=>{
+                    memberList.push({
+                        name: "회원"+ count.value++,
+                        age: 5,
+                        email: "naver.com"
+                    });
+                }
+
+                //setup에서 선언된 변수, 메서드는 반드시 vue application에 반환해주어야 한다.
+                return {count, memberList, regist}
+            }
+        });
+        app.mount("#app");
+    </script>
+</body>
+</html>
