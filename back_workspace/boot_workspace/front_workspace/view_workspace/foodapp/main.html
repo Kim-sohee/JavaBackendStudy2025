@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        #app{
+            width: 1400px;
+            height: 800px;
+        }
+        #content_header{
+            width: 100%;
+            height: 50px;
+            background-color: cornflowerblue;
+            text-align: center;
+            line-height: 50px;
+        }
+        #content_header input {
+            width: 70%;
+            height: 60%;
+        }
+        #content_header button {
+            width: 10%;
+            height: 70%;
+        }
+        #content_header button:hover{
+            background-color: darkblue;
+            color: white;
+        }
+        #content_body{
+            width: 100%;
+            height: 750px;
+            background-color: azure;
+            text-align: center;
+        }
+        #content_body table{
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="content_header">
+            <input type="text" placeholder="상호명 입력" id="name" v-model="msg">
+            <button type="button" @click="getList(msg)">검색</button>
+        </div>
+        <div id="content_body">
+            <table border="1px">
+                <tr>
+                    <th>시군</th>
+                    <th>상호</th>
+                    <th>구분</th>
+                    <th>대표메뉴</th>
+                    <th>전화번호</th>
+                    <th>영업시간</th>
+                    <th>위경도</th>
+
+                </tr>
+                <tr v-for="store in storeList">
+                    <td>{{store.SIGUN}}</td>
+                    <td><a :href="store._URL">{{store.CMPNM}}</a></td>
+                    <td>{{store.SE}}</td>
+                    <td>{{store.MNMNU}}</td>
+                    <td>{{store.TELNO}}</td>
+                    <td>{{store.TIME}}</td>
+                    <td>{{store.LO}}, {{store.LA}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        /*Vue3로 진행*/
+        const { createApp, reactive, ref } = Vue;   //구조분해
+
+        //Vue3 부터는 setup() 메서드 안에 필요한 변수 및 메서드를 한꺼번에 등록하며 등록된 변수 및 메서드는 Vue에게 반환(return)
+        createApp({
+            setup(){
+                let msg = ref("");
+                let storeList = reactive([]);   //바인딩 배열 선언
+
+                //음식 목록 요청 메서드 정의
+                const getList = (store_name)=>{
+                    store_name = (store_name==undefined)? "":store_name;
+                    $.ajax({
+                        url: "http://localhost:7777/food/stores?store_name="+store_name,
+                        method: "get",
+                        success:(result, status, xhr)=>{
+                            //result = JSON.parse(result);
+                            console.log("서버로 부터 받은 음식점 목록은 \n", result);
+                            // msg.value = result;
+                            storeList.splice(0);    //removeAll
+                            result.body.forEach(element => {
+                                storeList.push(element);
+                            });
+                        }
+                    });
+                }
+
+                getList("");
+
+                return {msg, storeList, getList};
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>
