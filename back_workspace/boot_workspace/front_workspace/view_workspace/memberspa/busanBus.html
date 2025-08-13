@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <table width="100%" border="1px">
+            <tr>
+                <th>ID</th>
+                <th>이름</th>
+                <th>번호</th>
+                <th>위경도</th>
+                <th>구분</th>
+            </tr>
+            <tr v-for="bus in busList">
+                <td>{{bus.bstopid}}</td>
+                <td>{{bus.bstopnm}}</td>
+                <td>{{bus.arsno}}</td>
+                <td>{{bus.gpsx}}, {{bus.gpsy}}</td>
+                <td>{{bus.stoptype}}</td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        const {createApp, reactive, ref} = Vue;
+
+        createApp({
+            setup(){
+                const busList = reactive([]);    //바인딩 배열
+
+                const getList = ()=>{
+                    $.ajax({
+                        url: "http://localhost:8888/bus",
+                        method: "get",
+                        success: (result, status, xhr)=>{
+                            console.log("목록 가져오기", result);
+
+                            busList.slice(0);
+                            result.forEach(element => {
+                                busList.push(element);
+                            });
+                        }
+                    });
+                }
+                getList();
+
+                return {busList, getList};
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>
