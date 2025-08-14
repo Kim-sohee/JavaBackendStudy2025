@@ -87,7 +87,9 @@
 
             //삭제 버튼
             $("#delete").click(()=>{
-                del();
+                if(confirm("삭제하시겠어요?")){
+                    del();
+                }
             });
 
             $("#list").click(()=>{
