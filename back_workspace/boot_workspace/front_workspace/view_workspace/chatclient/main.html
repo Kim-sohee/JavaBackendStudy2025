@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        #app{
+            width: 300px;
+            height: 400px;
+            background-color: rgb(156, 197, 238);
+            margin: auto;
+            text-align: center;
+        }
+        #content-header, #content-footer{
+            width: 100%;
+            height: 50px;
+        }
+        #content-header button{
+            width: 30%;
+            height: 30px;
+            background-color: darkblue;
+            margin-top: 10px;
+            color: white;
+            font-size: 15px;
+        }
+        #content-header button:hover{
+            background-color: lightblue;
+            color: black;
+        }
+        #content-body{
+            width: 100%;
+            height: 300px;
+        }
+        #content-body textarea{
+            width: 90%;
+            height: 100%;
+            border-radius: 5%;
+        }
+        #content-footer input{
+            width: 90%;
+            height: 30px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="content-header">
+            <button type="button" @click="connect()">접속</button>
+            <button type="button" @click="sendMsg()">전송</button>
+            <button type="button" @click="disconnect()">연결해제</button>
+        </div>
+        <div id="content-body">
+            <textarea id="area" ref="area" v-model="log"></textarea>
+        </div>
+        <div id="content-footer">
+            <input type="text" id="msg" v-model="text" @keyup.enter="sendMsg()" placeholder="전송할 메시지를 입력하세요">
+        </div>
+    </div>
+
+    <script>
+        const {createApp, reactive, ref} = Vue;
+        createApp({
+            //웹 소켓 서버 접속(모든 브라우저에는 표준으로 웹소켓이 지원된다. 따라서 별도의 라이브러리 설치X)
+            setup(){
+                let ws = null;
+                let log = ref("");  //바인딩 변수
+                let area = ref(null);   //textarea 제어를 위함
+                let text = ref("");     //input text값 제어
+
+                //로그 기록
+                const appendLog=(msg)=>{
+                    log.value += msg + "\n";
+
+                }
+
+                //접속 메서드
+                const connect=()=>{
+                    ws=new WebSocket("ws://localhost:7777/ws/echo"); //웹 소켓 접속
+                    //접속 성공
+                    ws.onopen=()=>{
+                        appendLog("Open: 서버에 접속 성공");
+                        area.value.style.backgroundColor = "yellow";
+                    }
+
+                    //서버의 메시지 청취
+                    ws.onmessage=(e)=>{
+                        appendLog(e.data);
+                    }
+                }
+
+                //메시지 전송
+                const sendMsg=()=>{
+                    ws.send(text.value);    //웹 소켓을 통해 메시지 전송
+                    text.value="";          //입력 초기화
+                }
+
+                //접속 끊기
+                const disconnect=()=>{
+                    //이미 연결이 존재할 때만 끊기
+                    if(ws && ws.readyState==WebSocket.OPEN){
+                        //웹 소켓에서 1000은 정상 종료 코드를 의미
+                        //즉, 서버에게 정상 접속 종료를 요청하는 것임
+                        ws.close(1000, "사용자 요청에 의한 접속 종료");
+                        appendLog("접속 종료");
+                    }else{
+                        appendLog("현재 서버에 연결되어 있지 않습니다.");
+                    }
+                    area.value.style.backgroundColor="";
+                }
+
+                return {log, area, text, connect, sendMsg, disconnect};
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>

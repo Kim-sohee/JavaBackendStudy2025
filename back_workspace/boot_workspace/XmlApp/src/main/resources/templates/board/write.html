@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        body {font-family: Arial, Helvetica, sans-serif;}
+        * {box-sizing: border-box;}
+
+        input[type=text], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 6px;
+            margin-bottom: 16px;
+            resize: vertical;
+        }
+
+        input[type=submit] {
+            background-color: #04AA6D;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type=submit]:hover {
+            background-color: #45a049;
+        }
+
+        .container {
+            border-radius: 5px;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h3>Contact Form</h3>
+
+    <div class="container">
+        <form>
+            <label for="fname">제목</label>
+            <input type="text" id="fname" name="title" placeholder="Input title..">
+
+            <label for="lname">작성자</label>
+            <input type="text" id="lname" name="writer" placeholder="Your name..">
+
+            <label for="subject">내용</label>
+            <textarea id="subject" name="content" placeholder="Write something.." style="height:200px"></textarea>
+
+            <input type="button" value="등록">
+        </form>
+    </div>
+    <script>
+        function regist(){
+            //폼 전송
+            $("form").attr({
+                action:"/board/regist",
+                method: "post"
+            });
+            $("form").submit();
+        }
+
+        //onLoad 시
+        $(()=>{
+            $("input[type='button']").click(()=>{
+                regist();
+            });
+        });
+    </script>
+</body>
+</html>
