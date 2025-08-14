@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        body {font-family: Arial, Helvetica, sans-serif;}
+        * {box-sizing: border-box;}
+
+        input[type=text], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 6px;
+            margin-bottom: 16px;
+            resize: vertical;
+        }
+
+        input[type=submit] {
+            background-color: #04AA6D;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type=submit]:hover {
+            background-color: #45a049;
+        }
+
+        .container {
+            border-radius: 5px;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h3>Contact Form</h3>
+
+    <div class="container">
+        <form>
+            <input type="hidden" name="board_id" th:value="${board.board_id}">
+            <label for="fname">제목</label>
+            <input type="text" id="fname" name="title" th:value="${board.title}">
+
+            <label for="lname">작성자</label>
+            <input type="text" id="lname" name="writer" th:value="${board.writer}">
+
+            <label for="subject">내용</label>
+            <textarea id="subject" name="content" style="height:200px" th:field="${board.content}"></textarea>
+
+            <input type="button" id="update" value="수정">
+            <input type="button" id="delete" value="삭제">
+            <input type="button" id="list" value="목록">
+        </form>
+    </div>
+    <script>
+        function update(){
+            //폼 전송
+            $("form").attr({
+                action:"/board/update",
+                method: "post"
+            });
+            $("form").submit();
+        }
+
+        function del(){
+            //폼 전송
+            $("form").attr({
+                action:"/board/delete",
+                method: "get"
+            });
+            $("form").submit();
+        }
+
+        //onLoad 시
+        $(()=>{
+            //수정 버튼
+            $("#update").click(()=>{
+                update();
+            });
+
+            //삭제 버튼
+            $("#delete").click(()=>{
+                del();
+            });
+
+            $("#list").click(()=>{
+                location.href="/board/list";
+            });
+        });
+    </script>
+</body>
+</html>

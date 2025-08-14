@@ -29,6 +29,11 @@ public class BoardController {
         return "board/list";
     }
 
+    @GetMapping("/board/registform")
+    public String getRegistForm() {
+        return "board/write";
+    }
+
     @GetMapping("/board/detail")
     public String getBoardDetail(Model model, int board_id) {
         Board board = boardService.select(board_id);
@@ -45,7 +50,8 @@ public class BoardController {
     @PostMapping("/board/update")
     public String update(Board board) {
         boardService.update(board);
-        return "redirect:/board/detail?board_id=" + board.getBoard_id();
+//        return "redirect:/board/detail?board_id=" + board.getBoard_id();
+        return "redirect:/board/list";
     }
 
     @GetMapping("/board/delete")
