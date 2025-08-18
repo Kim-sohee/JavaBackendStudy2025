@@ -54,7 +54,12 @@ public class ChatEndpoint {
         responseConnect.setData(userIdList);
 
         String json = objectMapper.writeValueAsString(responseConnect);
-        session.getAsyncRemote().sendText(json);
+        for(Session s: userList) {
+            if(s.isOpen()) {
+                s.getAsyncRemote().sendText(json);
+            }
+        }
+//        session.getAsyncRemote().sendText(json);
     }
 
     //메시지 감지
@@ -90,6 +95,19 @@ public class ChatEndpoint {
         //Session이 끊기면 Set에서 제거
         userList.remove(session);
         userIdList.remove(session.getId());     //Session Id 정보도 함께 제거
+
+        //퇴장 알림 Json 구성
+        ResponseConnect responseConnect = new ResponseConnect();
+        responseConnect.setResponseType("disconnect");
+        responseConnect.setData(userIdList);    //남은 유저 목록
+
+        String json = objectMapper.writeValueAsString(responseConnect);
+        //남은 유저들에게 브로드캐스트
+        for(Session ss: userList){
+            if(ss.isOpen()){
+                ss.getAsyncRemote().sendText(json);
+            }
+        }
     }
 
     @OnError
