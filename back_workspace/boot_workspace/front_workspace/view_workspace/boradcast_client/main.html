@@ -144,6 +144,14 @@
                         }else if(responseJson.responseType=="chat"){
                             //2) 채팅을 위한 메시지 전송 후, 서버로부터 다시 받게되는 메시지인 경우
                             log.value += responseJson.sender + "의 말: " + responseJson.data + "\n"
+                        }else if(responseJson.responseType=="disconnect"){
+                            log.value += "사용자가 퇴장했습니다.\n";
+
+                            //리스트 갱신
+                            userList.splice(0);
+                            responseJson.data.forEach(item=>{
+                                userList.push(item);
+                            });
                         }
                         
                         //3) 방 개설을 위해 서버에 요청 후, 그 결과를 받는 경우
