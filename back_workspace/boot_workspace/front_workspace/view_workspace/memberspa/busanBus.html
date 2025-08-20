@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        #app{
+            width: 1000px;
+            height: 800px;
+            margin: auto;
+        }
+        #tb{
+            width: 100%;
+            height: 200px;
+            overflow-y: scroll;
+        }
+        #tb,tr,th,td{
+            border: 1px solid black;
+        }
+        #map{
+            width: 100%;
+            height: 500px;
+            background-color: lightblue;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <table id="tb">
+            <tr>
+                <th>ID</th>
+                <th>이름</th>
+                <th>번호</th>
+                <th>위경도</th>
+                <th>구분</th>
+            </tr>
+            <tr v-for="bus in busList">
+                <td>{{bus.bstopid}}</td>
+                <td>{{bus.bstopnm}}</td>
+                <td>{{bus.arsno}}</td>
+                <td>{{bus.gpsx}}, {{bus.gpsy}}</td>
+                <td>{{bus.stoptype}}</td>
+            </tr>
+        </table>
+        <div id="map">
+        </div>
+    </div>
+    
+    <script>
+        const {createApp, reactive, ref} = Vue;
+        //구글 연동
+        let map;
+        function initMap(){
+            map = new google.maps.Map(document.getElementById("map"),{
+                center: {lat: 35.115355761619, lng:129.03332177581},
+                zoom: 16
+            });
+        };
+
+        createApp({
+            setup(){
+                const busList = reactive([]);    //바인딩 배열
+
+                //api 연동
+                const getList = ()=>{
+                    $.ajax({
+                        url: "http://localhost:8888/buses",
+                        method: "get",
+                        success: (result, status, xhr)=>{
+                            console.log("목록 가져오기", result);
+
+                            busList.slice(0);
+                            result.forEach(element => {
+                                busList.push(element);
+
+                                let marker = new google.maps.Marker({
+                                    position: new google.maps.LatLng(element.gpsy, element.gpsx),
+                                    animation:google.maps.Animation.BOUNCE,
+                                    map: map,
+                                    title: element.bstopnm
+                                });
+
+                                google.maps.event.addListener(marker,'click',()=>{
+                                    map.setZoom(18);
+                                    map.setCenter(marker.getPosition());
+
+                                    let infowindow = new google.maps.InfoWindow({
+                                        content:element.bstopnm
+                                    });
+                                    infowindow.open(map,marker);
+                                });
+
+                            });
+                        }
+                    });
+                }
+
+                getList();
+
+                return {busList, getList};
+            }
+        }).mount("#app");
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YourKey&callback=initMap"></script>
+</body>
+</html>

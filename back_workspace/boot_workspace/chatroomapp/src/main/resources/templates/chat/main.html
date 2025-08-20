@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #wrapper{
+            width: 1200px;
+            height: 800px;
+            background-color: #333333;
+        }
+        #aside{
+            width: 20%;
+            height: 100%;
+            background-color: darkseagreen;
+            float: left;
+            text-align: center;
+        }
+        #aside input{
+            width: 90%;
+            height: 20px;
+            font-style: inherit;
+            margin-top: 20px;
+            border-radius: 3px;
+        }
+        #aside button{
+            width: 90%;
+            height: 30px;
+            background-color: darkolivegreen;
+            color: white;
+            font-size: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        #pop button:hover{
+            background-color: darkgreen;
+        }
+        #content{
+            width: 80%;
+            height: 100%;
+            background-color: #dbf5db;
+            float: left;
+
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            padding: 10px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .room{
+            width: 200px;
+            height: 300px;
+            background-color: #666666;
+            margin:10px;
+            box-sizing: border-box;
+            border: 2px solid black;
+        }
+        .room-header{
+            width: 100%;
+            height: 20%;
+            background-color: white;
+            color: black;
+            line-height: 50px;
+            text-align: center;
+        }
+        .room-body{
+            width: 100%;
+            height: 80%;
+        }
+
+        /*팝업 디자인*/
+        #pop{
+            width: 600px;
+            height: 600px;
+            background-color: black;
+            margin: auto;
+            overflow: hidden;
+            position: fixed;
+            top: 15%;
+            left: 25%;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            border: 1px solid black;
+        }
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* 어두운 반투명 배경 */
+            z-index: 999; /* 팝업 바로 아래에 위치 */
+        }
+        #content2{
+            width: 400px;
+            height: 550px;
+            background-color: #45a049;
+            float: left;
+        }
+        #content-header{
+            width: 100%;
+            height: 10%;
+            background-color: darkolivegreen;
+            font-size: 30px;
+            color: beige;
+            text-align: center;
+            line-height: 50px;
+        }
+        #content-body{
+            width: 100%;
+            height: 90%;
+        }
+        #aside2{
+            width: 200px;
+            height: 550px;
+            background-color: darkseagreen;
+            float: left;
+        }
+        #aside-header, #aside-footer{
+            width: 100%;
+            height: 10%;
+            background-color: forestgreen;
+            text-align: center;
+            line-height: 50px;
+        }
+        #aside-body{
+            width: 100%;
+            height: 80%;
+        }
+        #aside-footer button{
+            width: 80%;
+            height: 80%;
+            background-color: #24330a;
+            color: white;
+            border-radius: 10px;
+        }
+        #aside-footer button:hover{
+            background-color: #001901;
+        }
+        #footer{
+            width: 100%;
+            height: 50px;
+            text-align: center;
+            background-color: black;
+        }
+        #footer input{
+            width: 75%;
+            height: 30px;
+            margin-top: 5px;
+            border-radius: 5px;
+        }
+        #footer button{
+            width: 20%;
+            height: 30px;
+            margin-top: 5px;
+            border-radius: 5px;
+            background-color: #24330a;
+            color: white;
+        }
+
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div id="wrapper">
+            <div id="aside">
+                <div th:if="${session.member != null}">
+                    <h4 th:text="|[ID: ${session.member.id}]|">아이디</h4>
+                    <h4 th:text="${session.member.name + '님 반갑습니다!'}">이름</h4>
+                </div>
+                <input type="hidden" th:value="${session.member.id}" name="id">
+                <input type="text" placeholder="방제목 입력" name="roomName">
+                <button type="button" @click="createRoom()">방 만들기</button>
+                <button type="button" @click="disconnect()">접속 끊기</button>
+
+                <h4 style="text-align: left;">접속자 목록</h4>
+                <ul style="text-align: left;">
+                    <li v-for="member in memberList">{{member.name}}</li>
+                </ul>
+            </div>
+            <div id="content">
+                <div class="room" v-for="room in roomList" key="room.uuid">
+                    <div class="room-header">
+                        <a href="" @click.prevent="openRoom(room.uuid)">{{room.roomName}}</a></div>
+                    <div class="room-body"></div>
+                </div>
+            </div>
+
+            <!-- 팝업 시작-->
+            <div id="overlay" v-show="visible"></div>
+            <div id=pop v-show="visible">
+                <div id="content2">
+                    <div id="content-header">
+                        <label>{{roomName}}</label>
+                    </div>
+                    <div id="content-body"><pre>{{data}}</pre></div>
+                </div>
+                <div id="aside2">
+                    <div id="aside-header">{{master}}</div>
+                    <div id="aside-body">
+                        <ul>
+                            <li v-for="user in userList" key="user.id">{{user.name}}</li>
+                        </ul>
+                    </div>
+                    <div id="aside-footer">
+                        <button type="button" @click="closeRoom()">나가기</button>
+                    </div>
+                </div>
+                <div id="footer">
+                    <input type="text" placeholder="메시지를 입력하세요" v-model="msg">
+                    <button type="button" @click="sendMessage()">Send</button>
+                </div>
+            </div>
+            <!-- 팝업 끝-->
+        </div>
+    </div>
+
+
+
+    <script>
+        const {createApp, reactive, ref} = Vue;
+
+        createApp({
+            setup(){
+                let roomList=reactive([]);
+                let memberList=reactive([]);
+                let ws = null;      //웹 소켓 객체 선언
+                let visible = ref(false);
+
+                //채팅방 상세 내용 관련
+                let roomName = ref("");
+                let master = ref("");
+                let userList = reactive([]);
+                let uuid = ref("");
+
+                let msg = ref("");  //전송할 채팅 메시지
+                let data = ref(""); //채팅 로그에 사용
+
+                //서버에 요청
+                const request=(data)=>{
+                    ws.send(data);
+                }
+
+                //웹 소켓 서버에 접속
+                const connect=()=>{
+                    ws = new WebSocket("ws://localhost:8989/chat/multi");
+
+                    //접속이 성공되면..
+                    ws.onopen=()=>{
+
+                    }
+
+                    //메시지가 수신되면..
+                    ws.onmessage=(e)=>{
+                        console.log("접속과 동시에 수신 받은 데이터는 ", e.data);
+                        let responseJson = JSON.parse(e.data);
+
+                        if(responseJson.responseType=="createRoom"){
+                            memberList.splice(0);
+                            //접속자 명단
+                            responseJson.memberList.forEach(member=>{
+                                memberList.push(member);
+                            });
+
+                            //채팅방 목록
+                            roomList.splice(0);
+                            if(responseJson.roomList != null) {
+                                responseJson.roomList.forEach(room => {
+                                    roomList.push(room);
+                                });
+                            }
+                        }else if(responseJson.responseType=="enterRoom"){
+                            console.log("서버에서 받은 데이터는???   ",responseJson);
+                            roomName.value = responseJson.room.roomName;
+                            master.value = responseJson.room.master;
+                            userList.splice(0);
+                            responseJson.room.userList.forEach(item=>{
+                                userList.push(item);
+                            });
+                            uuid.value = responseJson.room.uuid;
+                        }else if(responseJson.responseType=="chat"){
+                            let sender = responseJson.sender;
+                            let datas = responseJson.data;
+                            let uuid = responseJson.uuid;
+
+                            //예시: sohee님: 밥 먹었니?
+                            data.value += `${sender}님: ${datas}\n`;
+                        }
+                    }
+
+                    ws.onclose=(e)=>{
+                        console.log(e);
+                    }
+                }
+
+                //방 만들기 요청
+                /*[요청 데이터 예시]
+                * {
+                *       requestType: "createRoom",
+                *       userId: "방장ID",
+                *       roomName: "날아가는 지렁이"
+                * }
+                * */
+                const createRoom=()=>{
+                    let payload={
+                        requestType: "createRoom",
+                        userId: $("input[name='id']").val(),
+                        roomName: $("input[name='roomName']").val()
+                    }
+                    // console.log(payload);
+                    request(JSON.stringify(payload));
+                }
+
+                //방 입장하기
+                const openRoom=(roomId)=>{
+                    visible.value = true;
+
+                    //웹소켓 서버에 방 상세정보를 요청
+                    let payload={
+                        requestType: "enterRoom",
+                        uuid: roomId
+                    }
+                    request(JSON.stringify(payload));
+                }
+
+                //서버에 메시지 보내기
+                const sendMessage=()=>{
+                    let payload={
+                        requestType: "chat",
+                        sender: $("input[name='id']").val(),
+                        data: msg.value,
+                        uuid: uuid.value
+                    }
+                    request(JSON.stringify(payload));
+                    msg.value="";
+                }
+
+                //서버와 접속 끊기
+                const disconnect=()=>{
+                    // ws.disconnect();
+                    ws.close();
+                }
+
+                //방 나가기
+                const closeRoom=()=>{
+                    visible.value = false;
+                }
+
+                connect();
+                return {visible, roomList, memberList, roomName, master, userList, uuid, msg, data, createRoom, connect, openRoom, closeRoom, sendMessage, disconnect};
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>

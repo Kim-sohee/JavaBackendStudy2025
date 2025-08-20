@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        #wrapper{
+            width: 300px;
+            height: 600px;
+            background-color: rgb(156, 197, 238);
+            text-align: center;
+            margin: auto;
+        }
+        #btn{
+            width: 100%;
+            height: 50px;
+        }
+        #btn button{
+            width: 40%;
+            height: 35px;
+            background-color: navy;
+            color: white;
+            font-size: 16px;
+            font-style: bold;
+            margin-top: 5px;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+        #users{
+            width: 90%;
+            height: 150px;
+            background-color: aliceblue;
+            overflow-y: auto;
+            margin-bottom: 5px;
+            margin-left: 5%;
+        }
+        #area{
+            width: 100%;
+            height: 350px;
+        }
+        #area textarea{
+            width: 90%;
+            height: 100%;
+            border-radius: 10px;
+        }
+        #keyinput{
+            width: 100%;
+            height: 50px;
+        }
+        #keyinput input{
+            width: 70%;
+            height: 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        #keyinput button{
+            width: 20%;
+            border-radius: 5px;
+            background-color: navy;
+            color: white;
+            margin-top: 5px;
+        }
+        #app button:hover{
+            background-color: deepskyblue;
+            color:black;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="wrapper">
+            <div id="btn">
+                <button type="button" @click="connect()">접속</button>
+                <button type="button" @click="disconnect()">끊기</button>
+            </div>
+            <div id="users">
+                <ul style="text-align: left;">
+                    <li v-for="id in userList" :key="id">{{id}}님 접속했습니다.</li>
+                </ul>
+            </div>
+            <div id="area">
+                <textarea ref="area" v-model="log"></textarea>
+            </div>
+            <div id="keyinput">
+                <input type="text" v-model="txt" @keyup.enter="sendMsg()">
+                <button type="button" @click="sendMsg()">보내기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const {createApp, reactive, ref} = Vue;
+
+        createApp({
+            setup(){
+                let ws = null;
+                let area = ref(null);   //textarea를 제어하기 위한 변수
+                let log = ref("");
+                let txt = ref("");
+                let userList = reactive([]);
+
+                //서버에 요청하기
+                const request=(msg)=>{
+                    ws.send(msg);  //서버에 데이터 전송
+                }
+
+                const connect = ()=>{
+                    ws = new WebSocket("ws://localhost:9999/ws/multi");
+                    //연결
+                    ws.onopen=()=>{
+                        log.value += "접속함 \n";
+
+                        let msg = {};
+                        msg["requestType"] = "connect";
+
+                        request(JSON.stringify(msg));  //접속임을 알려줄 수 있는 메시지 전송
+                    }
+
+                    //메시지 청취
+                    ws.onmessage=(e)=>{
+                        // log.value += e.data+"\n"
+                        
+                        /* //서버에서 접속자 명단을 보내준 경우
+                        let jsonList = JSON.parse(e.data);
+                        userList.splice(0);
+                        jsonList.forEach(item => {
+                            userList.push(item);
+                            });  */
+                        
+                        // console.log(e.data);
+                        let responseJson = JSON.parse(e.data);
+                        if(responseJson.responseType=="connect"){
+                            //1) 최초 접속 시 서버로부터 접속자 정보를 받는 경우라면..
+                            console.log("접속 요청에 대한 응답 받음");
+                            userList.splice(0);
+                            responseJson.data.forEach(item => {
+                                userList.push(item);
+                            });
+
+                        }else if(responseJson.responseType=="chat"){
+                            //2) 채팅을 위한 메시지 전송 후, 서버로부터 다시 받게되는 메시지인 경우
+                            log.value += responseJson.sender + "의 말: " + responseJson.data + "\n"
+                        }else if(responseJson.responseType=="disconnect"){
+                            log.value += "사용자가 퇴장했습니다.\n";
+
+                            //리스트 갱신
+                            userList.splice(0);
+                            responseJson.data.forEach(item=>{
+                                userList.push(item);
+                            });
+                        }
+                        
+                        //3) 방 개설을 위해 서버에 요청 후, 그 결과를 받는 경우
+
+                        
+                        //4) 방 폐쇄
+
+                    }
+
+                }
+
+                const disconnect=()=>{
+                    if(ws && ws.readyState==WebSocket.OPEN){
+                        ws.close(1000, "사용자 요청에 의한 접속 종료");
+                        log.value += "접속 종료";
+                    }else{
+                        log.value += "현재 서버에 연결되어 있지 않습니다."
+                    }
+                }
+
+
+                //채팅 메시지 보내기
+                const sendMsg=()=>{
+                    // ws.send(txt.value);
+                    //서버는 클라이언트가 무엇을 원하는지 알아야 하므로, 클라이언트와 서버는 서로 원하는게 무엇인지 표현해놓은 형식을 만들어놓고 그 형식대로 메시지를 주고 받아야 한다.
+                    //통신 분야에서는 이 정해진 약속을 프로토콜이라 한다.
+                    /* [접속 시 구성할 요청 정보 예시]
+                    {
+                        "requestType":"connect", 
+                        "userId": "sohee2201",
+                        ...
+                    }
+                        [응답 시 구성할 응답 정보 예시]
+                    {
+                        "responseType": 1,
+                        "data": [{...}, {...}, {...}, ...],
+                        ...    
+                    }
+                    */
+
+                    let msg={};
+                    msg["requestType"] = "chat";
+                    msg["data"] = txt.value;
+
+                    request(JSON.stringify(msg));
+                    txt.value="";
+                }
+
+                return {area, log, txt, userList, connect, sendMsg, request, disconnect}
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>

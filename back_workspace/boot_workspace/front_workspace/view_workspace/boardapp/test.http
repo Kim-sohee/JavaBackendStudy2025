@@ -1,0 +1,31 @@
+### 게시물 목록
+GET http://localhost:9999/shop/boards
+Content-Type: application/json
+
+### 게시물 등록
+POST http://localhost:9999/shop/boards
+Content-Type: application/json
+
+{
+    "title": "게시판 등록3",
+    "writer": "sohee",
+    "content": "test"
+}
+
+### 게시물 한 건 조회
+GET http://localhost:9999/shop/boards/4
+Content-Type: application/json
+
+### 게시물 수정
+PUT http://localhost:9999/shop/boards/16
+Content-Type: application/json
+
+{
+    "title": "수정테스트",
+    "writer": "홍길동",
+    "content": "내용"
+}
+
+### 게시물 한 건 삭제
+DELETE http://localhost:9999/shop/boards/1
+Content-Type: application/json
