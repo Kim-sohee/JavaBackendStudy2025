@@ -161,20 +161,12 @@
              Note: The pattern used is equivalent to using pattern="common" -->
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t &quot;%r&quot; %s %b" prefix="localhost_access_log" suffix=".txt"/>
 
-<<<<<<< HEAD
-      
-      
-      
-      
-      <Context docBase="mall" path="/" reloadable="false" source="org.eclipse.jst.jee.server:mall">
-      		<ResourceLink global="jndi/mysql" name="jndi/mysql" type="javax.sql.DataSource"/>
-=======
       <Context docBase="mall" path="/" reloadable="true" source="org.eclipse.jst.jee.server:mall">
       	<ResourceLink global= "jndi/mysql"
 			name= "jndi/mysql"
 			type="javax.sql.DataSource"
 			/>
->>>>>>> 5be2981ef9ad603c3b1bb024924615b80a71b015
+
       </Context></Host>
     </Engine>
   </Service>
