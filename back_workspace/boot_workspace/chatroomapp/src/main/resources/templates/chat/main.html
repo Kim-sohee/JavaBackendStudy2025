@@ -32,7 +32,7 @@
             border-radius: 5px;
             margin-top: 20px;
         }
-        #aside button:hover{
+        #pop button:hover{
             background-color: darkgreen;
         }
         #content{
@@ -46,6 +46,7 @@
             align-content: flex-start;
             padding: 10px;
             box-sizing: border-box;
+            overflow-y: auto;
         }
         .room{
             width: 200px;
@@ -53,6 +54,7 @@
             background-color: #666666;
             margin:10px;
             box-sizing: border-box;
+            border: 2px solid black;
         }
         .room-header{
             width: 100%;
@@ -80,6 +82,7 @@
             border-radius: 10px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
             z-index: 1000;
+            border: 1px solid black;
         }
         #overlay {
             position: fixed;
@@ -143,10 +146,18 @@
             background-color: black;
         }
         #footer input{
-            width: 90%;
+            width: 75%;
             height: 30px;
             margin-top: 5px;
             border-radius: 5px;
+        }
+        #footer button{
+            width: 20%;
+            height: 30px;
+            margin-top: 5px;
+            border-radius: 5px;
+            background-color: #24330a;
+            color: white;
         }
 
     </style>
@@ -164,6 +175,7 @@
                 <input type="hidden" th:value="${session.member.id}" name="id">
                 <input type="text" placeholder="방제목 입력" name="roomName">
                 <button type="button" @click="createRoom()">방 만들기</button>
+                <button type="button" @click="disconnect()">접속 끊기</button>
 
                 <h4 style="text-align: left;">접속자 목록</h4>
                 <ul style="text-align: left;">
@@ -171,8 +183,9 @@
                 </ul>
             </div>
             <div id="content">
-                <div class="room" v-for="room in roomList" @click="openRoom()">
-                    <div class="room-header">{{room.roomName}}</div>
+                <div class="room" v-for="room in roomList" key="room.uuid">
+                    <div class="room-header">
+                        <a href="" @click.prevent="openRoom(room.uuid)">{{room.roomName}}</a></div>
                     <div class="room-body"></div>
                 </div>
             </div>
@@ -182,19 +195,24 @@
             <div id=pop v-show="visible">
                 <div id="content2">
                     <div id="content-header">
-                        <label> 방 제목</label>
+                        <label>{{roomName}}</label>
                     </div>
-                    <div id="content-body"></div>
+                    <div id="content-body"><pre>{{data}}</pre></div>
                 </div>
                 <div id="aside2">
-                    <div id="aside-header"></div>
-                    <div id="aside-body"></div>
+                    <div id="aside-header">{{master}}</div>
+                    <div id="aside-body">
+                        <ul>
+                            <li v-for="user in userList" key="user.id">{{user.name}}</li>
+                        </ul>
+                    </div>
                     <div id="aside-footer">
                         <button type="button" @click="closeRoom()">나가기</button>
                     </div>
                 </div>
                 <div id="footer">
-                    <input type="text" placeholder="메시지를 입력하세요">
+                    <input type="text" placeholder="메시지를 입력하세요" v-model="msg">
+                    <button type="button" @click="sendMessage()">Send</button>
                 </div>
             </div>
             <!-- 팝업 끝-->
@@ -212,7 +230,15 @@
                 let memberList=reactive([]);
                 let ws = null;      //웹 소켓 객체 선언
                 let visible = ref(false);
-                let enterRoom=reactive({});
+
+                //채팅방 상세 내용 관련
+                let roomName = ref("");
+                let master = ref("");
+                let userList = reactive([]);
+                let uuid = ref("");
+
+                let msg = ref("");  //전송할 채팅 메시지
+                let data = ref(""); //채팅 로그에 사용
 
                 //서버에 요청
                 const request=(data)=>{
@@ -241,6 +267,7 @@
                             });
 
                             //채팅방 목록
+                            roomList.splice(0);
                             if(responseJson.roomList != null) {
                                 responseJson.roomList.forEach(room => {
                                     roomList.push(room);
@@ -248,7 +275,25 @@
                             }
                         }else if(responseJson.responseType=="enterRoom"){
                             console.log("서버에서 받은 데이터는???   ",responseJson);
+                            roomName.value = responseJson.room.roomName;
+                            master.value = responseJson.room.master;
+                            userList.splice(0);
+                            responseJson.room.userList.forEach(item=>{
+                                userList.push(item);
+                            });
+                            uuid.value = responseJson.room.uuid;
+                        }else if(responseJson.responseType=="chat"){
+                            let sender = responseJson.sender;
+                            let datas = responseJson.data;
+                            let uuid = responseJson.uuid;
+
+                            //예시: sohee님: 밥 먹었니?
+                            data.value += `${sender}님: ${datas}\n`;
                         }
+                    }
+
+                    ws.onclose=(e)=>{
+                        console.log(e);
                     }
                 }
 
@@ -270,15 +315,34 @@
                     request(JSON.stringify(payload));
                 }
 
-                //방 클릭시 팝업
-                const openRoom=()=>{
+                //방 입장하기
+                const openRoom=(roomId)=>{
+                    visible.value = true;
+
+                    //웹소켓 서버에 방 상세정보를 요청
                     let payload={
                         requestType: "enterRoom",
-                        userId: $("input[name='id']").val(),
-                        roomName: $("input[name='roomName']").val()
+                        uuid: roomId
                     }
                     request(JSON.stringify(payload));
-                    visible.value = true;
+                }
+
+                //서버에 메시지 보내기
+                const sendMessage=()=>{
+                    let payload={
+                        requestType: "chat",
+                        sender: $("input[name='id']").val(),
+                        data: msg.value,
+                        uuid: uuid.value
+                    }
+                    request(JSON.stringify(payload));
+                    msg.value="";
+                }
+
+                //서버와 접속 끊기
+                const disconnect=()=>{
+                    // ws.disconnect();
+                    ws.close();
                 }
 
                 //방 나가기
@@ -287,7 +351,7 @@
                 }
 
                 connect();
-                return {visible, roomList, memberList, enterRoom, createRoom, connect, openRoom, closeRoom};
+                return {visible, roomList, memberList, roomName, master, userList, uuid, msg, data, createRoom, connect, openRoom, closeRoom, sendMessage, disconnect};
             }
         }).mount("#app");
     </script>
