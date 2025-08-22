@@ -13,7 +13,8 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
     //생성자 자동으로 컴파일 시점에 생성되므로 AutoWired 필요 없음
-    private final ChatWebSocketHandler webSocketHandler;
+    //private final ChatWebSocketHandler webSocketHandler;
+    private final ChatTextWebSocketHandler webSocketHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {

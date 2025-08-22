@@ -86,7 +86,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
                 broadCast("/rooms", roomStorage.values());
             }
             case "ROOM_LIST" ->{
-
+                broadCast("/rooms", roomStorage.values());
             }
             case "ROOM_ENTER" ->{
                 //Map에 모여 있는 룸들 중, 클라이언트가 참여하기를 원하는 룸을 검색하자.
