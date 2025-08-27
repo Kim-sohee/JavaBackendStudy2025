@@ -31,7 +31,7 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper" id="app">
+<div class="wrapper" >
 
   <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
@@ -39,47 +39,63 @@
   </div>
 
     <!-- nav import -->
-    <div th:insert="store/fragments/top_link :: topLink"></div>
+    <div th:replace="store/fragments/top_link :: topLink"></div>
 
   <!-- Main Sidebar Container -->
-    <div th:insert="store/fragments/side_navi :: navi"></div>
+    <div th:replace="store/fragments/side_navi :: navi"></div>
 
     <!-- content start-->
-    <form id="form1">
-    <input type="hidden" name="store.store_id" value="1">
-    <div class="col-md-6" style="margin: auto">
-        <div class="card card-secondary">
-            <div class="card-header">
-                <h3 class="card-title">상품 등록하기</h3>
+    <div id="app">
+        <div class="section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">등록된 상품 리스트</h3>
 
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
+                                <div class="card-tools">
+                                    <div class="input-group input-group-sm" style="width: 150px;">
+                                        <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-default">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body table-responsive p-0">
+                                <table class="table table-hover text-nowrap">
+                                    <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Name</th>
+                                        <th>Brand</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="product in productList" :key="product.product_id" @click="gotoDetail(product.product_id)" >
+                                            <td>1</td>
+                                            <td>{{product.product_name}}</td>
+                                            <td>{{product.brand}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label for="inputEstimatedBudget">상품 이름</label>
-                    <input type="text" name="product_name" id="inputEstimatedBudget" class="form-control" placeholder="상품명 입력">
-                </div>
-                <div class="form-group">
-                    <label for="inputSpentBudget">상품 가격</label>
-                    <input type="number" name="price" id="inputSpentBudget" class="form-control" placeholder="상품 가격 입력">
-                </div>
-                <div class="form-group">
-                    <label for="inputEstimatedDuration">브랜드명</label>
-                    <input type="text" name="brand" id="inputEstimatedDuration" class="form-control" placeholder="브랜드명 입력">
-                </div>
-                <button type="button" class="btn btn-block btn-dark" id="bt_regist">등록하기</button>
-            </div>
-            <!-- /.card-body -->
         </div>
     </div>
-    </form>
     <!-- content end-->
 
-     <div th:insert="store/fragments/footer :: footer"></div>
+     <div th:replace="store/fragments/footer :: footer"></div>
 
   <!-- Control Sidebar -->
   <aside class="control-sidebar control-sidebar-dark">
@@ -125,26 +141,32 @@
 <script src="/admin/dist/js/pages/dashboard.js"></script>
 
 <script>
-    function regist(){
-        console.log($("#form1").serialize());
+    const {createApp, ref, reactive} = Vue;
+    createApp({
+        setup(){
+            const productList = ref([]);
 
-        $.ajax({
-            url:"/store/product/regist",
-            method:"POST",
-            data:$("#form1").serialize(),
-            success:function(data){
-                console.log(data);
-                location.href="/store/product/listform";
+            const getList=()=>{
+                $.ajax({
+                    url: "/store/product/data",
+                    method: "get",
+                    success: (data=>{
+                        console.log("서버에서 전달받은 데이터는"+data);
+                        productList.value = data;
+                    })
+                });
             }
-        });
-    }
 
-    $(()=>{
-        $("#bt_regist").click(()=>{
-            console.log("버튼 눌림");
-            regist();
-        });
-    });
+            const gotoDetail=(productId)=>{
+                window.location.href = `/store/product/detail?product_id=${productId}`;
+                //console.log(productId+" 눌렸당!"+`/store/product/detail?product_id=${productId}`);
+            }
+
+            getList();
+
+            return{productList, getList, gotoDetail}
+        }
+    }).mount("#app");
 </script>
 </body>
 </html>
