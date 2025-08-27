@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdminLTE 3 | Dashboard</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/admin/plugins/fontawesome-free/css/all.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="/admin/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="/admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- JQVMap -->
+  <link rel="stylesheet" href="/admin/plugins/jqvmap/jqvmap.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="/admin/dist/css/adminlte.min.css">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="/admin/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+  <!-- Daterange picker -->
+  <link rel="stylesheet" href="/admin/plugins/daterangepicker/daterangepicker.css">
+  <!-- summernote -->
+  <link rel="stylesheet" href="/admin/plugins/summernote/summernote-bs4.min.css">
+
+    <!--vue -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper" id="app">
+
+  <!-- Preloader -->
+  <div class="preloader flex-column justify-content-center align-items-center">
+    <img class="animation__shake" src="/admin/dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+  </div>
+
+    <!-- nav import -->
+    <div th:insert="store/fragments/top_link :: topLink"></div>
+
+  <!-- Main Sidebar Container -->
+    <div th:insert="store/fragments/side_navi :: navi"></div>
+
+    <!-- content start-->
+    <form id="form1">
+    <input type="hidden" name="store.store_id" value="1">
+    <div class="col-md-6" style="margin: auto">
+        <div class="card card-secondary">
+            <div class="card-header">
+                <h3 class="card-title">상품 등록하기</h3>
+
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="inputEstimatedBudget">상품 이름</label>
+                    <input type="text" name="product_name" id="inputEstimatedBudget" class="form-control" placeholder="상품명 입력">
+                </div>
+                <div class="form-group">
+                    <label for="inputSpentBudget">상품 가격</label>
+                    <input type="number" name="price" id="inputSpentBudget" class="form-control" placeholder="상품 가격 입력">
+                </div>
+                <div class="form-group">
+                    <label for="inputEstimatedDuration">브랜드명</label>
+                    <input type="text" name="brand" id="inputEstimatedDuration" class="form-control" placeholder="브랜드명 입력">
+                </div>
+                <button type="button" class="btn btn-block btn-dark" id="bt_regist">등록하기</button>
+            </div>
+            <!-- /.card-body -->
+        </div>
+    </div>
+    </form>
+    <!-- content end-->
+
+     <div th:insert="store/fragments/footer :: footer"></div>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="/admin/plugins/jquery/jquery.min.js"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="/admin/plugins/jquery-ui/jquery-ui.min.js"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+  $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- Bootstrap 4 -->
+<script src="/admin/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- ChartJS -->
+<script src="/admin/plugins/chart.js/Chart.min.js"></script>
+<!-- Sparkline -->
+<script src="/admin/plugins/sparklines/sparkline.js"></script>
+<!-- JQVMap -->
+<script src="/admin/plugins/jqvmap/jquery.vmap.min.js"></script>
+<script src="/admin/plugins/jqvmap/maps/jquery.vmap.usa.js"></script>
+<!-- jQuery Knob Chart -->
+<script src="/admin/plugins/jquery-knob/jquery.knob.min.js"></script>
+<!-- daterangepicker -->
+<script src="/admin/plugins/moment/moment.min.js"></script>
+<script src="/admin/plugins/daterangepicker/daterangepicker.js"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="/admin/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+<!-- Summernote -->
+<script src="/admin/plugins/summernote/summernote-bs4.min.js"></script>
+<!-- overlayScrollbars -->
+<script src="/admin/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/admin/dist/js/adminlte.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="/admin/dist/js/demo.js"></script>
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<script src="/admin/dist/js/pages/dashboard.js"></script>
+
+<script>
+    function regist(){
+        console.log($("#form1").serialize());
+
+        $.ajax({
+            url:"/store/product/regist",
+            method:"POST",
+            data:$("#form1").serialize(),
+            success:function(data){
+                console.log(data);
+                location.href="/store/product/list";
+            }
+        });
+    }
+
+    $(()=>{
+        $("#bt_regist").click(()=>{
+            console.log("버튼 눌림");
+            regist();
+        });
+    });
+</script>
+</body>
+</html>

@@ -39,4 +39,10 @@ public class RestStoreController {
 
         return ResponseEntity.ok("success");
     }
+
+    //상점 관리자 메인 요청
+    @GetMapping("/store/main")
+    public String main(){
+        return "store/index";
+    }
 }
