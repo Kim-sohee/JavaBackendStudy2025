@@ -158,7 +158,9 @@
                     }));
 
                     //원하는 구독 요청
-
+                    stompClient.subscribe("/topic/connected", (msg)=>{
+                        console.log("받은 메시지는 ",msg.body);
+                    });
 
                 });
             }
