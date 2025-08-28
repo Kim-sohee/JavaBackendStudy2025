@@ -19,8 +19,8 @@ public class JpaProductDAO implements ProductDAO {
     }
 
     @Override
-    public Product findById(int product_id) {
-        return productJpaRepository.findById(product_id);
+    public Product findById(int productId) {
+        return productJpaRepository.findById(productId);
     }
 
     @Override
@@ -36,5 +36,10 @@ public class JpaProductDAO implements ProductDAO {
     @Override
     public void deleteById(int id) {
         productJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Product> selectByStoreId(int storeId) {
+        return productJpaRepository.findByStore_storeId(storeId);
     }
 }

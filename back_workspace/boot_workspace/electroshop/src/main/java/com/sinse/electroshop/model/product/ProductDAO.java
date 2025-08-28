@@ -19,4 +19,7 @@ public interface ProductDAO {
     
     //상품 정보 삭제
     public void deleteById(int id);
+
+    //특정 상점에 대한 모든 상품
+    public List<Product> selectByStoreId(int storeId);
 }

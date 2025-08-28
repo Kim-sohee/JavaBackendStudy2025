@@ -46,7 +46,7 @@
 
     <!-- content start-->
     <form id="form1">
-    <input type="hidden" name="store.store_id" value="1">
+    <input type="hidden" name="store.storeId" th:value="${session.store.storeId}">
     <div class="col-md-6" style="margin: auto">
         <div class="card card-secondary">
             <div class="card-header">
@@ -134,7 +134,7 @@
             data:$("#form1").serialize(),
             success:function(data){
                 console.log(data);
-                location.href="/store/product/listform";
+                location.href="/store/product/list";
             }
         });
     }

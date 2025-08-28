@@ -77,9 +77,9 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr v-for="product in productList" :key="product.product_id" @click="gotoDetail(product.product_id)" >
+                                    <tr v-for="product in productList" :key="product.productId" @click="gotoDetail(product.productId)" >
                                             <td>1</td>
-                                            <td>{{product.product_name}}</td>
+                                            <td>{{product.productName}}</td>
                                             <td>{{product.brand}}</td>
                                         </tr>
                                     </tbody>
@@ -158,8 +158,7 @@
             }
 
             const gotoDetail=(productId)=>{
-                window.location.href = `/store/product/detail?product_id=${productId}`;
-                //console.log(productId+" 눌렸당!"+`/store/product/detail?product_id=${productId}`);
+                window.location.href = `/store/product/detail?productId=${productId}`;
             }
 
             getList();

@@ -6,8 +6,8 @@ import lombok.Data;
 //Data Transfer Object
 @Data
 public class StoreDTO {
-    private int store_id;
+    private int storeId;
     private String id;
     private String pwd;
-    private String store_name;
+    private String storeName;
 }

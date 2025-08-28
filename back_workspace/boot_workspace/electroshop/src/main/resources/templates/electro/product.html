@@ -126,8 +126,8 @@
                         <!-- Product details -->
                         <div class="col-md-5">
                             <div class="product-details">
-                                <h2 class="product-name" th:text="${product.product_name}"></h2>
-                                <input type="hidden" id="product_id" th:value="${product.product_id}">
+                                <h2 class="product-name" th:text="${product.productName}"></h2>
+                                <input type="hidden" id="productId" th:value="${product.productId}">
                                 <div>
                                     <div class="product-rating">
                                         <i class="fa fa-star"></i>
@@ -485,14 +485,14 @@
                             connected.value = true;
                             console.log("STOMP로 서버 연결 성공");
 
-                            //구독하기
+                            //상점이 들어올 때, 그 시점을 알기 위한 구독 요청
                             stompClient.subscribe("/topic/connected", (message)=>{
                                 console.log("다른 사용자도 접속함: ", JSON.parse(message.body));
                             });
 
                             //접속 후, 서버에 메시지 보내기
                             stompClient.send("/app/connect", {}, JSON.stringify({
-                                content: $("#product_id").val()
+                                content: $("#productId").val()
                             }));
                         });
                     }
