@@ -19,7 +19,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member findById(int member_id) {
+    public Member findById(int memberId) {
         return null;
     }
 
@@ -44,7 +44,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void delete(int member_id) {
+    public void delete(int memberId) {
 
     }
 }

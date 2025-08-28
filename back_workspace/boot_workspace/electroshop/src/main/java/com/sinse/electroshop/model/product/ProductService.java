@@ -8,7 +8,7 @@ public interface ProductService  {   //모든 상품
     public List<Product> findAll();
 
     //하나의 상품
-    public Product findById(int product_id);
+    public Product findById(int productId);
 
     //상품정보 등록
     public Product save(Product product);
@@ -18,4 +18,6 @@ public interface ProductService  {   //모든 상품
 
     //상품 정보 삭제
     public void deleteById(int id);
+
+    public List getListByStoreId(int storeId);
 }

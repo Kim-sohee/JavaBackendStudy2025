@@ -20,8 +20,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product findById(int product_id) {
-        return productDAO.findById(product_id);
+    public Product findById(int productId) {
+        return productDAO.findById(productId);
     }
 
     @Override
@@ -37,5 +37,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteById(int id) {
         productDAO.deleteById(id);
+    }
+
+    @Override
+    public List getListByStoreId(int storeId) {
+        return productDAO.selectByStoreId(storeId);
     }
 }

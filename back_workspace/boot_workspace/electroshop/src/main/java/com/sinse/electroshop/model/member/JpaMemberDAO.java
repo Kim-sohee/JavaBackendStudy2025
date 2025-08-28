@@ -20,8 +20,8 @@ public class JpaMemberDAO implements  MemberDAO{
     }
 
     @Override
-    public Member findById(int member_id) {
-        return memberJpaRepository.findById(member_id).orElse(null);
+    public Member findById(int memberId) {
+        return memberJpaRepository.findById(memberId).orElse(null);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class JpaMemberDAO implements  MemberDAO{
     }
 
     @Override
-    public void delete(int member_id) {
-        memberJpaRepository.deleteById(member_id);
+    public void delete(int memberId) {
+        memberJpaRepository.deleteById(memberId);
     }
 }

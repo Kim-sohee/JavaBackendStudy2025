@@ -46,6 +46,7 @@
     <form id="form1">
         <input type="text" id="id" name="id" placeholder="Your Id..">
         <input type="password" id="password" name="pwd" placeholder="Your password..">
+        <input type="text" id="name" name="storeName" placeholder="Your name..">
 
         <input type="button" id="bt_login" value="Submit">
     </form>
@@ -60,8 +61,6 @@
                 data: $("#form1").serialize(),
                 success: function(data){
                     console.log(data);
-                    location.href="/store/main";
-                    // location.href="/store/product/regist";
                 }
             });
         }

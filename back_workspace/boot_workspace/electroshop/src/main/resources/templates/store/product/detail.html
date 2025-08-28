@@ -29,6 +29,7 @@
     <!--vue -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper" id="app">
@@ -46,11 +47,13 @@
 
     <!-- content start-->
     <form id="form1">
-    <input type="hidden" name="store.store_id" value="1">
-    <div class="col-md-6" style="margin: auto">
+    <input type="hidden" name="store.storeId" th:value="${product.store.storeId}">
+    <input type="hidden" id="product_id" th:value="${product.productId}">
+    <div class="col-md-6" style="margin: auto" >
         <div class="card card-secondary">
             <div class="card-header">
-                <h3 class="card-title">상품 상세보기</h3>
+                <h3 class="card-title" v-if="isOnAir">Live ON</h3>
+                <h3 class="card-title" v-else>Live OFF</h3>
 
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
@@ -61,7 +64,7 @@
             <div class="card-body">
                 <div class="form-group">
                     <label for="inputEstimatedBudget">상품 이름</label>
-                    <input type="text" name="product_name" id="inputEstimatedBudget" class="form-control" placeholder="상품명 입력" th:value="${product.product_name}">
+                    <input type="text" name="productName" id="inputEstimatedBudget" class="form-control" placeholder="상품명 입력" th:value="${product.productName}">
                 </div>
                 <div class="form-group">
                     <label for="inputSpentBudget">상품 가격</label>
@@ -73,8 +76,10 @@
                 </div>
                 <div class="form-group">
                     <label for="inputEstimatedDuration">상점</label>
-                    <input type="text" name="brand" id="inputEstimated" class="form-control" placeholder="브랜드명 입력" th:value="${product.store.store_name}">
+                    <input type="text" name="brand" id="inputEstimated" class="form-control" placeholder="브랜드명 입력" th:value="${product.store.storeName}">
                 </div>
+                <button type="button" class="btn btn-block btn-warning" id="bt_chatStart" @click="connect">라이브쇼핑 시작</button>
+                <button type="button" class="btn btn-block btn-warning" id="bt_chatEnd">라이브쇼핑 종료</button>
                 <button type="button" class="btn btn-block btn-dark" id="bt_regist">목록 보기</button>
             </div>
             <!-- /.card-body -->
@@ -129,6 +134,38 @@
 <script src="/admin/dist/js/pages/dashboard.js"></script>
 
 <script>
+    const {createApp, ref} = Vue;
+
+    createApp({
+        setup(){
+            const isOnAir = ref(false);     //방송중인지 여부 기준 변수
+
+            //웹소켓 서버 접속
+            let stompClient=null;
+            const connect=()=>{
+                const webSocket = new WebSocket("ws://localhost:9999/ws");
+                stompClient=Stomp.over(webSocket);
+
+                //stomp와 서버 연결
+                stompClient.connect({}, ()=>{
+                    //접속이 성공되면 할 작업들
+                    isOnAir.value = true;
+
+                    //접속했음을 알리고(방송시작 알림)
+                    stompClient.send("/app/connect", {}, JSON.stringify({
+                        senderType:"store",
+                        content: $("#product_id").val()
+                    }));
+
+                    //원하는 구독 요청
+
+
+                });
+            }
+
+            return {isOnAir, connect}
+        }
+    }).mount("#app");
 
     $(()=>{
         $("#bt_regist").click(()=>{
