@@ -96,4 +96,12 @@ public class ChatController {
 
         return chatRoom.getCustomers();
     }
+
+    //메시지 요청 처리
+    @MessageMapping("/chat.send")
+    @SendTo("/topic/messages")
+    public ChatMessage send(ChatMessage chatMessage) {
+        log.debug(chatMessage.getSender()+"가 전송한 메시지 "+chatMessage.getContent());
+        return chatMessage;
+    }
 }
