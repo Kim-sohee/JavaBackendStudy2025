@@ -24,9 +24,10 @@ public class UploadController {
     @PostConstruct
     public void init() {
         log.debug("업로드 될 파일의 경로는 {}",  uploadDir);
+        path = Path.of(uploadDir);
     }
 
-    @PostMapping("/files/upload")
+    @PostMapping("/file/upload")
     public ResponseEntity<String> uploadFile(MultipartFile file) throws IOException {
         String oriName = file.getOriginalFilename();
         String ext = oriName.substring(oriName.lastIndexOf(".")+1, oriName.length());
@@ -34,10 +35,22 @@ public class UploadController {
         String filename = UUID.randomUUID().toString() + "." + ext;
         log.debug("새로 생성한 파일 이름은 "+filename);
 
-        path = Path.of(uploadDir);
         Path target = path.resolve(filename);     //기존 path 객체에 파일명까지 적용
 
         file.transferTo(target);
+        return ResponseEntity.ok("업로드 완료");
+    }
+
+    @PostMapping("/files/upload")
+    public ResponseEntity<String> uploadFiles(MultipartFile[] files) throws IOException {
+        for(MultipartFile file : files) {
+            String oriName = file.getOriginalFilename();
+            String ext = oriName.substring(oriName.lastIndexOf(".")+1, oriName.length());
+
+            String filename = UUID.randomUUID().toString() + "." + ext;
+
+            file.transferTo(path.resolve(filename));
+        }
         return ResponseEntity.ok("업로드 완료");
     }
 }
