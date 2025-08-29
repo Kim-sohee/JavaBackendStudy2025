@@ -235,9 +235,9 @@
                                             <div class="col-md-9">
                                                 <div id="reviews">
                                                     <ul class="reviews">
-                                                        <li  v-for="message in messages">
+                                                        <li  v-for="chat in messages">
                                                             <div class="review-heading">
-                                                                <h5 class="name">John</h5>
+                                                                <h5 class="name">{{chat.sender}}</h5>
                                                                 <p class="date">27 DEC 2018, 8:0 PM</p>
                                                                 <div class="review-rating">
                                                                     <i class="fa fa-star"></i>
@@ -248,7 +248,7 @@
                                                                 </div>
                                                             </div>
                                                             <div class="review-body">
-                                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</p>
+                                                                <p>{{chat.content}}</p>
                                                             </div>
                                                         </li>
 
@@ -267,8 +267,10 @@
                                             <!-- Review Form -->
                                             <div class="col-md-3" v-if="connected">
                                                 <div id="review-form">
+                                                    <h4>참여자 수 <span>{{users.length}}</span></h4>
                                                     <form class="review-form">
-                                                        <textarea class="input" placeholder="Your Chatting"></textarea>
+                                                        <input type="hidden" id="user_id" th:value="${session.member.id}">
+                                                        <textarea class="input" placeholder="Your Chatting" v-model="message" @keyup.enter="sendMessage"></textarea>
                                                         <div class="input-rating">
                                                             <span>Your Rating: </span>
                                                             <div class="stars">
@@ -471,8 +473,9 @@
                     //STOMP 객체 선언
                     let stompClient = null;
                     const connected = ref(false);
-
-                    const messages = ref([1,2,3,4,5,6,7,8,9]);   //누적 채팅메시지
+                    const users=ref([]);
+                    const message = ref("");
+                    const messages = ref([]);   //누적 채팅메시지
 
                     //WebSocket 서버 접속
                     const connect = ()=>{
@@ -488,18 +491,35 @@
                             //상점이 들어올 때, 그 시점을 알기 위한 구독 요청
                             stompClient.subscribe("/topic/connected", (message)=>{
                                 console.log("다른 사용자도 접속함: ", JSON.parse(message.body));
+                                users.value = JSON.parse(message.body);
                             });
 
                             //접속 후, 서버에 메시지 보내기
                             stompClient.send("/app/connect", {}, JSON.stringify({
                                 content: $("#productId").val()
                             }));
+
+                            //구독하기
+                            stompClient.subscribe("/topic/messages", (msg)=>{
+                                messages.value.push(JSON.parse(msg.body));
+                            });
                         });
                     }
 
+                    //채팅하기
+                    const sendMessage=()=>{
+                        //메시지 입력을 하면, 서버에 전송
+                        if (message.value.trim()){
+                            stompClient.send("/app/chat.send", {}, JSON.stringify({
+                                sender: $("#user_id").val(),
+                                content: message.value
+                            }));
+                            message.value = ""; //입력창 비우기
+                        }
+                    }
 
-                    return {productList, connected, messages,
-                        connect}
+                    return {productList, connected, message, messages, users,
+                        connect, sendMessage}
                 }
             }).mount("#app");
         </script>

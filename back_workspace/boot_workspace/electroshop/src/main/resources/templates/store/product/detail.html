@@ -47,45 +47,91 @@
 
     <!-- content start-->
     <form id="form1">
-    <input type="hidden" name="store.storeId" th:value="${product.store.storeId}">
+    <input type="hidden" id="store_id" name="store.storeId" th:value="${product.store.storeId}">
+    <input type="hidden" id="store_name" name="store.storeName" th:value="${product.store.storeName}">
     <input type="hidden" id="product_id" th:value="${product.productId}">
-    <div class="col-md-6" style="margin: auto" >
-        <div class="card card-secondary">
-            <div class="card-header">
-                <h3 class="card-title" v-if="isOnAir">Live ON</h3>
-                <h3 class="card-title" v-else>Live OFF</h3>
+        <div class="row">
+            <div class="col-md-6" style="margin: auto" >
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title" v-if="isOnAir">Live ON</h3>
+                        <h3 class="card-title" v-else>Live OFF</h3>
 
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="inputEstimatedBudget">상품 이름</label>
+                            <input type="text" name="productName" id="inputEstimatedBudget" class="form-control" placeholder="상품명 입력" th:value="${product.productName}">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputSpentBudget">상품 가격</label>
+                            <input type="number" name="price" id="inputSpentBudget" class="form-control" placeholder="상품 가격 입력" th:value="${product.price}">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEstimatedDuration">브랜드명</label>
+                            <input type="text" name="brand" id="inputEstimatedDuration" class="form-control" placeholder="브랜드명 입력" th:value="${product.brand}">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEstimatedDuration">상점</label>
+                            <input type="text" name="brand" id="inputEstimated" class="form-control" placeholder="브랜드명 입력" th:value="${product.store.storeName}">
+                        </div>
+                        <button type="button" class="btn btn-block btn-warning" id="bt_chatStart" @click="connect">라이브쇼핑 시작</button>
+                        <button type="button" class="btn btn-block btn-warning" id="bt_chatEnd">라이브쇼핑 종료</button>
+                        <button type="button" class="btn btn-block btn-dark" id="bt_regist">목록 보기</button>
+                    </div>
+                    <!-- /.card-body -->
                 </div>
             </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label for="inputEstimatedBudget">상품 이름</label>
-                    <input type="text" name="productName" id="inputEstimatedBudget" class="form-control" placeholder="상품명 입력" th:value="${product.productName}">
+        </div>
+    </form>
+
+    <div class="row" v-if="isOnAir">
+        <div class="col-md-3">
+            <!--채팅 참여자 목록 시작-->
+            <textarea class="form-control" style="height: 300px; margin-left: 30%; border: none"></textarea>
+            <!--채팅 참여자 목록 끝-->
+        </div>
+        <div class="col-md-9">
+            <!--채팅 방-->
+            <div class="row" v-if="isOnAir"> <!--서버에 접속했을 때만 나오게-->
+                <div class="col-md-3">
+                    <!--채팅 참며자 목록 시작-->
+                    <textarea class="form-control" style="height: 300px">{{users.join("\n")}}</textarea>
+                    <!--채팅 참여자 목록 끝-->
                 </div>
-                <div class="form-group">
-                    <label for="inputSpentBudget">상품 가격</label>
-                    <input type="number" name="price" id="inputSpentBudget" class="form-control" placeholder="상품 가격 입력" th:value="${product.price}">
+
+                <div class="col-md-9">
+                    <!--등록폼 시작-->
+                    <div class="card card-primary">
+
+                        <!-- /.card-header -->
+                        <!-- form start -->
+
+                        <div class="card-body">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="product_name" placeholder="채팅 메시지 입력 " v-model="message" @keyup.enter="sendMsg">
+                            </div>
+
+                            <div class="form-group">
+                                <textarea class="form-control" style="height: 250px">{{messages.join("\n")}}</textarea>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+
+                        <div class="card-footer">
+                            <button type="button" id="bt_send" class="btn btn-primary">메시지 전송</button>
+                        </div>
+                    </div>
+                    <!--등록폼 끝-->
                 </div>
-                <div class="form-group">
-                    <label for="inputEstimatedDuration">브랜드명</label>
-                    <input type="text" name="brand" id="inputEstimatedDuration" class="form-control" placeholder="브랜드명 입력" th:value="${product.brand}">
-                </div>
-                <div class="form-group">
-                    <label for="inputEstimatedDuration">상점</label>
-                    <input type="text" name="brand" id="inputEstimated" class="form-control" placeholder="브랜드명 입력" th:value="${product.store.storeName}">
-                </div>
-                <button type="button" class="btn btn-block btn-warning" id="bt_chatStart" @click="connect">라이브쇼핑 시작</button>
-                <button type="button" class="btn btn-block btn-warning" id="bt_chatEnd">라이브쇼핑 종료</button>
-                <button type="button" class="btn btn-block btn-dark" id="bt_regist">목록 보기</button>
             </div>
-            <!-- /.card-body -->
         </div>
     </div>
-    </form>
     <!-- content end-->
 
      <div th:insert="store/fragments/footer :: footer"></div>
@@ -139,6 +185,10 @@
     createApp({
         setup(){
             const isOnAir = ref(false);     //방송중인지 여부 기준 변수
+            const users = ref([]);       //서버에서 보내온 메시지 배열
+
+            const message=ref("");
+            const messages=ref([]);
 
             //웹소켓 서버 접속
             let stompClient=null;
@@ -159,13 +209,30 @@
 
                     //원하는 구독 요청
                     stompClient.subscribe("/topic/connected", (msg)=>{
-                        console.log("받은 메시지는 ",msg.body);
+                        console.log("서버가 보낸 방 참여자는 ",msg);
+                        users.value = JSON.parse(msg.body);
+                    });
+
+                    //구독하기
+                    stompClient.subscribe("/topic/messages", (msg)=>{
+                        let chat = JSON.parse(msg.body);
+                        messages.value.push(chat.sender + ": "+chat.content);
                     });
 
                 });
             }
 
-            return {isOnAir, connect}
+            const sendMsg=()=>{
+                if(message.value.trim()){
+                    stompClient.send("/app/chat.send", {}, JSON.stringify({
+                        sender: $("#store_name").val(),
+                        content: message.value
+                    }));
+                    message.value = ""; //입력창 비우기
+                }
+            }
+
+            return {isOnAir, users, message, messages, connect, sendMsg}
         }
     }).mount("#app");
 
