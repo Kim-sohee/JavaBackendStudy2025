@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+    <style>
+        /* 기본 스타일 초기화 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f8;
+            color: #333;
+            padding: 30px;
+        }
+
+        /* 전체 컨테이너 */
+        #app {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        /* 제목 */
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+
+        /* 입력 필드와 버튼 */
+        input[type="text"] {
+            padding: 10px 15px;
+            margin: 10px 5px 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            width: 250px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 16px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px 0;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* 접속 정보 */
+        p {
+            margin: 15px 0;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* 리스트 스타일 */
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        /* 메시지 로그 */
+        h3 {
+            margin-top: 20px;
+            color: #34495e;
+        }
+
+        li::before {
+            content: "💬 ";
+        }
+
+        /* 방 정보 스타일 */
+        li > ul {
+            margin-top: 5px;
+            margin-left: 20px;
+            background-color: #f0f3f5;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        /* 방 이름 강조 */
+        li b {
+            color: #2c3e50;
+        }
+
+        /* 방 버튼 */
+        li button {
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+
+        /* 방 생성 입력 박스 */
+        div input[placeholder="방이름 입력"] {
+            width: 300px;
+        }
+    </style>
+
+</head>
+<body>
+<div id="app">
+    <h2>Spring WebSocket 기반 채팅 </h2>
+
+    <!--DB 연동하지 않고, 사용자를 직접 입력하여 채팅진행 -->
+    <div v-if="!connected">
+        <input type="text" v-model="username" placeholder="채팅 사용자명 입력">
+        <button type="button" @click="connect()">웹소켓서버 접속</button>
+    </div>
+    <div v-else>
+        <p><b>{{username}}</b>님 접속중</p>
+        <button type="button" @click="disconnect()">접속종료</button>
+
+        <div>
+            <input type="text" v-model="message" @keyup.enter="sendMessage()" placeholder="메시지를 입력하세요">
+            <button type="button" @click="sendMessage()">메시지 전송</button>
+        </div>
+    </div>
+
+    <h3>총 접속자</h3>
+    <ul>
+        <li v-for="user in users">{{user}}</li>
+    </ul>
+
+    <h3>메시지 로그</h3>
+    <ul>
+        <li v-for="msg in messages">{{msg.sender}}님의 말: {{msg.content}}</li>
+    </ul>
+
+    <div>
+        <input type="text" v-model="roomName" placeholder="방이름 입력">
+        <button type="button" @click="createRoom()">방만들기</button>
+    </div>
+
+    <h3>방목록</h3>
+    <ul>
+        <li v-for="room in rooms" :key="room.roomId">
+            <b>{{room.roomName}}</b> (참여자 수: {{room.users.length}})
+            <ul>
+                <li v-for="user in room.users">{{user}}</li>
+                <button type="button" @click="enterRoom(room.roomId)">참여하기</button>
+                <button type="button" @click="leaveRoom(room.roomId)">나가기</button>
+            </ul>
+        </li>
+    </ul>
+</div>
+<script>
+    const {createApp, ref} = Vue;
+
+    createApp({
+        setup(){
+            const username=ref("");
+            const connected=ref(false);
+            const users=ref([]);
+            const message=ref("");
+            const messages=ref([]);
+            const roomName=ref("");     //방 제목
+            const rooms=ref([]);
+
+
+            let stompClient=null; //STOMP 클라이언트 객체
+
+            //웹소켓 서버에 접속 시도
+            const connect =()=>{
+                //채팅 아이디를 입력했을때만 접속 시도
+                if(!username.value.trim() ){
+                    alert("채팅 아이디를 입력하세요");
+                    return; //메서드 종료
+                }
+                //우리의 경우 웹소켓 위에 STOMP를 얹혀 사용할 예정이므로,
+                //반드시 WebSocket 객체가 필요함
+                const socket=new WebSocket("ws://localhost:7777/ws");
+                stompClient = Stomp.over(socket);//WebSocket 위에 STOMP 프로토콜 올리기
+
+                //서버와 STOMP 연결 시도(헤더 정보 없이)
+                stompClient.connect({}, ()=>{
+                    connected.value=true;//바인딩 변수를 true로 놓아야 화면전환
+
+                    //접속과 동시에 원하는 채널을 구독하자
+                    stompClient.subscribe("/topic/users", (msg)=>{
+                        console.log("접속과 동시에 구독 메시지 받기",msg);
+                        users.value=JSON.parse(msg.body);
+                    });
+
+                    //채팅 메시지 구독
+                    stompClient.subscribe("/topic/messages", (msg)=>{
+                        messages.value.push(JSON.parse(msg.body));
+                    });
+
+                    //서버에 메시지 보내기
+                    stompClient.send("/app/connect", {}, JSON.stringify({sender:username.value}));
+
+                    //방 목록을 받기 위한 채널 구독
+                    stompClient.subscribe("/topic/rooms", (msg)=>{
+                        rooms.value = JSON.parse(msg.body);
+                    });
+
+                    //접속과 동시에 방 목록을 요청한다.
+                    getRooms();
+                });
+            }
+
+            //메시지 전송
+            const sendMessage=()=>{
+                //메시지 입력박스가 비어있지 않다면
+                if(message.value.trim()){
+                    stompClient.send("/app/chat.send", {}, JSON.stringify({
+                        sender:username.value,
+                        content:message.value
+                    }));
+                }
+            }
+
+            //방 만들기
+            const createRoom=()=>{
+                //방제목을 입력한 경우만
+                if(roomName.value.trim()){
+                    stompClient.send("/app/room.create", {}, JSON.stringify({
+                        sender: username.value,
+                        content: roomName.value
+                    }));
+                    roomName.value = "";    //입력값 초기화
+                }
+            }
+
+            //방 목록 구하기
+            const getRooms=()=>{
+                stompClient.send("/app/room.list", {}, {});
+            }
+
+            //방 참여하기
+            const enterRoom=(roomId)=>{
+                stompClient.send("/app/room.enter", {}, JSON.stringify({
+                    sender: username.value,
+                    roomId: roomId
+                }));
+            }
+
+            //방 나가기
+            const leaveRoom=(roomId)=>{
+                stompClient.send("/app/room.leave", {}, JSON.stringify({
+                    sender: username.value,
+                    roomId: roomId
+                }))
+            }
+
+            //접속종료
+            const disconnect=()=>{
+                //종료로 인하여 웹소켓이 끊기면 서버가 보내준 구독 브로드캐스팅 정보 조차 받을 수 없다.
+
+                //서버에 '나 나갈래' 알림 보내기
+                stompClient.send("/app/disconnect", {}, JSON.stringify({
+                    sender: username.value,
+                }));
+
+                //이미 접속이 끊어진 이후엔 브로드캐스팅을 받지 못하므로, 나의 정보를 스스로 제거
+                //참여자 목록을 다시 구성
+                let newUsers = [];
+                for(let i=0; i<users.value.length; i++){
+                    if(users.value[i] != username.value){
+                        newUsers.push(users[i].value);
+                    }
+                }
+                users.value = newUsers;
+
+                stompClient.disconnect();   //모든 사용자에게 나갔음을 알렸으므로, 나 죽기
+                connected.value = false;    //뷰 화면 갱신을 위해
+            }
+
+
+            return {username, connected, users, message, messages, roomName, rooms,
+                connect, sendMessage, createRoom, getRooms, enterRoom, leaveRoom, disconnect}
+        }
+    }).mount("#app");
+</script>
+</body>
+</html>
