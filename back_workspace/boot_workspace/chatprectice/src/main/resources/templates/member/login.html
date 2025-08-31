@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #74ebd5, #ACB6E5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px;
+            margin: 8px 0 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #74ebd5;
+            outline: none;
+        }
+
+        input[type="button"] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        input[type="button"]:hover {
+            background-color: #45a049;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="app" class="container">
+        <form id="form1">
+            <input type="text" name="id" placeholder="Your ID..">
+            <input type="password" name="password" placeholder="Your Password..">
+            <input type="button" value="Submit" @click="login()">
+        </form>
+    </div>
+
+    <script>
+        const {createApp, reactive, ref} = Vue;
+        createApp({
+            setup(){
+                const login=()=>{
+                    let formData = new FormData(document.getElementById(('form1')));
+                    $.ajax({
+                        url:"/member/login",
+                        method:"POST",
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        success:(result, status, xhr)=>{
+                            console.log(result);
+                            location.href="/chat/main";
+                        },
+                        error:(xhr, status, err)=>{
+
+                        }
+                    });
+                }
+
+                return {login}
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>
