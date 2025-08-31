@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+        }
+
+        #wrapper {
+            width: 1200px;
+            height: 800px;
+            margin: 30px auto;
+            background-color: white;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        #aside {
+            width: 240px;
+            background: #2f3542;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #aside input[type="text"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        #aside button {
+            background-color: #1e90ff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #aside button:hover {
+            background-color: #0f72d0;
+        }
+
+        #aside ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        #aside ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid #57606f;
+        }
+
+        #content {
+            flex: 1;
+            background-color: #f1f2f6;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .room {
+            width: 220px;
+            height: 270px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .room:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .room-header {
+            height: 40px;
+            background-color: #1e90ff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .room-body {
+            flex: 1;
+            background: url('https://via.placeholder.com/220x230?text=Live+Preview') center/cover no-repeat;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="wrapper">
+            <div id="aside">
+                <div th:if="${session.member != null}">
+                    <h4 th:text="${session.member.id+'님'}"></h4>
+                    <h4 th:text="|${session.member.name}님|"></h4>
+                </div>
+                <input type="hidden" th:value="${session.member.id}" name="id">
+                <input type="text" placeholder="방제목 입력" name="roomName">
+                <button type="button" @click="createRoom()">방만들기</button>
+                <button type="button">접속끊기</button>
+                <ul>
+                    <li>접속자 목록</li>
+                    <li v-for="member in memberList">{{member.name}}</li>
+                </ul>
+            </div>
+            <div id="content">
+                <!--팝업 시작-->
+                <div id="pop" v-show="flag">
+                    <div id="content2">
+                        <div id="content-header"></div>
+                        <div id="content-body" style="white-space: pre-line;"></div>
+                    </div>
+                    <div id="aside2">
+                        <div id="aside-header"></div>
+                        <div id="aside-body">
+                            <ul>
+                                <li></li>
+                            </ul>
+                        </div>
+                        <div id="aside-footer">
+                            <button type="button">방나가기</button>
+                        </div>
+                    </div>
+                    <div id="footer">
+                        <input type="text">
+                        <button type="button">Send</button>
+                    </div>
+                </div>
+                <!--팝업 끝-->
+                <div class="room" v-for="room in roomList" key="room.uuid">
+                    <div class="room-header">
+                        <a href="" @click.prevent="openForm(room.uuid)">{{room.roomName}}</a>
+                    </div>
+                    <div class="room-body"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const {createApp, reactive, ref} = Vue;
+
+        createApp({
+            setup(){
+                let ws = null;  //웹 소켓 객체
+
+                let roomList=reactive([]);
+                let memberList=reactive([]);
+                let flag=ref(false);
+
+                const request=(data)=>{
+                    ws.send(data);
+                }
+
+                const connect=()=>{
+                    ws = new WebSocket("ws://localhost:8989/chat/multi");
+
+                    ws.onopen=()=>{
+                    }
+
+                    ws.onmessage=(e)=>{
+                        const responseJson = JSON.parse(e.data);
+                        if(responseJson.responseType=="createRoom"){
+                            console.log("서버에서 보낸 메시지는 ",responseJson);
+                            //접속자 명단
+                            memberList.splice(0);
+                            responseJson.memberList.forEach(member=>{
+                                memberList.push(member);
+                            });
+                            //채팅방 목록
+                            roomList.splice(0);
+                            if(responseJson.roomList != null){
+                                responseJson.roomList.forEach(room=>{
+                                    roomList.push(room);
+                                });
+                            }
+                        }
+                    }
+                }
+
+                const createRoom=()=>{
+                    console.log("방 만든다!");
+                    let payload={
+                        requestType:"createRoom",
+                        userId: $("input[name='id']").val(),
+                        roomName: $("input[name='roomName']").val()
+                    }
+                    request(JSON.stringify(payload));
+                }
+
+                //채팅방 입장하기
+                const openForm = (roomId)=>{
+                    flag.value = true;
+
+                    let payload={
+                        responseType: "enterRoom",
+                        uuid: roomId
+                    }
+                    request(JSON.stringify(payload));
+                }
+
+                connect();
+
+                return{roomList, memberList, flag, createRoom, openForm}
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>
