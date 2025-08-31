@@ -1,5 +1,7 @@
 package com.example.studyspringjwt.config;
 
+import com.example.studyspringjwt.jwt.JwtFilter;
+import com.example.studyspringjwt.jwt.JwtUtil;
 import com.example.studyspringjwt.jwt.LoginFilter;
 import com.mysql.cj.log.Log;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     //AuthenticationManager가 인자로 받을 AuthenticationConfiguration 객체 주입
     private final AuthenticationConfiguration authenticationConfiguration;
+
+    //JwtUtil - JWT 토큰 생성
+    private final JwtUtil jwtUtil;
 
     //AuthenticationManager Bean 등록
     @Bean
@@ -52,7 +57,9 @@ public class SecurityConfig {
             .anyRequest().authenticated());
 
         //필터 등록
-        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
+        http.addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
 
         //세션 설정
         http.sessionManagement((session)->
