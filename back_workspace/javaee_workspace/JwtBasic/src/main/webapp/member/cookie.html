@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<script type="text/javascript">
+		/*	1. 쿠키란(cookie): 브라우저에 저장되는 작은 규모의 데이터
+			2. 내장 db와 차이점이 있나?
+				- 브라우저 내장 db: 용량 제한이 없음
+				- 쿠키: 4kb 용량을 가질 수 있으므로 db 용도로 부적합
+			3. 쿠키를 로컬상 브라우저의 저장용도로 생각하며 안되는 이유
+				- 쿠키는 서버에 요청 시 개발자의 의도와 상관없이 전송되어 버린다.
+				- 즉, http 요청 시 무조건 함께 전달된다.
+				- 따라서 너무 많은 쿠키를 저장할 경우 네트워크 데이터량 증가됨
+			4. 쿠키 생명력
+				1) 세션 쿠키(session cookie)
+					- 브라우저의 메모리에 생성, 따라서 브라우저를 끌때까지는 유지(세션이 유지될때까지) 
+				2) 영속 쿠키(persistent cookie)
+					-브라우저가 사용하는 디스크의 스토리지에 저장됨(가끔 쿠키 지우기 시도할 때 경험)
+					-쿠키 생성 시, 유효기간을 지정하면 됨
+				*/
+				
+		//쿠키 생성 함수 정의
+		//setCookie(name: 쿠키명, value: 쿠키값, min: 유효기간)
+		function setCookie(name, value, min){
+			let date = new Date();	//현재 날짜 정보
+			date.setTime(date.getTime()+(1000*60*min));		//밀리세컨드를 기본으로 하므로
+			
+			//쿠키는 브라우저와 서버와의 통신을 통해 주고 받으므로, 한글, 특수문자 등이 섞여있을 때 깨지지 않고 안전하게 저장이 되어야 한다.
+			let limit = date.toUTCString();	//쿠키의 유효기간은 반드시 UTC(세계 표준시) 문자열 형식으로 표현해야 한다.
+			document.cookie=name + "="+encodeURIComponent(value)+"; expires="+limit+"; path=/";
+		}
+
+	</script>
+</head>
+<body>
+	<a href="/member/request.jsp">Link</a>
+</body>
+</html>
