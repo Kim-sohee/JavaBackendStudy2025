@@ -24,10 +24,15 @@ public class ProtectedApiServlet extends HttpServlet{
 		
 		//응답 정보를 json으로 가져갈 수 있도록 처리
 		response.setContentType("application/json; charset=utf-8");
-		
 		Map<String, String> map = new HashMap<>();
-		map.put("message", "보호된 데이터 접근 성공");
-		map.put("user", username);
+		
+		if(username == null) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			map.put("error", "로그인이 필요한 서비스입니다.");
+		}else {
+			map.put("message", "보호된 데이터 접근 성공");
+			map.put("user", username);
+		}
 		
 		response.getWriter().print(new Gson().toJson(map));
 	}

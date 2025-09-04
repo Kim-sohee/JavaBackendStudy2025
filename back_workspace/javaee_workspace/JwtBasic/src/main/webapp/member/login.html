@@ -7,10 +7,16 @@
 </head>
 <body>
 	<form id="form1">
-		<input type="text" placeholder="아이디 입력..." name="username">
-		<input type="password" placeholder="비밀번호 입력..." name="password">
-		<button type="button" id="bt_login">로그인</button>
-		<button type="button" id="bt_access">자원접근</button>
+		<div>
+			<input type="text" placeholder="아이디 입력..." name="username">
+		</div>
+		<div>
+			<input type="password" placeholder="비밀번호 입력..." name="password">
+		</div>
+		<div>
+			<button type="button" id="bt_login">로그인</button>
+			<button type="button" id="bt_access">자원접근</button>
+		</div>
 	</form>
 	
 	<script>
@@ -37,10 +43,28 @@
 				}
 			});
 			
-			$("#bt_access").click(()=>{
-				
 			});
-		});
+			//로그인에 성공한 경우, 서버에 다시 엑세스해보자
+			$("#bt_access").click(()=>{
+				const token = localStorage.getItem("accessToken");
+				alert("서버에 요청 시 지참할 토큰은 "+ token);
+				
+				//비동기 방식
+				$.ajax({
+					url:"/api/protected",
+					method:"get",
+					//JWT 토큰을 get, post던 상관없이 언제나 서버에 요청 시 지참해야 하므로, 헤더에 보유하여 요청을 시도해야 한다.
+					headers: {
+						"Authorization": "Bearer "+token
+					},
+					success: function(result){
+						console.log("API 접근 성공", result);
+					},
+					error: function(xhr){
+						console.log("API 접근 실패", xhr.responseText);
+					}
+				});
+			});
 	</script>
 </body>
 </html>
