@@ -1,11 +1,15 @@
 package util;
 
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 //JWT 토큰을 생성, 검증하는 객체
 public class MyJwtUtil {
@@ -71,5 +75,67 @@ public class MyJwtUtil {
 	
 	//클라이언트에게 새로운 토큰을 발급할 리프레시 토큰 생성 메서드
 	
+	
+	
+	/*JWT 검증
+	 * 1. 최종 서명 결과와 클라이언트의 JWT가 같은지
+	 * 2. JWT 유효시간이 만료되었는지*/
+	public static boolean validateToken(String token) {
+		boolean flag=true;
+		String[] parts = token.split("\\.");
+		
+		//배열의 수가 3이 아닌 경우는 검증할 필요조차 없는 올바르지 않은 JWT이다.
+		if(parts.length != 3) flag = false;
+		
+		String data = parts[0]+"."+parts[1];
+		String expectedSig = hmacSha256(data, SECRET);
+		
+		if(!expectedSig.equals(parts[2])) flag = false;
+		
+		String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+		
+		//exp: 뒤의 숫자만 남기고 나머지는 전부 지워버리자(즉, 시간만 추출)
+		//. 임이의 한 문자 또는 여러개들, d는 숫자, +는 패턴이 1회 이상 반복된느 경우(여러개의 숫자)
+		//패턴이 발견된 결과 즉 매칭 결과를 그룹 1에 저장한다.
+//		String expStr = payloadJson.replaceAll(".*\"exp\":(\\d+).*" ,"$1");
+//		System.out.println("추출한 유효기간은 "+expStr);
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			JsonNode node = objectMapper.readTree(payloadJson);
+			long exp = node.path("exp").asLong();	//밀리세컨드
+			System.out.println("파싱 후 추출한 유효시간은 "+exp);
+			
+			//현재 시간이 유효기간보다 크다면, 유효기간은 지난것임
+			long now = System.currentTimeMillis()/1000;
+			if(now > exp) flag = false;
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			flag = false;
+		}
+		
+		return flag;
+	}
+	
+	//JWT로부터 유저명 꺼내기(자주 있는 일이므로, 아예 메서드로 지원해놓자)
+	public static String getUsername(String token) {
+		String username = "";
+		String[] parts = token.split("\\.");
+		String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		try {
+			JsonNode node = objectMapper.readTree(payloadJson);
+			username = node.path("sub").asText();
+			System.out.println("유저 이름은? "+username);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return username;
+	}
 	
 }
