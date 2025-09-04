@@ -11,9 +11,9 @@
 - [x] JSP/Servlet
 - [x] Spring Framework
 - [x] Vue.js
-- [ ] Spring Boot (진행 중)
+- [x] Spring Boot
+- [ ] Spring Security (진행 중) 
 - [ ] Spring MSA 
-- [ ] Spring Security 
 - [ ] React.js 
 - [ ] Docker 
 
