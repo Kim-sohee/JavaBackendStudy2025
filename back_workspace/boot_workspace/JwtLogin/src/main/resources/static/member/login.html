@@ -54,20 +54,51 @@
 </div>
 
 <script>
+    /*
+    //동기방식
+    $("#bt_login").click(()=>{
+        $("form").attr({
+            action: "/member/login",
+            method: "post"
+        });
+        $("form").submit();
+    });
+    */
+
+
+    //비동기 방식
     $("#bt_login").click(()=>{
         $.ajax({
             url:"/member/login",
             method: "post",
             data: $("form").serialize(),
             success: function (data){
+                console.log(data.accessToken);
+
+                //AccessToken 꺼내서 보관해놓아야 함
+                localStorage.setItem("accessToken", data.accessToken);
+            },
+            error: function (xhr){
+                console.log(xhr.status, ", ", xhr.responseText);
+            }
+        });
+    });
+
+    $("#bt_access").click(()=>{
+        $.ajax({
+            url: "/member/mypage",
+            method: "get",
+            headers:{
+                "Authorization": "Bearer "+localStorage.getItem("accessToken")
+            },
+            success: function (data){
                 console.log(data);
             },
             error: function (xhr){
                 console.log(xhr);
             }
-        });
+        })
     });
-
 </script>
 
 </body>
