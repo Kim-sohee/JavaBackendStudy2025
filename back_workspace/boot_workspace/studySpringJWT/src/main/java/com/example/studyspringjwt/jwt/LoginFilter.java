@@ -1,9 +1,10 @@
 package com.example.studyspringjwt.jwt;
 
-import com.example.studyspringjwt.dto.CustomUserDetails;
+import com.example.studyspringjwt.entity.RefreshEntity;
+import com.example.studyspringjwt.model.user.RefreshRepository;
 import com.example.studyspringjwt.util.CookieUtil;
+import com.example.studyspringjwt.util.RefreshUtil;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,8 @@ import java.util.Iterator;
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+
+    private final RefreshRepository refreshRepository;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -59,6 +62,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         //2개의 토큰을 발급하기(Refresh/Access)
         String access = jwtUtil.createJwt("access", username, role, 600000L);
         String refresh = jwtUtil.createJwt("refresh", username, role, 86400000L);
+
+        //Refresh 토큰 저장
+        RefreshEntity entity = RefreshUtil.addRefreshEntity(username, refresh, 86400000L);
+        refreshRepository.save(entity);
 
         //응답 설정
         response.setHeader("access", access);       //access: localStorage
