@@ -1,7 +1,9 @@
 package com.example.studyspringjwt.jwt;
 
 import com.example.studyspringjwt.dto.CustomUserDetails;
+import com.example.studyspringjwt.util.CookieUtil;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -41,18 +43,28 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
         log.debug("successful Authentication");
 
-        //JWT 토큰 발급
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        String username = customUserDetails.getUsername();      //이름 얻어오기
+//        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+//        String username = customUserDetails.getUsername();      //이름 얻어오기
+
+        String  username = authentication.getName();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();  //role 얻어오기
 
-        String token = jwtUtil.createJwt(username, role, 60*60*10L);    //토큰 생성
+//        String token = jwtUtil.createJwt(username, role, 60*60*10L);    //토큰 생성
+//        response.addHeader("Authorization", "Bearer " + token);     //response에 담아서 응답하기
 
-        response.addHeader("Authorization", "Bearer " + token);     //response에 담아서 응답하기
+        //2개의 토큰을 발급하기(Refresh/Access)
+        String access = jwtUtil.createJwt("access", username, role, 600000L);
+        String refresh = jwtUtil.createJwt("refresh", username, role, 86400000L);
+
+        //응답 설정
+        response.setHeader("access", access);       //access: localStorage
+        response.addCookie(CookieUtil.createCookie("refresh", refresh));   //refresh: http only cookie
+        response.setStatus(HttpServletResponse.SC_OK);
+
     }
     //로그인 실패시 실행하는 메소드
     @Override
