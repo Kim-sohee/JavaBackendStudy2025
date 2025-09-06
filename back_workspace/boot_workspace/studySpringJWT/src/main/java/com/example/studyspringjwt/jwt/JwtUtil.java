@@ -24,6 +24,9 @@ public class JwtUtil {
     }
 
     //검증 진행
+    public String getCategory(String token){
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
+    }
     public String getUsername(String token) {   //JWT에서 username 값을 추출하는 메서드
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username", String.class);
     }
@@ -36,8 +39,9 @@ public class JwtUtil {
 
     //JWT 토큰 생성
     //username + role 정보를 담아서 JWT를 생성한다.
-    public String createJwt(String username, String role, Long expiredMs) {
+    public String createJwt(String category, String username, String role, Long expiredMs) {
         return Jwts.builder()
+                .claim("category", category)
                 .claim("username", username)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))

@@ -3,7 +3,8 @@ package com.example.studyspringjwt.config;
 import com.example.studyspringjwt.jwt.JwtFilter;
 import com.example.studyspringjwt.jwt.JwtUtil;
 import com.example.studyspringjwt.jwt.LoginFilter;
-import com.mysql.cj.log.Log;
+import com.example.studyspringjwt.jwt.CustomLogoutFilter;
+import com.example.studyspringjwt.model.user.RefreshRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -30,6 +32,9 @@ public class SecurityConfig {
 
     //JwtUtil - JWT 토큰 생성
     private final JwtUtil jwtUtil;
+
+    //refresh 저장소
+    private final RefreshRepository refreshRepository;
 
     //AuthenticationManager Bean 등록
     @Bean
@@ -79,12 +84,14 @@ public class SecurityConfig {
         http.authorizeHttpRequests((auth) -> auth
             .requestMatchers("/login", "/", "/join").permitAll()
             .requestMatchers("/admin").hasRole("ADMIN")
+            .requestMatchers("/reissue").permitAll()
             .anyRequest().authenticated());
 
         //필터 등록
-        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class);
 
         http.addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
+        http.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
 
         //세션 설정
         http.sessionManagement((session)->
