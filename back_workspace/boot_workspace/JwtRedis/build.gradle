@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.sinse'
 version = '0.0.1-SNAPSHOT'
-description = 'JwtLogin'
+description = 'JwtRedis'
 
 java {
     toolchain {
@@ -35,14 +35,15 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
+
+    //Redis Client(Lettuce import)
+    //Jedis: 원래 Jedis라는 클라이언트가 많이 사용되었으나, 동기방식, 연결을 쓰레드마다 관리하여 자원관리에 부담.
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+    //JWT
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
-    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
-    implementation("org.springframework.boot:spring-boot-starter-data-redis:3.5.4")
 }
 
 tasks.named('test') {
