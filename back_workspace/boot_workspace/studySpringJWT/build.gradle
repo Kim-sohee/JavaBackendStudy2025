@@ -43,6 +43,7 @@ dependencies {
     implementation("com.mysql:mysql-connector-j:8.0.33")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter
     implementation("org.springframework.boot:spring-boot-starter:3.5.4")
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.5.4'
 }
 
 tasks.named('test') {
