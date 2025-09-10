@@ -1,5 +1,6 @@
 package com.sinse.jwtredis.security;
 
+import com.sinse.jwtredis.filter.JwtAuthFilter;
 import com.sinse.jwtredis.model.member.MemberDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,10 +12,18 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.AuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    private final JwtAuthFilter jwtAuthFilter;
+
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+    }
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -49,9 +58,11 @@ public class SecurityConfig {
                 .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth->auth
                         //로그인 하지 않아도 접근 가능한 것
-                        .requestMatchers("/member/regist.html", "/member/regist", "/member/login.html","/member/login", "/member/refresh", "/member/logout").permitAll()
+                        .requestMatchers("/index.html", "/member/regist.html", "/member/regist", "/member/login.html","/member/login", "/member/refresh", "/member/logout").permitAll()
                         //접근 허용하지 않아야 할 경로(그밖에)
                         .anyRequest().authenticated())
+                //JWT 검증 필터를 스프링 시큐리티의 필터 체인 중 어느 부분에 관여해야 할 지 명시
+                .addFilterBefore(jwtAuthFilter, AuthenticationFilter.class)
                 .build();
     }
 }
