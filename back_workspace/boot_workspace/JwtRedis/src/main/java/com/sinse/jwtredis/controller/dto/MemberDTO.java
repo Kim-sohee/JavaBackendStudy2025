@@ -10,4 +10,5 @@ public class MemberDTO {
     private String name;
     private String email;
     private String code;
+    private String deviceId;    //유저가 사용중인 디바이스의 고유값(디바이스마다 다름)
 }
