@@ -12,9 +12,9 @@
 - [x] Spring Framework
 - [x] Vue.js
 - [x] Spring Boot
-- [ ] Spring Security (진행 중) 
-- [ ] Spring MSA 
-- [ ] React.js 
+- [x] Spring Security 
+- [ ] Spring MSA (진행 중) 
+- [ ] React.js (진행 중)
 - [ ] Docker 
 
 ### 📁 디렉토리 구조
