@@ -1,5 +1,6 @@
 package com.sinse.jwtredis.controller;
 
+import com.sinse.jwtredis.controller.dto.LogoutRequest;
 import com.sinse.jwtredis.controller.dto.MemberDTO;
 import com.sinse.jwtredis.controller.dto.TokenResponse;
 import com.sinse.jwtredis.domain.CustomUserDetails;
@@ -8,17 +9,21 @@ import com.sinse.jwtredis.model.member.MemberService;
 import com.sinse.jwtredis.model.member.RedisTokenService;
 import com.sinse.jwtredis.util.CookieUtil;
 import com.sinse.jwtredis.util.JwtUtil;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -95,8 +100,12 @@ public class MemberController {
         String accessToken = jwtUtil.createAccessToken(userDetails.getUsername(), userVersion, memberDTO.getDeviceId());
         String refreshToken = jwtUtil.createRefreshToken(userDetails.getUsername(), memberDTO.getDeviceId());
 
-        //refresh token을 보안 쿠키에 담기
         long rfTtlSec = refreshDays * (24*60*60);
+        //refresh 토큰의 경우, 서버에 저장해놓아야 추후 재발급 시 클라이언트가 전송한 쿠키에 들어있는 refreshToken과 비교가 가능하므로,
+        //redis에 저장하자.
+        redisTokenService.saveRefreshToken(userDetails.getUsername(), memberDTO.getDeviceId(), refreshToken, rfTtlSec);
+
+        //refresh token을 보안 쿠키에 담기
         CookieUtil.setRefreshCookie(response, refreshToken, (int)rfTtlSec);
 
         //엑세스 토큰의 유효시간
@@ -105,11 +114,110 @@ public class MemberController {
         return ResponseEntity.ok(new TokenResponse(accessToken, expSec));
     }
 
+    //토큰 재발급 요청 처리
+    /*@CookieValue(value="쿠키명", required=true/false) 자료형 변수명
+    *  -> 클라이언트의 요청 헤더에 포함된 Cookie 항목에서 특정 쿠키 이름을 찾아 컨트롤러 메서드의 파라미터에 주입
+    * required = true : 해당 쿠키가 없으면 400 에러 (Bad Request)
+    * required = false : 쿠키가 없어도 예외가 발생하지 않음, 그냥 null이 들어옴
+    * */
+    @PostMapping("/member/refresh")
+    public ResponseEntity<?> refresh(@CookieValue(value="Refresh", required = false) String refreshToken
+            , @RequestBody MemberDTO memberDTO, HttpServletResponse response) {
+        String deviceId = memberDTO.getDeviceId();
+
+        try{
+            //쿠키가 없다면 401 에러
+            if(!StringUtils.hasText(refreshToken)){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(Map.of("error", "no refresh token cookie"));
+            }
+
+            //필수는 아니지만, 한명의 유저가 보유한 여러 디바이스와 관련 인증처리할 경우 deviceId
+
+            //재발급에 앞서, RefreshToken이 유효한지 알아보기
+            Jws<Claims> jws = jwtUtil.parseToken(refreshToken);
+            Claims claims = jws.getBody();
+            String userId = claims.getSubject();
+
+            //redis와 일치여부를 판단
+            if(!redisTokenService.matchesRefreshToken(userId, deviceId, refreshToken)){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "refresh token not matched"));
+            }
+
+            //redis에서 관리중인 userVersion을 가져오기
+            //현재 사용자 버전 가져오기
+            int version = redisTokenService.currentUserVersion(userId);
+
+            //보안상 안전성을 위해 AccessToken만 발급하지 말고, RefreshToken 조차 갱신하는 게 좋다.
+            String newAccess = jwtUtil.createAccessToken(userId, version, deviceId);
+            String newRefresh = jwtUtil.createRefreshToken(userId, deviceId);
+
+            //RefreshToken 새롭게 발급되었으므로 기존 redis가 보관하고 있넌 refreshToken을 제거하고 새롭게 다시 넣기
+            redisTokenService.deleteRefreshToken(userId, deviceId);
+
+            long ttlSec = refreshDays * (24*60*60);
+            redisTokenService.saveRefreshToken(userId, deviceId, newRefresh, ttlSec);
+
+            //보안 처리된 쿠키에 새 refreshToken 담기
+            CookieUtil.setRefreshCookie(response, newRefresh, (int)ttlSec);
+
+            //원래 목적이었던 AccessToken을 응답 body에 넣기
+            return ResponseEntity.ok(Map.of("accessToken", newAccess, "refreshToken", newRefresh));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "refresh token Failed!"));
+        }
+    }
+
     //회원 정보 요청 처리
     @GetMapping("/member/myinfo")
     public ResponseEntity<?> getMyInfo() {
 
         return ResponseEntity.ok("당신은 인증받은 회원입니다.");
     }
+
+    //로그아웃 처리
+    /*1) 로그아웃을 요청하는 클라이언트의 AccessToken을 블랙리스트로 등록
+     *2) 회원으로서 서비스 이용을 중단 요청이기에 Redis에 등록된 RefreshToken 삭제
+     *3) 쿠키에 들어있는 RefreshToken 삭제 */
+    @PostMapping("/member/logout")
+    public ResponseEntity<?> logout(@RequestBody LogoutRequest request, HttpServletResponse response) {
+        try {
+            // 1) 요청의 유효성을 판단하여, 무조건 로그아웃에 대한 요청 처리 결과는 동일한 '성공'으로 응답
+            if (request == null || !StringUtils.hasText(request.getAccessToken())
+                    || !StringUtils.hasText(request.getDeviceId())) {
+                return ResponseEntity.ok(Map.of("result", "로그아웃 성공"));
+            }
+
+            //클라이언트가 전송한 AccessToken 에서 정보 꺼내기
+            Jws<Claims> jws = jwtUtil.parseToken(request.getAccessToken());
+            Claims claims = jws.getBody();
+
+            String userId = claims.getSubject();
+            String jti = claims.getId();
+
+            //현재 시간과 JWT가 보유한 유효기간을 구해서 남은 TTL을 구하자
+            long exp = claims.getExpiration().toInstant().getEpochSecond();
+            long now = Instant.now().getEpochSecond();
+            //결과가 양수라면 - 만료까지 남은 초
+            //결과가 음수라면 - 남은 시간이 없음, 만료되었음
+            long ttl = Math.max(0, exp-now);      //남은 만료 초
+
+            //redis에 블랙리스트에 등록
+            redisTokenService.registBlackList(jti, ttl);    //redis에서 SET bl:access:<jti>  <time>
+
+           //redis에서 refreshToken 삭제
+            redisTokenService.deleteRefreshToken(userId, request.getDeviceId());
+
+            //쿠키 삭제
+            CookieUtil.clearRefreshCookie(response);
+
+            return ResponseEntity.ok(Map.of("result", "로그아웃 성공"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(Map.of("result", "로그아웃 성공(token invalid)"));
+        }
+    }
+
 
 }

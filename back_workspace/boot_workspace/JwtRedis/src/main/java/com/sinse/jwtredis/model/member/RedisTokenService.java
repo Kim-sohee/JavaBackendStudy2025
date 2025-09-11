@@ -63,4 +63,29 @@ public class RedisTokenService {
 
         return exists;
     }
+
+    //refresh 토큰 저장하기
+    //SETEX rt:scott:browser 지속시간 "값"
+    public void saveRefreshToken(String userId, String deviceId, String refreshToken, long ttlSeconds){
+        redis.opsForValue().set("rt:"+userId+":"+deviceId, refreshToken, Duration.ofSeconds(ttlSeconds));
+        //참고로, 추후 이 사용자의 디바이스를 목록으로 만들어 놓으려면
+        //SADD rtkeys:scott browser,  SADD rtkeys:scott pc,  SADD rtkeys:scott smartphone
+        //redis.opsForSet().add("rtkeys:"+userId, deviceId);
+    }
+
+    //RefreshToken 일치 여부 확인 메서드 정의
+    //Get rt:<userId>:<deviceId>
+    public boolean matchesRefreshToken(String userId, String deviceId, String refreshToken){
+        //기존 redis에 저장해놓은 refreshToken에 대한 키 갖고 오기
+        String storedValue = redis.opsForValue().get("rt:"+userId+":"+deviceId);
+
+        //저장된 키와 refreshToken과 비교
+        return storedValue != null && storedValue.equals(refreshToken);
+    }
+
+    //특정 refreshToken 지우기
+    //키만 있다면, 언제든 지울 수 있다. key형식 rt:<userId>:<deviceId>
+    public void deleteRefreshToken(String userId, String deviceId){
+        redis.delete("rt:"+userId+":"+deviceId);
+    }
 }
