@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { getProducts } from "../../utils/ProductApi";
 
 export default function ProductList(){
-    const [productList, setProductList] = useState([1,1,1,1,1]);
+    const [productList, setProductList] = useState([]);
 
     //서버에 요청하기
     const getProductList = async()=>{
@@ -60,7 +60,7 @@ export default function ProductList(){
                     <tr>
                         <td colSpan={5}>
                             <button type="button">상품등록</button>
-                            <button type="button" onClick={getProductList}>상품목록</button>
+                            <button type="button" onClick={()=>{getProductList();}}>상품목록</button>
                         </td>
                     </tr>
                   </tbody>

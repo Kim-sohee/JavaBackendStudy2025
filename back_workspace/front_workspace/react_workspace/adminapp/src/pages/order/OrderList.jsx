@@ -60,7 +60,7 @@ export default function OrderList(){
                     <tr>
                         <td colSpan={5}>
                             <button type="button">주문등록</button>
-                            <button type="button" onClick={getOrderList}>주문목록</button>
+                            <button type="button" onClick={()=>{getOrderList();}}>주문목록</button>
                         </td>
                     </tr>
                   </tbody>
