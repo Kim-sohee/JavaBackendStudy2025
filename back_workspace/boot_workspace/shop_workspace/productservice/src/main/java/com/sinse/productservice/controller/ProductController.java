@@ -12,7 +12,7 @@ public class ProductController {
 
     @GetMapping("/products")
     public ResponseEntity<?> products() {
-        return ResponseEntity.ok(Map.of("result","상품목록"));
+        return ResponseEntity.ok(Map.of("data", List.of("노트북", "스마트폰", "태블릿")));
     }
 
 }

@@ -1,5 +1,14 @@
+import {Link} from 'react-router-dom'
+import React, {useState} from 'react'
+
 export default function Sidebar(){
-    return (
+  const [isOpen, setIsOpen] = useState();
+
+  const toggleMenu = (e)=>{
+    setIsOpen(!isOpen);
+  };
+
+  return (
   <aside className="main-sidebar sidebar-dark-primary elevation-4">
     {/* <!-- Brand Logo --> */}
     <a href="index3.html" className="brand-link">
@@ -36,36 +45,80 @@ export default function Sidebar(){
         <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           {/* <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library --> */}
-          <li className="nav-item menu-open">
-            <a href="#" className="nav-link active">
+          {/* 상품관련 */}
+          <li className={`nav-item ${isOpen ? 'menu-open' : ''}`}>
+            <Link to="#" className="nav-link active" onClick={toggleMenu}>
               <i className="nav-icon fas fa-tachometer-alt"></i>
               <p>
-                Dashboard
+                상품관리
                 <i className="right fas fa-angle-left"></i>
               </p>
-            </a>
+            </Link>
             <ul className="nav nav-treeview">
               <li className="nav-item">
-                <a href="./index.html" className="nav-link active">
+                <Link to="/product/list" className="nav-link active">
                   <i className="far fa-circle nav-icon"></i>
-                  <p>Dashboard v1</p>
-                </a>
+                  <p>상품목록</p>
+                </Link>
               </li>
               <li className="nav-item">
-                <a href="./index2.html" className="nav-link">
+                <Link to="/product/registform" className="nav-link">
                   <i className="far fa-circle nav-icon"></i>
-                  <p>Dashboard v2</p>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="./index3.html" className="nav-link">
-                  <i className="far fa-circle nav-icon"></i>
-                  <p>Dashboard v3</p>
-                </a>
+                  <p>상품등록</p>
+                </Link>
               </li>
             </ul>
           </li>
           
+          {/* 주문관련 */}
+          <li className={`nav-item ${isOpen ? 'menu-open' : ''}`}>
+            <Link to="#" className="nav-link" onClick={toggleMenu}>
+              <i className="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                주문관리
+                <i className="right fas fa-angle-left"></i>
+              </p>
+            </Link>
+            <ul className="nav nav-treeview">
+              <li className="nav-item">
+                <Link to="/order/list" className="nav-link">
+                  <i className="far fa-circle nav-icon"></i>
+                  <p>주문목록</p>
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/order/registform" className="nav-link">
+                  <i className="far fa-circle nav-icon"></i>
+                  <p>주문등록</p>
+                </Link>
+              </li>
+            </ul>
+          </li>
+
+          {/* 회원관련 */}
+          <li className={`nav-item ${isOpen ? 'menu-open' : ''}`}>
+            <Link to="#" className="nav-link" onClick={toggleMenu}>
+              <i className="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                회원관리
+                <i className="right fas fa-angle-left"></i>
+              </p>
+            </Link>
+            <ul className="nav nav-treeview">
+              <li className="nav-item">
+                <Link to="/product/list" className="nav-link">
+                  <i className="far fa-circle nav-icon"></i>
+                  <p>회원목록</p>
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/product/registform" className="nav-link">
+                  <i className="far fa-circle nav-icon"></i>
+                  <p>회원등록</p>
+                </Link>
+              </li>
+            </ul>
+          </li>
         </ul>
       </nav>
       {/* <!-- /.sidebar-menu --> */}
