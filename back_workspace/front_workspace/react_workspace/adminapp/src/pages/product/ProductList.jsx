@@ -9,7 +9,7 @@ export default function ProductList(){
         console.log("상품 목록 요청할거임");
         const response = await getProducts(); //response.data가 json임
         console.log("서버에서 받아온 결과 response ", response);
-        setProductList(response.data);
+        setProductList(response.data.data);
     }
 
     useEffect(()=>{
