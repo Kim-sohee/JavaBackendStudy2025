@@ -35,6 +35,9 @@ dependencies {
     //Eureka 클라이언트로 등록
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
 }
 
 ext {

@@ -7,7 +7,9 @@ const URL = "http://localhost:7777/products";
 export const getProducts = ()=>axios.get(URL);
 
 //상품등록
-export const registProduct = (data)=>axios.post(URL, data);
+export const registProduct = (data)=>axios.post(URL, data, {
+    headers:{"Content-Type": "multipart/form-data"}
+});
 
 //상품 한건
 export const getProduct = (productId)=>axios.get(`${URL}/${productId}`);

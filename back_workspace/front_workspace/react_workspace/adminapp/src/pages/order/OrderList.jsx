@@ -2,14 +2,14 @@ import { useEffect, useState } from "react"
 import { getOrders } from "../../utils/OrderApi";
 
 export default function OrderList(){
-    const [orderList, setOrderList] = useState([1,1,1,1,1]);
+    const [orderList, setOrderList] = useState([]);
 
     //서버에 요청하기
     const getOrderList = async()=>{
         console.log("주문 목록 요청할거임");
         const response = await getOrders(); //response.data가 json임
         console.log("서버에서 받아온 결과 response ", response);
-        setOrderList(response.data);
+        setOrderList(response.data.products);
     }
 
     useEffect(()=>{
