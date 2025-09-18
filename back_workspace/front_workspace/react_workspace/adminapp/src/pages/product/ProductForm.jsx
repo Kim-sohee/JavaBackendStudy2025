@@ -61,12 +61,18 @@ export default function ProductForm(){
         //바이너리 파일 추가(배열의 수만큼 반복하면서 sendData에 넣기)
         files.forEach((file)=>sendData.append("files",file));
 
-        registProduct(sendData);
+        registProduct(sendData)
+        .then(res=>{        //서버로부터 응답 정보가 올 경우, 응답 정보 출력하기
+            console.log("서버로부터 응답받은 정보는 ", res);
+        })
+        .catch(err=>{
+            console.log("에러발생", err);
+        });
     }
 
     const handleInput=(e)=>{
         //[이벤트 발생 주체] : 그 주체의 값
-        console.log(e);
+        // console.log(e);
         setFormData({...formData, [e.target.name]: e.target.value});
     }
 
