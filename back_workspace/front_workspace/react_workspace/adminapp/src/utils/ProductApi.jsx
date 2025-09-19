@@ -1,7 +1,7 @@
 import axios from "axios"
 
 //상품관련 공통 URL
-const URL = "http://localhost:7777/products";
+const URL = "http://localhost:7777/productapp/products";
 
 //상품목록
 export const getProducts = ()=>axios.get(URL);
