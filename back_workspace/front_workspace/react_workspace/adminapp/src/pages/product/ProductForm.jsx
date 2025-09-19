@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { registProduct } from "../../utils/ProductApi";
+import { useNavigate } from "react-router-dom";
 
 export default function ProductForm(){
+    const navigate = useNavigate();     //location.href를 대신함
     const [files, setFiles]=useState([]);
     const [previews, setPreviews]=useState([]);
 
@@ -64,6 +66,8 @@ export default function ProductForm(){
         registProduct(sendData)
         .then(res=>{        //서버로부터 응답 정보가 올 경우, 응답 정보 출력하기
             console.log("서버로부터 응답받은 정보는 ", res);
+            alert("상품이 등록되었습니다");
+            navigate("/product/list");
         })
         .catch(err=>{
             console.log("에러발생", err);

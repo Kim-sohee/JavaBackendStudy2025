@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class ProductDTO {
-    private int prouctId;
+    private int productId;
     private String productName;
     private String brand;
     private int price;
@@ -15,5 +15,5 @@ public class ProductDTO {
     private String detail;
 
     private SubCategoryDTO subCategoryDTO;
-    private List<MultipartFile> files;
+    private List<ProductFileDTO> productFileList;
 }

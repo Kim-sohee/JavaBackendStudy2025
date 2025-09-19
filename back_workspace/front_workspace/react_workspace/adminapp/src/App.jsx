@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import ProductList from './pages/product/ProductList'
 import ProductForm from './pages/product/ProductForm'
+import ProductDetail from './pages/product/ProductDetail'
 
 import OrderList from './pages/order/OrderList'
 
@@ -25,6 +26,7 @@ function App() {
               {/* 상품관련 */}
               <Route path="product/list" element={<ProductList/>}/>
               <Route path="product/registform" element={<ProductForm/>}/>
+              <Route path="product/detail/:productId" element={<ProductDetail/>}/>
 
               {/* 주문관련 */}
               <Route path="order/list" element={<OrderList/>}/>
