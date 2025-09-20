@@ -23,7 +23,8 @@
 📦 back_workspace  
 ├── 📁 boot_workspace        # Spring Boot 관련 예제 코드  
 ├── 📁 java_workspace        # Java 기초 문법 관련 예제 코드  
-├── 📁 javaee_workspace      # Java EE 및 Spring Framework 관련 예제 코드  
+├── 📁 javaee_workspace      # Java EE 및 Spring Framework 관련 예제 코드
+├── 📁 front_workspace       # Vue.js 및 React.js 관련 예제 코드  
 
 📁 html_workspace            # 기본 HTML/CSS 문법 예제 코드  
 📁 js_workspace              # HTML/CSS/JavaScript 응용 예제  
