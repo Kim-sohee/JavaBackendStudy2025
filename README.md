@@ -13,9 +13,9 @@
 - [x] Vue.js
 - [x] Spring Boot
 - [x] Spring Security 
-- [ ] Spring MSA (진행 중) 
-- [ ] React.js (진행 중)
-- [ ] Docker 
+- [x] Spring MSA
+- [x] React.js
+- [x] Docker 
 
 ### 📁 디렉토리 구조
 
@@ -33,9 +33,15 @@
 
 ### ✅ 사용 기술 스택
 - 언어: Java, JavaScript, SQL
-- 프레임워크: Spring, Spring Boot, JSP, Vue.js, React.js
-- 데이터베이스: MySQL
+- 프레임워크: Spring Framework, Spring Boot, JSP, Vue.js, React.js
+- 데이터베이스 / ORM: MySQL, Jpa, Hibernate, Mybatis
 - 도구: Git, Docker
+
+### 🔧 환경 설정
+- **Java**: 버전 8 이상 (Java 21은 Spring Boot 프로젝트에만 해당)
+- **Node.js**: Vue.js, React.js 프로젝트 실행을 위한 Node.js 14 이상
+- **Maven/Gradle**: Spring Boot 프로젝트는 Maven을 사용하여 빌드 및 실행
+- **MySQL**: 로컬에 MySQL 데이터베이스 설치 후 설정이 필요
 
 ### ▶️ 실행 방법
 - html/css/Js 관련 예제는 코드를 다운받아 live Server로 확인 가능
